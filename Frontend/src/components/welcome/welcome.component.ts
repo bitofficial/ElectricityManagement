@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RegistrationComponent } from '../customerRelated/registration/registration.component';
@@ -11,4 +11,13 @@ import { LoginComponent } from '../customerRelated/login/login.component';
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.css']
 })
-export class WelcomeComponent {}
+
+export class WelcomeComponent implements OnInit {
+  currentYear: number = new Date().getFullYear();
+
+  constructor() { }
+
+  ngOnInit(): void {
+    // placeholder for potential initialization (analytics, prefetch, etc.)
+  }
+}
