@@ -1,0 +1,20 @@
+.container {
+  max-width: 1100px;
+}
+
+table {
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  vertical-align: middle;
+}
+
+h5 {
+  font-weight: 600;
+}
+
+.btn {
+  padding: 8px 16px;
+}

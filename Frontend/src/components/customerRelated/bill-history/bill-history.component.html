@@ -1,34 +1,110 @@
-<div class="container mt-4">
-  <h2 class="text-center mb-4">Bill History</h2>
+<div class="bh-root container">
+  <h2 class="heading">Electricity Usage & Bill History</h2>
 
-  <div *ngIf="bills.length === 0" class="alert alert-info text-center">
-    No bill history found.
+  <!-- Authentication / Error -->
+  <div *ngIf="error && !loading" class="card error-card">
+    <p class="mb-2">{{ error }}</p>
+    <div class="actions">
+      <button class="btn btn-outline-secondary" (click)="goBack()">Back</button>
+      <button class="btn btn-primary" (click)="retry()">Retry</button>
+    </div>
   </div>
 
-  <table *ngIf="bills.length > 0" class="table table-bordered table-striped">
-    <thead class="table-dark">
-      <tr>
-        <th>Bill ID</th>
-        <th>Month</th>
-        <th>Amount (₹)</th>
-        <th>Due Date</th>
-        <th>Status</th>
-        <th>Payment Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let bill of bills">
-        <td>{{ bill.id }}</td>
-        <td>{{ bill.month }}</td>
-        <td>{{ bill.amount }}</td>
-        <td>{{ bill.dueDate | date: 'dd-MM-yyyy' }}</td>
-        <td>
-          <span [class]="bill.status === 'PAID' ? 'text-success' : 'text-danger'">
-            {{ bill.status }}
-          </span>
-        </td>
-        <td>{{ bill.paymentDate ? (bill.paymentDate | date: 'dd-MM-yyyy') : 'Not Paid' }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner" aria-hidden="true"></div>
+    <div>Loading bill history...</div>
+  </div>
+
+  <!-- Main content -->
+  <div *ngIf="!loading && !error" class="card content-card">
+    <!-- Controls: date range and filters -->
+    <div class="controls d-flex flex-wrap gap-2 align-items-end">
+      <div class="control">
+        <label class="form-label small">From</label>
+        <input type="date" class="form-control" [(ngModel)]="fromDate" (change)="onFilterChange()" />
+      </div>
+
+      <div class="control">
+        <label class="form-label small">To</label>
+        <input type="date" class="form-control" [(ngModel)]="toDate" (change)="onFilterChange()" />
+      </div>
+
+      <div class="control">
+        <label class="form-label small">Payment Status</label>
+        <select class="form-select" [(ngModel)]="statusFilter" (change)="onFilterChange()">
+          <option value="ALL">All</option>
+          <option value="PAID">Paid</option>
+          <option value="UNPAID">Unpaid</option>
+          <option value="PARTIAL">Partial</option>
+        </select>
+      </div>
+
+      <div class="control ms-auto">
+        <label class="form-label small">Visible Total</label>
+        <div class="visible-total">₹ {{ formatCurrency(visibleTotal) }}</div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive mt-3">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Consumer</th>
+            <th (click)="toggleSort('billDate')" class="sortable">
+              Bill Date
+              <small *ngIf="sortColumn === 'billDate'">({{ sortDirection }})</small>
+            </th>
+            <th>Billing Period</th>
+            <th (click)="toggleSort('dueDate')" class="sortable">
+              Due Date
+              <small *ngIf="sortColumn === 'dueDate'">({{ sortDirection }})</small>
+            </th>
+            <th (click)="toggleSort('billAmount')" class="text-end sortable">
+              Bill Amount
+              <small *ngIf="sortColumn === 'billAmount'">({{ sortDirection }})</small>
+            </th>
+            <th>Payment Status</th>
+            <th>Payment Date</th>
+            <th>Mode of Payment</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let b of filtered">
+            <td>{{ b.consumerNumber }}</td>
+            <td>{{ b.billDate }}</td>
+            <td>{{ b.billingPeriod }}</td>
+            <td>{{ b.dueDate }}</td>
+            <td class="text-end">₹ {{ formatCurrency(b.billAmount) }}</td>
+            <td>
+              <span class="status" [ngClass]="{
+                'paid': b.paymentStatus === 'PAID',
+                'unpaid': b.paymentStatus === 'UNPAID',
+                'partial': b.paymentStatus === 'PARTIAL'
+              }">{{ b.paymentStatus }}</span>
+            </td>
+            <td>{{ b.paymentDate || '-' }}</td>
+            <td>{{ b.modeOfPayment || '-' }}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary" (click)="viewOrDownload(b)">
+                View / Download
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="!filtered || filtered.length === 0">
+            <td colspan="9" class="text-center p-4">
+              No billing records found for the selected range / filters.
+              <div class="mt-2">
+                <button class="btn btn-sm btn-outline-secondary" (click)="loadBills()">Reset & Refresh</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

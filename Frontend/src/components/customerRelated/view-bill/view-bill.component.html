@@ -1,37 +1,96 @@
 <div class="container mt-4">
-  <h2 class="text-center mb-4">View Your Bill</h2>
+  <h2 class="text-center mb-4">View / Pay Bills</h2>
 
-  <form (ngSubmit)="getBill()" #billForm="ngForm" class="card p-4 shadow-sm">
-    <div class="form-group mb-3">
-      <label for="customerId">Customer ID:</label>
-      <input
-        type="text"
-        id="customerId"
-        class="form-control"
-        name="customerId"
-        [(ngModel)]="customerId"
-        placeholder="Enter your Customer ID"
-        required
-      />
+  <!-- Search Form -->
+  <form (ngSubmit)="getBills()" #billForm="ngForm" class="card p-4 shadow-sm">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-9">
+        <label for="customerId" class="form-label">Bill Number</label>
+        <input
+          type="text"
+          id="customerId"
+          class="form-control"
+          name="customerId"
+          [(ngModel)]="customerId"
+          placeholder="Enter your Bill Number"
+          required
+        />
+      </div>
+
+      <div class="col-md-3 d-grid">
+        <button class="btn btn-primary" [disabled]="!billForm.form.valid">View Bills</button>
+      </div>
     </div>
-
-    <button class="btn btn-primary w-100" [disabled]="!billForm.form.valid">
-      View Bill
-    </button>
   </form>
 
-  <div *ngIf="bill" class="card mt-4 shadow-sm p-3">
-    <h4>Bill Details</h4>
-    <hr />
-    <p><strong>Customer ID:</strong> {{ bill.customerId }}</p>
-    <p><strong>Name:</strong> {{ bill.customerName }}</p>
-    <p><strong>Month:</strong> {{ bill.month }}</p>
-    <p><strong>Units Consumed:</strong> {{ bill.units }}</p>
-    <p><strong>Amount:</strong> ₹{{ bill.amount }}</p>
-    <p><strong>Status:</strong> {{ bill.status }}</p>
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger mt-4 text-center">
+    {{ errorMessage }}
   </div>
 
-  <div *ngIf="errorMessage" class="alert alert-danger mt-4">
-    {{ errorMessage }}
+  <!-- Bill Table -->
+  <div *ngIf="bills && bills.length > 0" class="card mt-4 shadow-sm p-3">
+    <h4 class="mb-3">Bill Details</h4>
+
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+          <tr class="text-center">
+            <th>Select</th>
+            <th>Consumer No</th>
+            <th>Bill Number</th>
+            <th>Payment Status</th>
+            <th>Connection Type</th>
+            <th>Connection Status</th>
+            <th>Mobile Number</th>
+            <th>Bill Period</th>
+            <th>Bill Date</th>
+            <th>Due Date</th>
+            <th>Disconnection Date</th>
+            <th>Due Amount (₹)</th>
+            <th>Payable Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let bill of bills" class="text-center">
+            <td>
+              <input type="checkbox" [(ngModel)]="bill.selected" (change)="updateTotal()" />
+            </td>
+            <td>{{ bill.consumerNo }}</td>
+            <td>{{ bill.billNumber }}</td>
+            <td>
+              <span [ngClass]="bill.paymentStatus === 'Paid' ? 'text-success' : 'text-danger'">
+                {{ bill.paymentStatus }}
+              </span>
+            </td>
+            <td>{{ bill.connectionType }}</td>
+            <td>{{ bill.connectionStatus }}</td>
+            <td>{{ bill.mobileNumber }}</td>
+            <td>{{ bill.billPeriod }}</td>
+            <td>{{ bill.billDate | date }}</td>
+            <td>{{ bill.dueDate | date }}</td>
+            <td>{{ bill.disconnectionDate | date }}</td>
+            <td>{{ bill.dueAmount | number: '1.2-2' }}</td>
+            <td>
+              <input
+                type="number"
+                class="form-control text-center"
+                [(ngModel)]="bill.payableAmount"
+                [disabled]="!bill.selected"
+                (input)="updateTotal()"
+                min="0"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <h5>Total Amount Payable: ₹{{ totalAmount | number: '1.2-2' }}</h5>
+      <button class="btn btn-success" [disabled]="totalAmount <= 0" (click)="proceedToPay()">
+        Proceed to Pay
+      </button>
+    </div>
   </div>
 </div>

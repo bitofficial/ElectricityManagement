@@ -1,0 +1,59 @@
+.vbs-root {
+  margin-top: 18px;
+  max-width: 980px;
+  padding: 0 12px;
+}
+
+.title {
+  margin-bottom: 12px;
+  font-weight: 600;
+  font-size: 1.4rem;
+}
+
+.card {
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  background: #fff;
+}
+
+/* Loading */
+.loading-area {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 22px;
+}
+.spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 3px solid rgba(0,0,0,0.08);
+  border-top-color: rgba(0,0,0,0.45);
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Error message */
+.error-area { color: #6a1b1b; background: #fff6f6; border: 1px solid #f5c2c2; padding: 16px; }
+.error-msg { margin: 0 0 10px 0; font-weight: 500; }
+
+/* Table styling tweaks */
+.table td, .table th { vertical-align: middle; }
+
+/* Summary */
+.summary-row { margin-top: 14px; gap: 12px; padding-top: 12px; border-top: 1px solid #eef2f5; }
+.payment-options .option { margin-right: 12px; font-size: 0.95rem; display:flex; align-items:center; gap:6px; }
+.total-label { font-size: 0.85rem; color: #666; }
+.total-amount { font-size: 1.15rem; font-weight: 700; margin-top: 4px; }
+
+/* Buttons */
+.actions-row { margin-top: 10px; }
+.btn-lg { padding: 10px 20px; border-radius: 8px; }
+
+/* Responsive adjustments */
+@media (max-width: 720px) {
+  .summary-row { flex-direction: column; align-items: stretch; }
+  .totals { margin-top: 10px; text-align: left; }
+  .payment-options .option { display:block; }
+}
