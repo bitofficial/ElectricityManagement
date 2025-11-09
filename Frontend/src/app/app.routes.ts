@@ -23,7 +23,7 @@ import { AdminComplaintsComponent } from '../components/adminRelated/admin-compl
 import { AdminViewBillComponent } from '../components/adminRelated/admin-view-bill/admin-view-bill.component';
 
 //sme
-import { ListSmeComplaintsComponent } from '../components/smeRelated/list-sme-complaints/list-sme-complaints.component';
+import { ListSmeComplaintComponent } from '../components/smeRelated/list-sme-complaints/list-sme-complaints.component';
 import { ResolveComplaintComponent } from '../components/smeRelated/resolve-complaint/resolve-complaint.component';
 import { SearchComplaintComponent } from '../components/smeRelated/search-complaint/search-complaint.component';
 
@@ -55,7 +55,7 @@ export const routes: Routes = [
   { path: 'admin/complaints', component: AdminComplaintsComponent },
 
   // 🧰 SME Routes
-  { path: 'sme/complaints', component: ListSmeComplaintsComponent },
+  { path: 'sme/complaints', component: ListSmeComplaintComponent },
   { path: 'sme/resolve-complaint', component: ResolveComplaintComponent },
   { path: 'sme/search-complaint', component: SearchComplaintComponent },
 

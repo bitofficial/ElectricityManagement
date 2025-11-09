@@ -1,1 +1,45 @@
-<p>list-sme-complaints works!</p>
+<div class="container mt-4">
+  <h2 class="text-center mb-3">SME Complaint List</h2>
+
+  <div *ngIf="errorMessage" class="alert alert-danger text-center">
+    {{ errorMessage }}
+  </div>
+
+  <table class="table table-bordered table-hover shadow-sm" *ngIf="complaints.length > 0; else noComplaints">
+    <thead class="table-dark">
+      <tr>
+        <th>Complaint ID</th>
+        <th>Customer ID</th>
+        <th>Issue</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Date Raised</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let complaint of complaints">
+        <td>{{ complaint.complaintId }}</td>
+        <td>{{ complaint.customerId }}</td>
+        <td>{{ complaint.issue }}</td>
+        <td>{{ complaint.description }}</td>
+        <td>
+          <span 
+            class="badge"
+            [ngClass]="{
+              'bg-success': complaint.status === 'Resolved',
+              'bg-warning': complaint.status === 'Pending',
+              'bg-danger': complaint.status === 'Rejected'
+            }"
+          >
+            {{ complaint.status }}
+          </span>
+        </td>
+        <td>{{ complaint.date | date:'mediumDate' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #noComplaints>
+    <p class="text-center text-muted mt-3">No complaints found.</p>
+  </ng-template>
+</div>

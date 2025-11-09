@@ -1,1 +1,67 @@
-<p>admin-view-bill works!</p>
+
+<div class="container mt-4">
+  <h2 class="text-center mb-4">All Bills</h2>
+
+  <!-- Search and Filter Bar -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <input
+      type="text"
+      class="form-control w-50"
+      placeholder="Search by Customer ID or Month..."
+      [(ngModel)]="searchText"
+    />
+
+    <select class="form-select w-25 ms-3" [(ngModel)]="filterStatus">
+      <option value="">All Status</option>
+      <option value="Paid">Paid</option>
+      <option value="Unpaid">Unpaid</option>
+    </select>
+
+    <button class="btn btn-secondary ms-3" (click)="loadBills()">Refresh</button>
+  </div>
+
+  <!-- Bills Table -->
+  <div class="table-responsive card shadow-sm">
+    <table class="table table-hover table-striped">
+      <thead class="table-dark">
+        <tr>
+          <th>Bill ID</th>
+          <th>Customer ID</th>
+          <th>Month</th>
+          <th>Units</th>
+          <th>Amount (₹)</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let bill of filteredBills()">
+          <td>{{ bill.billId }}</td>
+          <td>{{ bill.customerId }}</td>
+          <td>{{ bill.month }}</td>
+          <td>{{ bill.units }}</td>
+          <td>{{ bill.amount }}</td>
+          <td>
+            <span
+              class="badge"
+              [ngClass]="{
+                'bg-success': bill.status === 'Paid',
+                'bg-warning': bill.status === 'Unpaid'
+              }"
+            >
+              {{ bill.status }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="bills.length === 0" class="text-center mt-4 text-muted">
+    No bills found.
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mt-4">
+    {{ errorMessage }}
+  </div>
+</div>

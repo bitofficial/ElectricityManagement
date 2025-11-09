@@ -1,1 +1,18 @@
-<p>home works!</p>
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Welcome to Smart Billing Portal</h2>
+
+  <div class="row">
+    <div class="col-md-4 mb-4" *ngFor="let feature of features">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <i [class]="feature.icon + ' fs-1 text-primary mb-3'"></i>
+          <h5 class="card-title">{{ feature.title }}</h5>
+          <p class="card-text text-muted">{{ feature.description }}</p>
+          <a [href]="feature.route" class="btn btn-outline-primary">
+            Go
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

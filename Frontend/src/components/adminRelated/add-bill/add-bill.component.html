@@ -1,1 +1,88 @@
-<p>add-bill works!</p>
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Add New Bill</h2>
+
+  <form (ngSubmit)="addBill()" #billForm="ngForm" class="card p-4 shadow-sm">
+    <!-- Customer ID -->
+    <div class="form-group mb-3">
+      <label for="customerId">Customer ID:</label>
+      <input
+        type="text"
+        id="customerId"
+        name="customerId"
+        class="form-control"
+        [(ngModel)]="bill.customerId"
+        placeholder="Enter Customer ID"
+        required
+      />
+    </div>
+
+    <!-- Month -->
+    <div class="form-group mb-3">
+      <label for="month">Billing Month:</label>
+      <input
+        type="month"
+        id="month"
+        name="month"
+        class="form-control"
+        [(ngModel)]="bill.month"
+        required
+      />
+    </div>
+
+    <!-- Units -->
+    <div class="form-group mb-3">
+      <label for="units">Units Consumed:</label>
+      <input
+        type="number"
+        id="units"
+        name="units"
+        class="form-control"
+        [(ngModel)]="bill.units"
+        placeholder="Enter number of units"
+        required
+      />
+    </div>
+
+    <!-- Amount -->
+    <div class="form-group mb-3">
+      <label for="amount">Amount (₹):</label>
+      <input
+        type="number"
+        id="amount"
+        name="amount"
+        class="form-control"
+        [(ngModel)]="bill.amount"
+        placeholder="Enter total bill amount"
+        required
+      />
+    </div>
+
+    <!-- Status -->
+    <div class="form-group mb-3">
+      <label for="status">Status:</label>
+      <select
+        id="status"
+        name="status"
+        class="form-control"
+        [(ngModel)]="bill.status"
+        required
+      >
+        <option value="">-- Select Status --</option>
+        <option value="Unpaid">Unpaid</option>
+        <option value="Paid">Paid</option>
+      </select>
+    </div>
+
+    <button class="btn btn-primary w-100" [disabled]="!billForm.form.valid">
+      Add Bill
+    </button>
+  </form>
+
+  <div *ngIf="successMessage" class="alert alert-success mt-4">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mt-4">
+    {{ errorMessage }}
+  </div>
+</div>

@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
-import { LoginComponent } from '../customerRelated/login/login.component';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { RegistrationComponent } from '../customerRelated/registration/registration.component';
+import { LoginComponent } from '../customerRelated/login/login.component';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [LoginComponent,RegistrationComponent],
+  imports: [CommonModule, RouterModule,LoginComponent, RegistrationComponent],
   templateUrl: './welcome.component.html',
-  styleUrl: './welcome.component.css'
+  styleUrls: ['./welcome.component.css']
 })
-export class WelcomeComponent {
-
-}
+export class WelcomeComponent {}

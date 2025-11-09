@@ -1,1 +1,85 @@
 <p>resolve-complaint works!</p>
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Resolve Complaint</h2>
+
+  <!-- Search Form -->
+  <form (ngSubmit)="getComplaint()" #searchForm="ngForm" class="card p-4 shadow-sm mb-4">
+    <div class="form-group mb-3">
+      <label for="complaintId">Complaint ID:</label>
+      <input
+        type="text"
+        id="complaintId"
+        name="complaintId"
+        class="form-control"
+        placeholder="Enter Complaint ID"
+        [(ngModel)]="complaintId"
+        required
+      />
+    </div>
+    <button type="submit" class="btn btn-primary w-100" [disabled]="!searchForm.form.valid">
+      Search Complaint
+    </button>
+  </form>
+
+  <!-- Complaint Details -->
+  <div *ngIf="complaint" class="card shadow-sm p-4">
+    <h4>Complaint Details</h4>
+    <hr />
+    <p><strong>ID:</strong> {{ complaint.id }}</p>
+    <p><strong>Customer ID:</strong> {{ complaint.customerId }}</p>
+    <p><strong>Category:</strong> {{ complaint.category }}</p>
+    <p><strong>Details:</strong> {{ complaint.details }}</p>
+    <p><strong>Status:</strong> 
+      <span
+        class="badge"
+        [ngClass]="{
+          'bg-warning': complaint.status === 'Pending',
+          'bg-success': complaint.status === 'Resolved'
+        }"
+      >
+        {{ complaint.status }}
+      </span>
+    </p>
+
+    <!-- Resolution Form -->
+    <div class="mt-4">
+      <h5>Add Resolution</h5>
+      <form (ngSubmit)="resolveComplaint()" #resolveForm="ngForm">
+        <div class="form-group mb-3">
+          <label for="remarks">Remarks:</label>
+          <textarea
+            id="remarks"
+            name="remarks"
+            class="form-control"
+            rows="3"
+            [(ngModel)]="remarks"
+            placeholder="Enter remarks or action taken"
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="status">Update Status:</label>
+          <select
+            id="status"
+            name="status"
+            class="form-control"
+            [(ngModel)]="complaint.status"
+            required
+          >
+            <option value="Pending">Pending</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
+
+        <button class="btn btn-success w-100" [disabled]="!resolveForm.form.valid">
+          Update Complaint
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="successMessage" class="alert alert-success mt-4">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert alert-danger mt-4">{{ errorMessage }}</div>
+</div>

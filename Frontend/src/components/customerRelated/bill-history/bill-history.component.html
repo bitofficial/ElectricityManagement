@@ -1,1 +1,34 @@
-<p>bill-history works!</p>
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Bill History</h2>
+
+  <div *ngIf="bills.length === 0" class="alert alert-info text-center">
+    No bill history found.
+  </div>
+
+  <table *ngIf="bills.length > 0" class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>Bill ID</th>
+        <th>Month</th>
+        <th>Amount (₹)</th>
+        <th>Due Date</th>
+        <th>Status</th>
+        <th>Payment Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let bill of bills">
+        <td>{{ bill.id }}</td>
+        <td>{{ bill.month }}</td>
+        <td>{{ bill.amount }}</td>
+        <td>{{ bill.dueDate | date: 'dd-MM-yyyy' }}</td>
+        <td>
+          <span [class]="bill.status === 'PAID' ? 'text-success' : 'text-danger'">
+            {{ bill.status }}
+          </span>
+        </td>
+        <td>{{ bill.paymentDate ? (bill.paymentDate | date: 'dd-MM-yyyy') : 'Not Paid' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

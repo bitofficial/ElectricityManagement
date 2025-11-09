@@ -1,1 +1,129 @@
-<p>update-customers works!</p>
+<div class="container mt-4">
+  <h2 class="text-center mb-4">🔧 Update Customer Details</h2>
+
+  <!-- Search Customer -->
+  <div class="card shadow p-4 mb-4">
+    <form (ngSubmit)="fetchCustomer()" #searchForm="ngForm">
+      <div class="row align-items-end">
+        <div class="col-md-8 mb-3">
+          <label for="customerId" class="form-label">Enter Customer ID</label>
+          <input
+            type="text"
+            id="customerId"
+            class="form-control"
+            placeholder="e.g., CUST1001"
+            [(ngModel)]="searchId"
+            name="customerId"
+            required
+          />
+        </div>
+        <div class="col-md-4 mb-3 text-center">
+          <button type="submit" class="btn btn-primary w-100" [disabled]="!searchForm.form.valid">
+            Search
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Customer Details Form -->
+  <div *ngIf="customer" class="card shadow p-4">
+    <h5 class="mb-3">Customer Information</h5>
+    <form (ngSubmit)="updateCustomer()" #updateForm="ngForm">
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="name" class="form-label">Full Name</label>
+          <input
+            type="text"
+            id="name"
+            class="form-control"
+            [(ngModel)]="customer.name"
+            name="name"
+            required
+          />
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input
+            type="email"
+            id="email"
+            class="form-control"
+            [(ngModel)]="customer.email"
+            name="email"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="phone" class="form-label">Phone Number</label>
+          <input
+            type="text"
+            id="phone"
+            class="form-control"
+            [(ngModel)]="customer.phone"
+            name="phone"
+            maxlength="10"
+            required
+          />
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="address" class="form-label">Address</label>
+          <input
+            type="text"
+            id="address"
+            class="form-control"
+            [(ngModel)]="customer.address"
+            name="address"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="connectionType" class="form-label">Connection Type</label>
+          <select
+            id="connectionType"
+            class="form-control"
+            [(ngModel)]="customer.connectionType"
+            name="connectionType"
+          >
+            <option value="domestic">Domestic</option>
+            <option value="commercial">Commercial</option>
+          </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="status" class="form-label">Status</label>
+          <select
+            id="status"
+            class="form-control"
+            [(ngModel)]="customer.status"
+            name="status"
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="text-center mt-3">
+        <button type="submit" class="btn btn-success px-4" [disabled]="!updateForm.form.valid">
+          Update Customer
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Status Messages -->
+  <div *ngIf="successMessage" class="alert alert-success mt-3 text-center">
+    ✅ {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3 text-center">
+    ❌ {{ errorMessage }}
+  </div>
+</div>

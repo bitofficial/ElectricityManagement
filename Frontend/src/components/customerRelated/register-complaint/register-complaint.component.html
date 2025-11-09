@@ -1,1 +1,60 @@
-<p>register-complaint works!</p>
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Register Complaint</h2>
+
+  <form (ngSubmit)="registerComplaint()" #complaintForm="ngForm" class="card p-4 shadow-sm">
+    <div class="form-group mb-3">
+      <label for="customerId">Customer ID:</label>
+      <input
+        type="text"
+        id="customerId"
+        name="customerId"
+        class="form-control"
+        [(ngModel)]="complaint.customerId"
+        placeholder="Enter your Customer ID"
+        required
+      />
+    </div>
+
+    <div class="form-group mb-3">
+      <label for="category">Complaint Category:</label>
+      <select
+        id="category"
+        name="category"
+        class="form-control"
+        [(ngModel)]="complaint.category"
+        required
+      >
+        <option value="">-- Select Category --</option>
+        <option value="Billing Issue">Billing Issue</option>
+        <option value="Meter Fault">Meter Fault</option>
+        <option value="Power Cut">Power Cut</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <div class="form-group mb-3">
+      <label for="details">Complaint Details:</label>
+      <textarea
+        id="details"
+        name="details"
+        class="form-control"
+        rows="4"
+        [(ngModel)]="complaint.details"
+        placeholder="Describe your issue here"
+        required
+      ></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100" [disabled]="!complaintForm.form.valid">
+      Submit Complaint
+    </button>
+  </form>
+
+  <div *ngIf="successMessage" class="alert alert-success mt-4">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mt-4">
+    {{ errorMessage }}
+  </div>
+</div>

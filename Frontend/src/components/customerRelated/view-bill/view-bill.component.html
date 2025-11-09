@@ -1,1 +1,37 @@
-<p>view-bill works!</p>
+<div class="container mt-4">
+  <h2 class="text-center mb-4">View Your Bill</h2>
+
+  <form (ngSubmit)="getBill()" #billForm="ngForm" class="card p-4 shadow-sm">
+    <div class="form-group mb-3">
+      <label for="customerId">Customer ID:</label>
+      <input
+        type="text"
+        id="customerId"
+        class="form-control"
+        name="customerId"
+        [(ngModel)]="customerId"
+        placeholder="Enter your Customer ID"
+        required
+      />
+    </div>
+
+    <button class="btn btn-primary w-100" [disabled]="!billForm.form.valid">
+      View Bill
+    </button>
+  </form>
+
+  <div *ngIf="bill" class="card mt-4 shadow-sm p-3">
+    <h4>Bill Details</h4>
+    <hr />
+    <p><strong>Customer ID:</strong> {{ bill.customerId }}</p>
+    <p><strong>Name:</strong> {{ bill.customerName }}</p>
+    <p><strong>Month:</strong> {{ bill.month }}</p>
+    <p><strong>Units Consumed:</strong> {{ bill.units }}</p>
+    <p><strong>Amount:</strong> ₹{{ bill.amount }}</p>
+    <p><strong>Status:</strong> {{ bill.status }}</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mt-4">
+    {{ errorMessage }}
+  </div>
+</div>

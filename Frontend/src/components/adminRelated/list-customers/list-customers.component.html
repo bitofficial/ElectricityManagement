@@ -1,1 +1,59 @@
-<p>list-customers works!</p>
+<div class="container mt-4">
+  <h2 class="text-center mb-4">List of Consumers</h2>
+
+  <!-- Search Bar -->
+  <div class="d-flex justify-content-between mb-3">
+    <input
+      type="text"
+      class="form-control w-50"
+      placeholder="Search by name or ID..."
+      [(ngModel)]="searchText"
+    />
+    <button class="btn btn-secondary ms-3" (click)="loadCustomers()">Refresh</button>
+  </div>
+
+  <!-- Consumer Table -->
+  <div class="table-responsive card shadow-sm">
+    <table class="table table-hover table-striped">
+      <thead class="table-dark">
+        <tr>
+          <th>Customer ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Address</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let c of filteredCustomers()">
+          <td>{{ c.customerId }}</td>
+          <td>{{ c.name }}</td>
+          <td>{{ c.email }}</td>
+          <td>{{ c.phone }}</td>
+          <td>{{ c.address }}</td>
+          <td>
+            <span
+              class="badge"
+              [ngClass]="{
+                'bg-success': c.active,
+                'bg-danger': !c.active
+              }"
+            >
+              {{ c.active ? 'Active' : 'Disconnected' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="customers.length === 0" class="text-center mt-4 text-muted">
+    No consumers found.
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+  </div>
+</div>

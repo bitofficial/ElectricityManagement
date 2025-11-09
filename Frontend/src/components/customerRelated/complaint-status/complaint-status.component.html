@@ -1,1 +1,42 @@
-<p>complaint-status works!</p>
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Complaint Status</h2>
+
+  <!-- Complaint Search -->
+  <form (ngSubmit)="getComplaintStatus()" #statusForm="ngForm" class="mb-4">
+    <div class="row justify-content-center">
+      <div class="col-md-4">
+        <input 
+          type="number" 
+          [(ngModel)]="complaintId" 
+          name="complaintId" 
+          class="form-control" 
+          placeholder="Enter Complaint ID"
+          required>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Check</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Display Complaint Details -->
+  <div *ngIf="complaint" class="card p-4 shadow-sm">
+    <h5>Complaint ID: {{ complaint.id }}</h5>
+    <p><strong>Type:</strong> {{ complaint.type }}</p>
+    <p><strong>Description:</strong> {{ complaint.description }}</p>
+    <p><strong>Status:</strong> 
+      <span [class]="complaint.status === 'RESOLVED' ? 'text-success' : 'text-warning'">
+        {{ complaint.status }}
+      </span>
+    </p>
+    <p><strong>Registered On:</strong> {{ complaint.date | date: 'dd-MM-yyyy' }}</p>
+    <p *ngIf="complaint.resolutionDetails">
+      <strong>Resolution:</strong> {{ complaint.resolutionDetails }}
+    </p>
+  </div>
+
+  <!-- No Complaint Found -->
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3 text-center">
+    {{ errorMessage }}
+  </div>
+</div>

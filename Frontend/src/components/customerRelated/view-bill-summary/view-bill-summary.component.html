@@ -1,1 +1,66 @@
-<p>view-bill-summary works!</p>
+<div class="container mt-4">
+  <h2 class="text-center mb-4">📄 Bill Summary</h2>
+
+  <div class="card shadow p-4">
+    <div class="card-body">
+      <div class="row mb-2">
+        <div class="col-md-6">
+          <p><strong>Consumer ID:</strong> {{ bill.consumerId }}</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p><strong>Bill Number:</strong> {{ bill.billNumber }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-md-6">
+          <p><strong>Billing Month:</strong> {{ bill.billingMonth }}</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p><strong>Units Consumed:</strong> {{ bill.unitsConsumed }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-md-6">
+          <p><strong>Bill Amount:</strong> ₹{{ bill.amount }}</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p><strong>Due Date:</strong> {{ bill.dueDate | date }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <p>
+            <strong>Status:</strong>
+            <span
+              class="badge"
+              [ngClass]="{
+                'bg-success': bill.status === 'Paid',
+                'bg-danger': bill.status === 'Unpaid'
+              }"
+            >
+              {{ bill.status }}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <button
+          class="btn btn-primary px-4"
+          (click)="goToPayment()"
+          [disabled]="bill.status === 'Paid'"
+        >
+          Pay Now
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center mt-4">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p>Loading bill summary...</p>
+  </div>
+</div>
