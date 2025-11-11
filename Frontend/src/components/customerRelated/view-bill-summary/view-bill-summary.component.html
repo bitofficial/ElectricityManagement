@@ -2,16 +2,15 @@
   <div class="wm-container">
     <div class="brand">
       <div class="logo" aria-hidden="true">
-        <!-- simple bolt icon -->
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
           <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-       <a href="/"><span class="brand-name">PowerEase</span></a>
+      <a routerLink="/"><span class="brand-name">PowerEase</span></a>
     </div>
 
     <ul class="nav-links">
-      <li><a routerLink="/customer/home" style="color: #0EA5A4;">Home</a></li>
+      <li><a routerLink="/customer/home" style="color:#0EA5A4;">Home</a></li>
       <li><a routerLink="/customer/pay-bill">Pay Bill</a></li>
       <li><a routerLink="/customer/complaint-status">Search Complaint</a></li>
       <li><a routerLink="/customer/register-complaint" style="color:red">Register Complaint</a></li>
@@ -19,64 +18,56 @@
   </div>
 </nav>
 
-<div class="container mt-5 text-center">
-  <h2 class="welcome-heading mb-4">Bill Summary</h2>
+<div class="container mt-4">
+  <h2 class="mb-3">Bill Summary</h2>
 
-  <div *ngIf="loading">Loading your bills...</div>
-  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-
-  <!-- Bill Table -->
-  <table class="table table-bordered table-hover" *ngIf="bills.length > 0">
-    <thead class="table-primary">
-      <tr>
-        <th>Select</th>
-        <th>Bill Number</th>
-        <th>Bill Period</th>
-        <th>Bill Date</th>
-        <th>Due Date</th>
-        <th>Due Amount</th>
-        <th>Payable Amount</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let bill of bills">
-        <td>
-          <input
-            type="checkbox"
-            (change)="toggleBillSelection(bill, $event)"
-          />
-        </td>
-        <td>{{ bill.billNumber }}</td>
-        <td>{{ bill.billPeriod }}</td>
-        <td>{{ bill.billDate | date }}</td>
-        <td>{{ bill.dueDate | date }}</td>
-        <td>{{ bill.dueAmount | currency: "INR" }}</td>
-        <td>{{ bill.payableAmount | currency: "INR" }}</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div *ngIf="bills.length === 0 && !loading" class="alert alert-info mt-4">
-    No bills found for this consumer.
+  <!-- Bills table -->
+  <div *ngIf="selectedBills.length > 0; else noBills">
+    <table class="table table-bordered table-hover">
+      <thead class="table-primary">
+        <tr>
+          <th>#</th>
+          <th>Bill Number</th>
+          <th>Bill Period</th>
+          <th>Bill Date</th>
+          <th>Due Date</th>
+          <th class="text-end">Payable Amount</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let b of selectedBills; index as i">
+          <td>{{ i + 1 }}</td>
+          <td>{{ b.billId }}</td>
+          <td>{{ b.billPeriod || '-' }}</td>
+          <td>{{ b.billDate | date:'mediumDate' }}</td>
+          <td>{{ b.dueDate | date:'mediumDate' }}</td>
+          <td class="text-end">{{ b.payableAmount | currency:'INR' }}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-danger" (click)="removeBill(b.billId)">
+              Remove
+            </button>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="5" class="text-end">Total</th>
+          <th class="text-end">{{ totalAmount | currency:'INR' }}</th>
+          <th></th>
+        </tr>
+      </tfoot>
+    </table>
   </div>
+  <button (click)="proceedToPay()" class="btn btn-success mt-3" [disabled]="selectedBills.length === 0">
+    Proceed to Pay
+  </button>
 
-  <!-- Total and Payment -->
-  <div *ngIf="selectedBills.length > 0" class="mt-4">
-    <h4>Total Payable: {{ totalPayable | currency: "INR" }}</h4>
-    <button class="btn btn-success mt-3" (click)="processPayment()">
-      Pay Now
-    </button>
-  </div>
-
-  <!-- Payment Success Message -->
-  <div *ngIf="paymentSuccess" class="mt-5 alert alert-success">
-    <h5>✅ Payment Successful!</h5>
-    <p>Transaction ID: {{ transactionId }}</p>
-    <p>Receipt Number: {{ receiptNumber }}</p>
-    <p>Transaction Amount: {{ totalPayable | currency: "INR" }}</p>
-
-    <button class="btn btn-outline-primary mt-3" (click)="downloadInvoice()">
-      Download Invoice (PDF)
-    </button>
-  </div>
+  <ng-template #noBills>
+    <div class="alert alert-info mt-3">
+      No bills selected. Go to
+      <a class="ms-1" routerLink="/customer/view-bill">View Bills</a>
+      to choose bills.
+    </div>
+  </ng-template>
 </div>

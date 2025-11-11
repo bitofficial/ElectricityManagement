@@ -2,17 +2,16 @@
   <div class="wm-container">
     <div class="brand">
       <div class="logo" aria-hidden="true">
-        <!-- simple bolt icon -->
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
           <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-       <a href="/"><span class="brand-name">PowerEase</span></a>
+      <a routerLink="/"><span class="brand-name">PowerEase</span></a>
     </div>
 
     <ul class="nav-links">
-      <li><a routerLink="/customer/home" style="color: #0EA5A4;">Home</a></li>
-      <li><a routerLink="/customer/view-bill">View Bill</a></li>
+      <li><a routerLink="/customer/home" style="color:#0EA5A4;">Home</a></li>
+      <li><a routerLink="/customer/pay-bill">Pay Bill</a></li>
       <li><a routerLink="/customer/complaint-status">Search Complaint</a></li>
       <li><a routerLink="/customer/register-complaint" style="color:red">Register Complaint</a></li>
     </ul>
@@ -20,112 +19,119 @@
 </nav>
 
 <div class="container mt-4">
-  <h2 class="text-center mb-4">💳 Pay Your Bill</h2>
+  <h2 class="mb-3">Pay Selected Bills</h2>
 
-  <!-- Bill Details Card -->
-  <div class="card shadow p-3 mb-4">
-    <div class="card-body">
-      <h5 class="card-title">Bill Summary</h5>
-      <p><strong>Consumer ID:</strong> {{ bill.consumerId }}</p>
-      <p><strong>Bill Number:</strong> {{ bill.billNumber }}</p>
-      <p><strong>Billing Month:</strong> {{ bill.billingMonth }}</p>
-      <p><strong>Total Amount:</strong> ₹{{ bill.amount }}</p>
-      <p><strong>Due Date:</strong> {{ bill.dueDate | date }}</p>
-    </div>
+  <!-- Bills table -->
+  <div *ngIf="selectedBills.length > 0; else noBills">
+    <table class="table table-bordered table-hover">
+      <thead class="table-primary">
+        <tr>
+          <th>#</th>
+          <th>Bill Number</th>
+          <th>Bill Period</th>
+          <th>Bill Date</th>
+          <th>Due Date</th>
+          <th class="text-end">Payable Amount</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let b of selectedBills; index as i">
+          <td>{{ i + 1 }}</td>
+          <td>{{ b.billId }}</td>
+          <td>{{ b.billPeriod || '-' }}</td>
+          <td>{{ b.billDate | date:'mediumDate' }}</td>
+          <td>{{ b.dueDate | date:'mediumDate' }}</td>
+          <td class="text-end">{{ b.payableAmount | currency:'INR' }}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-danger" (click)="removeBill(b.billId)">Remove</button>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="5" class="text-end">Total</th>
+          <th class="text-end">{{ totalAmount | currency:'INR' }}</th>
+          <th></th>
+        </tr>
+      </tfoot>
+    </table>
   </div>
 
-  <!-- Payment Form -->
-  <form (ngSubmit)="makePayment()" #paymentForm="ngForm">
-    <div class="card shadow p-3">
-      <h5 class="card-title">Payment Details</h5>
+  <ng-template #noBills>
+    <div class="alert alert-info mt-3">
+      No bills selected. Please go back and select bills to pay.
+      <a routerLink="/customer/view-bill" class="ms-2">View Bills</a>
+    </div>
+  </ng-template>
 
-      <div class="form-group mb-3">
-        <label for="paymentMethod">Select Payment Method</label>
-        <select
-          id="paymentMethod"
-          class="form-control"
-          required
-          [(ngModel)]="payment.method"
-          name="paymentMethod"
-        >
-          <option value="">-- Select --</option>
-          <option value="credit">Credit Card</option>
-          <option value="debit">Debit Card</option>
-          <option value="upi">UPI</option>
-          <option value="netbanking">Net Banking</option>
+  <!-- Payment form -->
+  <div class="card mt-4" *ngIf="selectedBills.length > 0">
+    <div class="card-body">
+      <h5 class="card-title">Payment Method</h5>
+
+      <div class="mb-3">
+        <select class="form-select" [(ngModel)]="payment.method" name="method">
+          <option value="" disabled selected>Select method</option>
+          <option value="UPI">UPI</option>
+          <option value="Card">Card</option>
+          <option value="NetBanking">NetBanking</option>
         </select>
       </div>
 
-      <div *ngIf="payment.method === 'upi'" class="mb-3">
-        <label for="upiId">UPI ID</label>
-        <input
-          type="text"
-          id="upiId"
-          class="form-control"
-          placeholder="example@upi"
-          [(ngModel)]="payment.upiId"
-          name="upiId"
-          required
-        />
+      <!-- UPI fields -->
+      <div *ngIf="payment.method === 'UPI'" class="mb-3">
+        <label class="form-label">UPI ID</label>
+        <input class="form-control" [(ngModel)]="payment.upiId" name="upiId" placeholder="name@bank" />
       </div>
 
-      <div *ngIf="payment.method === 'credit' || payment.method === 'debit'" class="mb-3">
-        <label for="cardNumber">Card Number</label>
-        <input
-          type="text"
-          id="cardNumber"
-          maxlength="16"
-          class="form-control"
-          placeholder="Enter 16-digit card number"
-          [(ngModel)]="payment.cardNumber"
-          name="cardNumber"
-          required
-        />
-
-        <div class="row mt-2">
-          <div class="col-md-6">
-            <label for="expiry">Expiry (MM/YY)</label>
-            <input
-              type="text"
-              id="expiry"
-              class="form-control"
-              placeholder="MM/YY"
-              [(ngModel)]="payment.expiry"
-              name="expiry"
-              required
-            />
-          </div>
-          <div class="col-md-6">
-            <label for="cvv">CVV</label>
-            <input
-              type="password"
-              id="cvv"
-              maxlength="3"
-              class="form-control"
-              placeholder="***"
-              [(ngModel)]="payment.cvv"
-              name="cvv"
-              required
-            />
-          </div>
+      <!-- Card fields -->
+      <div *ngIf="payment.method === 'Card'" class="row g-3 mb-1">
+        <div class="col-md-6">
+          <label class="form-label">Card Number</label>
+          <input class="form-control" [(ngModel)]="payment.cardNumber" name="cardNumber" maxlength="19" placeholder="1111 2222 3333 4444" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Expiry (MM/YY)</label>
+          <input class="form-control" [(ngModel)]="payment.expiry" name="expiry" placeholder="MM/YY" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">CVV</label>
+          <input class="form-control" [(ngModel)]="payment.cvv" name="cvv" maxlength="4" placeholder="123" />
         </div>
       </div>
 
-      <div class="text-center mt-4">
-        <button type="submit" class="btn btn-success px-4" [disabled]="!paymentForm.form.valid">
-          Pay Now
-        </button>
+      <!-- NetBanking fields -->
+      <div *ngIf="payment.method === 'NetBanking'" class="mb-3">
+        <label class="form-label">Select Bank</label>
+        <select class="form-select" [(ngModel)]="payment.bank" name="bank">
+          <option value="" disabled selected>Select bank</option>
+          <option value="SBI">SBI</option>
+          <option value="HDFC">HDFC</option>
+          <option value="ICICI">ICICI</option>
+          <option value="Axis">Axis</option>
+          <option value="Kotak">Kotak</option>
+        </select>
       </div>
-    </div>
-  </form>
 
-  <!-- Payment Success Message -->
-  <div *ngIf="paymentSuccess" class="alert alert-success mt-4 text-center">
-    ✅ Payment Successful! Transaction ID: {{ transactionId }}
+      <div *ngIf="paymentError" class="alert alert-danger mt-2">
+        {{ paymentError }}
+      </div>
+
+      <button
+        class="btn btn-success mt-3"
+        (click)="makePayment()"
+        [disabled]="isSubmitting || selectedBills.length === 0"
+      >
+        {{ isSubmitting ? 'Processing...' : ('Pay ' + (totalAmount | currency:'INR')) }}
+      </button>
+    </div>
   </div>
 
-  <!-- Payment Error -->
-  <div *ngIf="paymentError" class="alert alert-danger mt-4 text-center">
-    ❌ Payment Failed: {{ paymentError }}
+  <!-- Success -->
+  <div *ngIf="paymentSuccess" class="alert alert-success mt-4">
+    ✅ Payment successful!<br />
+    Transaction ID: <strong>{{ transactionId }}</strong><br />
+    Amount: <strong>{{ totalAmount | currency:'INR' }}</strong>
   </div>
 </div>

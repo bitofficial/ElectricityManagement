@@ -135,12 +135,14 @@ export class ViewBillComponent implements OnInit {
 
   proceedToSummary(): void {
     const selectedBills = this.bills.filter(b => b.selected);
+    console.log('Selected bills for summary:', selectedBills);
     if (!selectedBills.length) {
       alert('Please select at least one bill to proceed.');
       return;
     }
+    localStorage.setItem('selectedBills', JSON.stringify(selectedBills));
     this.router.navigate(['/customer/bill-summary'], {
-      state: { selectedBills, totalAmount: this.totalAmount }
+      state: { selectedBills:selectedBills, totalAmount: this.totalAmount }
     });
   }
 }
