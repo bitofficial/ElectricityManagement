@@ -1,132 +1,128 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface Bill {
-  id: string;
-  consumerNumber: string;
-  billDate: string;        // ISO or formatted string
-  billingPeriod: string;   // e.g. "Mar 2025"
-  billAmount: number;      // numeric amount
-  dueDate: string;
-  selected?: boolean;
-}
+import { Router, RouterLink } from '@angular/router';
+import { BillService } from '../../services/bill.service';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-view-bill-summary',
-  standalone:true,
-  imports:[FormsModule,CommonModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './view-bill-summary.component.html',
   styleUrls: ['./view-bill-summary.component.css']
 })
 export class ViewBillSummaryComponent implements OnInit {
-  bills: Bill[] = [];
+  consumerNumber: number = 0;
+  consumerName: string = 'John Doe';
+  mobile: string = '9876543210';
+  bills: any[] = [];
+  selectedBills: any[] = [];
+  totalPayable: number = 0;
   loading = false;
-  error = '';
-  paymentMethod: 'credit_card' | 'debit_card' | 'net_banking' | '' = '';
-  proceedDisabledMsg = ''; // optional message shown when proceed disabled
+  errorMessage = '';
 
-  constructor(
-    private router: Router,
-    private location: Location
-  ) {}
+  // Payment variables
+  paymentSuccess = false;
+  transactionId = '';
+  receiptNumber = '';
+  paymentId = '';
+  transactionDate = new Date();
+  transactionType = 'Credit Card';
+  transactionStatus = 'Success';
+
+  constructor(private billService: BillService, private router: Router) {}
 
   ngOnInit(): void {
+    this.consumerNumber = Number(localStorage.getItem('consumerNumber'));
     this.loadBills();
   }
 
-  // Simulated async loader — replace with real service call
   loadBills(): void {
     this.loading = true;
-    this.error = '';
-    this.bills = [];
-
-    // Simulate network delay
-    setTimeout(() => {
-      // Simulate success or failure (set to false to test error UI)
-      const simulateFailure = false;
-
-      if (simulateFailure) {
+    this.billService.getBillByConsumerNumber(this.consumerNumber).subscribe({
+      next: (data) => {
+        this.bills = data;
         this.loading = false;
-        this.error = 'Failed to load bills. Please retry or go back.';
-      } else {
-        // Example data - replace with API response mapping
-        this.bills = [
-          { id: 'b1', consumerNumber: 'C12345', billDate: '2025-10-01', billingPeriod: 'Sep 2025', billAmount: 120.50, dueDate: '2025-10-20', selected: false },
-          { id: 'b2', consumerNumber: 'C12345', billDate: '2025-09-01', billingPeriod: 'Aug 2025', billAmount: 98.00, dueDate: '2025-09-20', selected: false },
-          { id: 'b3', consumerNumber: 'C98765', billDate: '2025-10-05', billingPeriod: 'Sep 2025', billAmount: 45.75, dueDate: '2025-10-25', selected: false }
-        ];
+      },
+      error: () => {
+        this.errorMessage = 'Error fetching bills. Please try again later.';
         this.loading = false;
       }
-    }, 700);
+    });
   }
 
-  // toggle called when checkbox clicked (two-way binding also keeps selected up-to-date)
-  toggleSelection(bill: Bill): void {
-    bill.selected = !bill.selected;
-  }
-
-  // compute total for selected bills
-  get totalAmount(): number {
-    // digit-by-digit-safe sum: sum as integer cents then divide to avoid floating issues
-    const cents = this.bills
-      .filter(b => b.selected)
-      .reduce((acc, b) => acc + Math.round(b.billAmount * 100), 0);
-    return cents / 100;
-  }
-
-  // whether any bills selected
-  get anySelected(): boolean {
-    return this.bills.some(b => b.selected);
-  }
-
-  // proceed to payment click
-  proceedToPayment(): void {
-    if (!this.anySelected) {
-      this.proceedDisabledMsg = 'Please select at least one bill to proceed.';
-      return;
+  toggleBillSelection(bill: any, event: any): void {
+    if (event.target.checked) {
+      this.selectedBills.push(bill);
+    } else {
+      this.selectedBills = this.selectedBills.filter(
+        (b) => b.billNumber !== bill.billNumber
+      );
     }
-    if (!this.paymentMethod) {
-      this.proceedDisabledMsg = 'Please choose a payment method.';
+    this.updateTotal();
+  }
+
+  updateTotal(): void {
+    this.totalPayable = this.selectedBills.reduce(
+      (sum, bill) => sum + (bill.payableAmount || 0),
+      0
+    );
+  }
+
+  processPayment(): void {
+    if (this.selectedBills.length === 0) {
+      alert('Please select at least one bill to proceed.');
       return;
     }
 
-    // Prepare payload for backend
-    const payload = {
-      bills: this.bills.filter(b => b.selected).map(b => ({
-        id: b.id,
-        consumerNumber: b.consumerNumber,
-        billAmount: b.billAmount
-      })),
-      total: this.totalAmount,
-      paymentMethod: this.paymentMethod
-    };
+    // Simulate payment success
+    this.paymentId = 'PAY' + Math.floor(Math.random() * 100000);
+    this.transactionId = 'TXN' + Math.floor(Math.random() * 100000);
+    this.receiptNumber = 'RCPT' + Math.floor(Math.random() * 100000);
+    this.transactionDate = new Date();
 
-    // TODO: replace with real payment flow / service call
-    console.log('Proceeding to payment with payload:', payload);
-
-    // Example: navigate to a payment page, pass state or query params
-    this.router.navigate(['/payment'], { state: { payload } });
+    this.paymentSuccess = true;
   }
 
-  // deselect a row directly (used by a 'deselect' icon if provided)
-  deselectBill(bill: Bill): void {
-    bill.selected = false;
-  }
+  downloadInvoice(): void {
+    const doc = new jsPDF();
 
-  // go back
-  goBack(): void {
-    this.location.back();
-  }
+    doc.setFontSize(18);
+    doc.text('Electricity Bill Payment Invoice', 60, 15);
 
-  // retry after error
-  retry(): void {
-    this.loadBills();
-  }
+    doc.setFontSize(12);
+    doc.text(`Consumer Number: ${this.consumerNumber}`, 15, 30);
+    doc.text(`Consumer Name: ${this.consumerName}`, 15, 38);
+    doc.text(`Mobile: ${this.mobile}`, 15, 46);
 
-  // helper to format currency
-  formatCurrency(amount: number): string {
-    return amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    doc.text(`Invoice Number: INV${Math.floor(Math.random() * 100000)}`, 15, 60);
+    doc.text(`Payment ID: ${this.paymentId}`, 15, 68);
+    doc.text(`Transaction ID: ${this.transactionId}`, 15, 76);
+    doc.text(`Receipt Number: ${this.receiptNumber}`, 15, 84);
+    doc.text(`Transaction Date: ${this.transactionDate.toLocaleString()}`, 15, 92);
+    doc.text(`Transaction Type: ${this.transactionType}`, 15, 100);
+    doc.text(`Transaction Status: ${this.transactionStatus}`, 15, 108);
+
+    // Add bill details in a table
+    const tableData = this.selectedBills.map((b, i) => [
+      i + 1,
+      b.billNumber,
+      b.billPeriod,
+      b.billDate,
+      b.dueDate,
+      b.payableAmount
+    ]);
+
+    (autoTable as any)(doc, {
+      head: [['#', 'Bill Number', 'Bill Period', 'Bill Date', 'Due Date', 'Amount']],
+      body: tableData,
+      startY: 115
+    });
+
+    doc.text(`Total Transaction Amount: ₹${this.totalPayable}`, 15, (doc as any).lastAutoTable.finalY + 10);
+
+    doc.save(`Invoice_${this.consumerNumber}.pdf`);
   }
 }

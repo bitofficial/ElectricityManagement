@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Tue Nov 11 08:54:37 IST 2025:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.16.1.1 - (1901046): instance a816c00e-019a-70f1-a847-0000011a5df0 
+on database directory C:\ElectrycityProject\Electricity_DB with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@531d72ca 
+Loaded from file:/C:/Stream%20Software/Repo/repository/org/apache/derby/derby/10.16.1.1/derby-10.16.1.1.jar
+java.vendor=Eclipse Adoptium
+java.runtime.version=17.0.1+12
+user.dir=C:\Users\2860439\Downloads\1762798514_Register_Login\Register_Login\Register_Login
+os.name=Windows 10
+os.arch=amd64
+os.version=10.0
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

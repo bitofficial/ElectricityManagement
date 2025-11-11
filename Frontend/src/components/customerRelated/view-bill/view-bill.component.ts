@@ -1,98 +1,146 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
+import { BillService } from '../../services/bill.service';
 
 interface Bill {
-  consumerNo: string;
-  billNumber: string;
-  paymentStatus: string;
-  connectionType: string;
-  connectionStatus: string;
-  mobileNumber: string;
+  consumerNo?: string;
+  billId: string;
+  paymentStatus?: string;
+  connectionType?: string;
+  connectionStatus?: string;
+  mobileNumber?: string;
   billPeriod: string;
   billDate: Date;
   dueDate: Date;
-  disconnectionDate: Date;
-  dueAmount: number;
+  disconnectionDate?: Date;
+  dueAmount?: number;
   payableAmount: number;
   selected?: boolean;
 }
 
 @Component({
   selector: 'app-view-bill',
-  standalone:true,
-  imports:[FormsModule,CommonModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink, HttpClientModule],
   templateUrl: './view-bill.component.html',
   styleUrls: ['./view-bill.component.css']
 })
-export class ViewBillComponent {
-  customerId: string = '';
-  billId: string = '';
+export class ViewBillComponent implements OnInit {
   bills: Bill[] = [];
-  totalAmount: number = 0;
-  errorMessage: string = '';
+  filtered: Bill[] = [];
+  searchTerm = '';
+  totalAmount = 0;
+  loading = false;
+  errorMessage = '';
 
-  // Simulated backend call
-  getBills() {
-    if (!this.customerId.trim()) {
-      this.errorMessage = 'Please enter a valid Customer ID.';
-      this.bills = [];
-      return;
-    }
+  private readonly rawUserId = localStorage.getItem('userId') ?? '';
+  private readonly consumerNumber = this.parseConsumerNumber(this.rawUserId);
 
+  constructor(private router: Router, private billService: BillService) {}
+
+  ngOnInit(): void {
+    this.fetchAllMyBills();
+  }
+
+  // --- Helpers ---
+  private parseConsumerNumber(userId: string): string {
+    // If your userId is "u-<number>", remove the first 2 chars ("u-")
+    if (!userId) return '';
+    return userId.startsWith('u-') ? userId.slice(2) : userId;
+  }
+
+  private mapBill(b: any): Bill {
+  return {
+    billId: String(b.billId ?? 'N/A'),   // 👈 force string
+    billPeriod: b.billPeriod ?? '',
+    billDate: new Date(b.billDate),
+    dueDate: new Date(b.dueDate),
+    disconnectionDate: b.disconnectionDate ? new Date(b.disconnectionDate) : undefined,
+    paymentStatus: b.status ?? 'N/A',
+    connectionType: b.connectionType ?? '',
+    connectionStatus: b.connectionStatus ?? '',
+    mobileNumber: b.mobileNumber ?? '',
+    dueAmount: b.amount ?? 0,
+    payableAmount: b.amount ?? 0,
+    selected: false,
+    consumerNo: this.consumerNumber
+  };
+}
+
+
+  // --- Data loading ---
+  fetchAllMyBills(): void {
+    this.loading = true;
     this.errorMessage = '';
-
-    // Sample mock bills (in real app, fetch from backend API)
-    this.bills = [
-      {
-        consumerNo: this.customerId,
-        billNumber: 'BILL001',
-        paymentStatus: 'Unpaid',
-        connectionType: 'Domestic',
-        connectionStatus: 'Connected',
-        mobileNumber: '9876543210',
-        billPeriod: 'Oct 2025',
-        billDate: new Date('2025-10-01'),
-        dueDate: new Date('2025-10-20'),
-        disconnectionDate: new Date('2025-10-30'),
-        dueAmount: 1200,
-        payableAmount: 1200
+    this.billService.getAllBillsForCurrentUser().subscribe({
+      next: (data) => {
+        const mapped = (data ?? []).map(x => this.mapBill(x));
+        this.bills = mapped;
+        this.filtered = mapped.slice(); // show all initially
+        this.updateTotal();
+        this.loading = false;
       },
-      {
-        consumerNo: this.customerId,
-        billNumber: 'BILL002',
-        paymentStatus: 'Unpaid',
-        connectionType: 'Commercial',
-        connectionStatus: 'Connected',
-        mobileNumber: '9876543210',
-        billPeriod: 'Nov 2025',
-        billDate: new Date('2025-11-01'),
-        dueDate: new Date('2025-11-20'),
-        disconnectionDate: new Date('2025-11-30'),
-        dueAmount: 1800,
-        payableAmount: 1800
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err?.message || 'Failed to load bills. Please try again.';
+        this.bills = [];
+        this.filtered = [];
+        this.updateTotal();
       }
-    ];
+    });
+  }
 
+  // --- Search (manual) ---
+  // No-op kept only for compatibility if referenced elsewhere
+  applyFilter(): void {}
+
+  searchBills(): void {
+  const term = (this.searchTerm || '').trim().toLowerCase();
+
+  if (!term) {
+    this.filtered = this.bills.slice();
+    this.updateTotal();
+    return;
+  }
+
+  // 👇 Always compare lowercase strings
+  this.filtered = this.bills.filter(b => String(b.billId).toLowerCase() === term);
+
+  // If you prefer partial match, use:
+  // this.filtered = this.bills.filter(b => String(b.billId).toLowerCase().includes(term));
+
+  this.updateTotal();
+}
+
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.filtered = this.bills.slice();
     this.updateTotal();
   }
 
-  updateTotal() {
+  // --- Totals / Navigation ---
+  updateTotal(): void {
     this.totalAmount = this.bills
-      .filter(bill => bill.selected)
-      .reduce((sum, bill) => sum + (bill.payableAmount || 0), 0);
+      .filter(b => b.selected)
+      .reduce((sum, b) => sum + (Number(b.payableAmount) || 0), 0);
   }
 
-  proceedToPay() {
+  get hasSelected(): boolean {
+  return this.bills.some(b => !!b.selected);
+}
+
+  proceedToSummary(): void {
     const selectedBills = this.bills.filter(b => b.selected);
-    if (selectedBills.length === 0) {
+    if (!selectedBills.length) {
       alert('Please select at least one bill to proceed.');
       return;
     }
-
-    // Navigate to payment screen or process payment
-    alert(
-      `Proceeding to payment for ${selectedBills.length} bill(s). Total: ₹${this.totalAmount.toFixed(2)}`
-    );
+    this.router.navigate(['/customer/bill-summary'], {
+      state: { selectedBills, totalAmount: this.totalAmount }
+    });
   }
 }

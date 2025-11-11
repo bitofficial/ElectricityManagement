@@ -12,6 +12,7 @@
 
     <ul class="nav-links">
       <li><a routerLink="/login">Login</a></li>
+      <li><a routerLink="/admin/login">Admin</a></li>
       <li><a routerLink="/register" class="cta">Register</a></li>
     </ul>
   </div>
@@ -20,21 +21,15 @@
 <header class="hero">
   <div class="wm-container hero-grid">
     <div class="hero-left">
-      <h1>Smart electricity management for homes & utilities</h1>
+      <h1>Smart Electricity Bill Management</h1>
       <p class="lead">
-        Monitor usage, manage bills, detect faults and optimise energy — all from one elegant dashboard.
+        Monitor usage, manage bills, detect faults and optimise energy — all from one platform.
       </p>
 
-      <div class="hero-cta">
-        <a routerLink="/register" class="btn-primary">Get Started</a>
+      <div class="nav-links">
+        <a routerLink="/register" class="cta">Get Started</a>
         <a routerLink="/features" class="btn-ghost">See Features</a>
       </div>
-
-      <ul class="key-stats" aria-hidden="true">
-        <li><strong>24/7</strong><span>Fault alerts</span></li>
-        <li><strong>Save up to</strong><span>15% energy</span></li>
-        <li><strong>Secure</strong><span>meter & billing</span></li>
-      </ul>
     </div>
 
     <div class="hero-right">
@@ -43,7 +38,7 @@
         <div class="meter">
           <div class="meter-header">
             <div class="dot"></div>
-            <span>Live Meter</span>
+            <span>Smart Billing</span>
           </div>
           <div class="reading">3.42 kW</div>
           <div class="graph" aria-hidden="true">
@@ -66,7 +61,7 @@
         <!-- icon: analytics -->
         <svg viewBox="0 0 24 24"><path d="M3 3v18h18" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <h3>Real-time monitoring</h3>
+      <h3 style="color:#0EA5A4">Real-time monitoring</h3>
       <p>Live consumption graphs, device-level breakdown and historical reports.</p>
     </article>
 
@@ -75,7 +70,7 @@
         <!-- icon: bolt/alerts -->
         <svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <h3>Fault detection & alerts</h3>
+      <h3 style="color:#0EA5A4">Fault detection & alerts</h3>
       <p>Automatic detection of outages, spikes and potential wiring faults with instant notifications.</p>
     </article>
 
@@ -84,7 +79,7 @@
         <!-- icon: billing -->
         <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <h3>Billing & payments</h3>
+      <h3 style="color:#0EA5A4">Billing & payments</h3>
       <p>Generate accurate bills, accept online payments and offer clear usage-based invoices.</p>
     </article>
 
@@ -93,7 +88,7 @@
         <!-- icon: scheduling -->
         <svg viewBox="0 0 24 24"><path d="M7 10h5v5" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <h3>Load scheduling</h3>
+      <h3 style="color:#0EA5A4">Load scheduling</h3>
       <p>Shift heavy loads to off-peak hours and optimise costs with intelligent schedules.</p>
     </article>
   </div>
@@ -103,8 +98,7 @@
   <div class="wm-container">
     <div>© {{ currentYear }} PowerEase — Built for smarter power</div>
     <div class="footer-links">
-      <a href="/privacy">Privacy</a>
-      <a href="/contact">Contact</a>
+      <a href="/privacy/privacy">Privacy&amp;Contact</a>
     </div>
   </div>
 </footer>

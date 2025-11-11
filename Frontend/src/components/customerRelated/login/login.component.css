@@ -10,15 +10,15 @@
   background: rgba(255, 255, 255, 0.9);
   border-radius: 16px;
   backdrop-filter: blur(10px);
-  width: 450px;
+  width: 500px;
   transition: all 0.3s ease;
   border: 1px solid rgba(0, 0, 0, 0.05);
   padding: 30px 20px;
   display: flex;
   flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin: auto;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
 }
 
 .login-card:hover {
@@ -52,6 +52,7 @@
   padding: 10px 14px;
   font-size: 0.95rem;
   transition: all 0.2s ease;
+  margin-inline: 10px;
 }
 
 .custom-input:focus {
@@ -70,8 +71,8 @@
   padding: 12px 10px;
   transition: all 0.2s ease;
   margin: 20px 0;
-    text-align: center;
-    width: 100%;
+  text-align: center;
+  width: 100%;
 }
 
 .gradient-btn:hover {
@@ -86,24 +87,26 @@
   cursor: not-allowed;
 }
 
-form{
-    width: 80%;
+form {
+  width: 80%;
 }
-.form-group{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px;
+
+.form-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px;
 }
+
 /* Alerts */
 .alert {
   font-size: 0.9rem;
   border-radius: 10px;
 }
 
-a{
-    color: #06b6d4;
-    text-decoration: none;
+a {
+  color: #06b6d4;
+  text-decoration: none;
 }
 
 /* Small screen responsiveness */

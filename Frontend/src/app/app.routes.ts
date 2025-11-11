@@ -14,6 +14,7 @@ import { ComplaintStatusComponent } from '../components/customerRelated/complain
 
 
 //admin
+import { AdminLoginComponent } from '../components/adminRelated/admin-login/admin-login.component';
 import { AddCustomerComponent } from '../components/adminRelated/add-customer/add-customer.component';
 import { AddBillComponent } from '../components/adminRelated/add-bill/add-bill.component';
 import { ListCustomersComponent } from '../components/adminRelated/list-customers/list-customers.component';
@@ -46,6 +47,7 @@ export const routes: Routes = [
   { path: 'customer/complaint-status', component: ComplaintStatusComponent },
 
   // 🧑‍💼 Admin Routes
+  { path: 'admin/login', component: AdminLoginComponent},
   { path: 'admin/add-customer', component: AddCustomerComponent },
   { path: 'admin/list-customer', component: ListCustomersComponent },
   { path: 'admin/update-customer', component: UpdateCustomersComponent },

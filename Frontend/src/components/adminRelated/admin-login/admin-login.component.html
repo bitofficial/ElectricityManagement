@@ -1,0 +1,77 @@
+<nav class="wm-navbar">
+  <div class="wm-container">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <!-- simple bolt icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <a href="/"><span class="brand-name">PowerEase</span></a>
+    </div>
+
+    <ul class="nav-links">
+      <li><a href="">Home</a></li>
+    </ul>
+  </div>
+</nav>
+
+
+<div class="login-wrapper d-flex justify-content-center align-items-center">
+  <div class="login-card shadow-lg p-4">
+    <div class="text-center mb-4">
+      <div class="login-logo mb-2">
+        <svg viewBox="0 0 24 24" class="bolt-icon" fill="none" stroke="currentColor">
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3 class="fw-bold text-dark mb-1" style="text-align: center;">Login to Admin</h3>
+    </div>
+
+    <form (ngSubmit)="onLogin()" #adminLoginForm="ngForm" autocomplete="off">
+      <div class="form-group mb-3">
+        <label for="email" class="form-label">Email </label>
+        <input
+          id="userId"
+          type="text"
+          class="form-control custom-input"
+          placeholder="Enter your userId"
+          [(ngModel)]="loginData.userId"
+          name="userId"
+          required
+        />
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="password" class="form-label">Password</label>
+        <input
+          id="password"
+          type="password"
+          class="form-control custom-input"
+          placeholder="Enter your password"
+          [(ngModel)]="loginData.password"
+          name="password"
+          required
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary w-100 gradient-btn"
+        [disabled]="adminLoginForm.invalid"
+        (click)="onLogin()"
+      >
+        <span>Login</span>
+      </button>
+    </form>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3 text-center rounded-pill py-2">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="successMessage" class="alert alert-success mt-3 text-center rounded-pill py-2">
+      {{ successMessage }}
+    </div>
+
+  </div>
+</div>

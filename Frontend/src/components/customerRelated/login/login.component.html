@@ -11,7 +11,7 @@
     </div>
 
     <ul class="nav-links">
-      <li><a href="/login">Login</a></li>
+      <li><a href="">Home</a></li>
       <li><a href="/register" class="cta">Register</a></li>
     </ul>
   </div>
@@ -26,21 +26,22 @@
           <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <h3 class="fw-bold text-dark mb-1" style="text-align: center;">Welcome Back</h3>
+      <h3 class="fw-bold text-dark mb-1" style="text-align: center;">Welcome Back!</h3>
       <p class="text-muted mb-0">Login to manage your electricity account</p>
     </div>
 
     <form (ngSubmit)="onLogin()" #loginForm="ngForm" autocomplete="off">
       <div class="form-group mb-3">
-        <label for="email" class="form-label">Email </label>
+        <label for="userId" class="form-label">User ID </label>
         <input
-          id="email"
-          type="email"
+          id="userId"
+          type="userId"
           class="form-control custom-input"
-          placeholder="Enter your email"
-          [(ngModel)]="loginData.email"
-          name="email"
+          placeholder="Enter your User ID"
+          [(ngModel)]="loginData.userId"
+          name="userId"
           required
+          style="width: 250px;"
         />
       </div>
 
@@ -50,10 +51,11 @@
           id="password"
           type="password"
           class="form-control custom-input"
-          placeholder="Enter your password"
+          placeholder="Enter your Password"
           [(ngModel)]="loginData.password"
           name="password"
           required
+          style="width: 250px;"
         />
       </div>
 
@@ -61,6 +63,7 @@
         type="submit"
         class="btn btn-primary w-100 gradient-btn"
         [disabled]="loginForm.invalid"
+        (click)="onLogin()"
       >
         <span>Login</span>
       </button>

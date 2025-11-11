@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { ComplaintService } from '../../services/complaint.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-register-complaint',
   standalone:true,
-  imports:[FormsModule,CommonModule],
+  imports:[FormsModule,CommonModule,RouterLink],
   templateUrl: './register-complaint.component.html',
   styleUrls: ['./register-complaint.component.css']
 })

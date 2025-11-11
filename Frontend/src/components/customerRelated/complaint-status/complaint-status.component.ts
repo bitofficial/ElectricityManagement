@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ComplaintStatusService } from '../../services/complaint-status.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-complaint-status',
   standalone:true,
-  imports:[FormsModule, CommonModule],
+  imports:[FormsModule, CommonModule, RouterLink],
   templateUrl: './complaint-status.component.html',
   styleUrls: ['./complaint-status.component.css']
 })

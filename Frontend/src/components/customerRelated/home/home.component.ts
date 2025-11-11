@@ -1,101 +1,159 @@
-// home.component.ts
+
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 interface FeatureCard {
   title: string;
   description: string;
   route: string;
-  icon: string; // class for icon library (e.g., 'bi bi-file-earmark-text' or 'fa fa-file')
+  icon: string;
+}
+
+interface UserDetails {
+  fullName: string;
+  consumerNumber: string;
+  billingAddress: string;
+}
+
+interface BillDetails {
+  billId?: string;
+  billingMonth: string;
+  dueDate: string;
+  amount: number;
+  paid: boolean;
 }
 
 @Component({
   selector: 'app-home',
-  standalone:true,
-  imports:[FormsModule,CommonModule],
+  standalone: true,
+  imports: [FormsModule, CommonModule, RouterLink, HttpClientModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
-  user = {
-    firstName: 'Rajesh',
-    accountNumber: 'AC-12345678',
-    billingAddress: '12/4 MG Road, Sector 5, Example City, State - 400001'
+  user: UserDetails = {
+    fullName: '',
+    consumerNumber: '',
+    billingAddress: '',
   };
 
-  currentBill: {
-    period: string;
-    dueDate: Date;
-    amount: number;
-    paid: boolean;
-  } | null = null;
+  currentBill: BillDetails | null = null;
+
+
+
+  consumerNumber: string =
+    localStorage.getItem('userId')?.toString().substring(2) || '';
 
   features: FeatureCard[] = [
     {
       title: 'View Bills',
       description: 'See and download your recent bills and invoices.',
       route: '/customer/view-bill',
-      icon: 'bi bi-receipt'
+      icon: 'bi bi-receipt',
     },
     {
       title: 'Pay Bill',
       description: 'Make a secure payment online using cards or netbanking.',
       route: '/customer/pay-bill',
-      icon: 'bi bi-credit-card-2-front'
+      icon: 'bi bi-credit-card-2-front',
     },
     {
       title: 'Bill History',
       description: 'Review your billing history and past payments.',
       route: '/customer/bill-history',
-      icon: 'bi bi-clock-history'
+      icon: 'bi bi-clock-history',
     },
     {
       title: 'Register Complaint',
       description: 'Report an issue with your service or bill.',
       route: '/customer/register-complaint',
-      icon: 'bi bi-exclamation-circle'
+      icon: 'bi bi-exclamation-circle',
     },
     {
       title: 'Complaint Status',
       description: 'Track the resolution status of your raised complaints.',
       route: '/customer/complaint-status',
-      icon: 'bi bi-list-check'
+      icon: 'bi bi-list-check',
     },
     {
       title: 'Account Settings',
       description: 'Edit contact details, change address and preferences.',
-      route: '/profile',
-      icon: 'bi bi-gear'
-    }
+      route: '/profile/profile',
+      icon: 'bi bi-gear',
+    },
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private http: HttpClient) {}
 
   ngOnInit(): void {
-    // Simulate fetching current bill from API
-    this.loadCurrentBill();
-    // In a real app, fetch user + bill via a service, e.g. userService.getProfile()
+    this.loadUser(this.consumerNumber);
+    this.loadCurrentBill(this.consumerNumber);
   }
 
-  loadCurrentBill() {
-    // Replace with actual HTTP call
-    this.currentBill = {
-      period: 'Oct 1, 2025 - Oct 31, 2025',
-      dueDate: new Date(new Date().getFullYear(), new Date().getMonth(), 28), // example
-      amount: 2479.50,
-      paid: false
-    };
+  /** ✅ Fetch user details */
+  loadUser(consumerNumber: string): void {
+    this.http
+      .get<UserDetails>(`http://localhost:8085/api/dashboard/${consumerNumber}`)
+      .subscribe({
+        next: (data: UserDetails) => {
+          this.user = data;
+          console.log('User Details:', data);
+        },
+        error: (error) => {
+          console.error('Error fetching user details:', error);
+        },
+      });
   }
 
-  logout() {
-    // Clear session / tokens here (call your auth service)
-    // then navigate to login
-    // e.g. this.authService.logout();
-    // For demo:
+  /** ✅ Fetch current bill details */
+ /** ✅ Fetch current bill details (handles array responses) *//** ✅ Fetch only the latest (most recent) bill */
+loadCurrentBill(consumerNumber: string): void {
+  this.http
+    .get<BillDetails[]>(`http://localhost:8085/api/dashboard/${consumerNumber}/bills`)
+    .subscribe({
+      next: (bills: BillDetails[]) => {
+        console.log('Fetched Bills:', bills);
+
+        if (bills && bills.length > 0) {
+          // Sort bills by billingMonth (you can adjust sorting logic if needed)
+          const sortedBills = bills.sort((a, b) => {
+            const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+                            'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+            const [aMonth, aYear] = a.billingMonth.split('-');
+            const [bMonth, bYear] = b.billingMonth.split('-');
+
+            const aIndex = months.indexOf(aMonth);
+            const bIndex = months.indexOf(bMonth);
+
+            // Sort by year first, then month
+            if (aYear !== bYear) return Number(bYear) - Number(aYear);
+            return bIndex - aIndex;
+          });
+
+          // ✅ Pick the most recent (first after sort)
+          this.currentBill = sortedBills[0];
+          console.log('Latest Bill Selected:', this.currentBill);
+        } else {
+          console.warn('No bills found for this consumer');
+          this.currentBill = null;
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching current bill:', error);
+        this.currentBill = null;
+      },
+    });
+}
+
+
+  /** ✅ Logout functionality */
+  logout(): void {
     console.log('Logout clicked - clearing session and redirecting to /login');
-    // perform actual logout steps, e.g. localStorage.removeItem('token')
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
     this.router.navigate(['/login']);
   }
 }

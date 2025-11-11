@@ -6,24 +6,28 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:8080/api/auth';
+  private baseUrl = 'http://localhost:8085/api'; // adjust as per backend
 
   constructor(private http: HttpClient) {}
 
-  login(credentials: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/login`, credentials);
+  // ✅ Login with backend API
+  login(credentials: { userId: string; password: string }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/login`, credentials);
   }
 
+  // ✅ Register new customer
   register(user: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/register`, user);
+    
+    return this.http.post<any>(`${this.baseUrl}/register/save`, user);
   }
 
-  logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
+  // ✅ Logout (if backend supports session logout)
+  logout(): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/logout`, {});
   }
 
-  isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+  // ✅ Optional: fetch current user info from backend
+  getProfile(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/profile`);
   }
 }

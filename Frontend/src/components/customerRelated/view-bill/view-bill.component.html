@@ -1,35 +1,74 @@
+<!-- ✅ Navbar -->
+<nav class="wm-navbar">
+  <div class="wm-container">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
+          <path
+            d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"
+            stroke-width="1.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <a href="/"><span class="brand-name">PowerEase</span></a>
+    </div>
+
+    <ul class="nav-links">
+      <li><a routerLink="/customer/home" style="color: #0EA5A4;">Home</a></li>
+      <li><a routerLink="/customer/pay-bill">Pay Bill</a></li>
+      <li><a routerLink="/customer/complaint-status">Search Complaint</a></li>
+      <li><a routerLink="/customer/register-complaint" style="color: red;">Register Complaint</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ✅ Main Container -->
 <div class="container mt-4">
   <h2 class="text-center mb-4">View / Pay Bills</h2>
 
-  <!-- Search Form -->
-  <form (ngSubmit)="getBills()" #billForm="ngForm" class="card p-4 shadow-sm">
-    <div class="row g-3 align-items-end">
-      <div class="col-md-9">
-        <label for="customerId" class="form-label">Bill Number</label>
+  <!-- ✅ Search (manual) -->
+  <div class="card p-3 shadow-sm mb-3">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-7">
+        <label for="searchBill" class="form-label">Search by Bill Number</label>
         <input
+          id="searchBill"
           type="text"
-          id="customerId"
           class="form-control"
-          name="customerId"
-          [(ngModel)]="customerId"
-          placeholder="Enter your Bill Number"
-          required
+          placeholder="Enter exact Bill ID…"
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="searchBills()"
+          [ngModelOptions]="{standalone: true}"
         />
       </div>
 
       <div class="col-md-3 d-grid">
-        <button class="btn btn-primary" [disabled]="!billForm.form.valid">View Bills</button>
+        <button class="btn btn-primary" (click)="searchBills()">Search</button>
+      </div>
+
+      <div class="col-md-2 d-grid">
+        <button class="btn btn-link" (click)="clearSearch()">Clear</button>
       </div>
     </div>
-  </form>
+  </div>
 
-  <!-- Error Message -->
-  <div *ngIf="errorMessage" class="alert alert-danger mt-4 text-center">
+  <!-- ✅ Loading Indicator -->
+  <div *ngIf="loading" class="alert alert-info text-center">Loading bills...</div>
+
+  <!-- ✅ Error Message -->
+  <div *ngIf="!loading && errorMessage" class="alert alert-danger text-center">
     {{ errorMessage }}
   </div>
 
-  <!-- Bill Table -->
-  <div *ngIf="bills && bills.length > 0" class="card mt-4 shadow-sm p-3">
+  <!-- ✅ Empty State -->
+  <div *ngIf="!loading && !errorMessage && filtered.length === 0" class="alert alert-warning text-center">
+    No bills found.
+  </div>
+
+  <!-- ✅ Bill Table -->
+  <div *ngIf="!loading && filtered.length > 0" class="card mt-2 shadow-sm p-3">
     <h4 class="mb-3">Bill Details</h4>
 
     <div class="table-responsive">
@@ -42,7 +81,7 @@
             <th>Payment Status</th>
             <th>Connection Type</th>
             <th>Connection Status</th>
-            <th>Mobile Number</th>
+            <!-- <th>Mobile Number</th> -->
             <th>Bill Period</th>
             <th>Bill Date</th>
             <th>Due Date</th>
@@ -52,12 +91,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let bill of bills" class="text-center">
+          <tr *ngFor="let bill of filtered" class="text-center">
             <td>
-              <input type="checkbox" [(ngModel)]="bill.selected" (change)="updateTotal()" />
+              <input
+                type="checkbox"
+                [(ngModel)]="bill.selected"
+                (change)="updateTotal()"
+                [ngModelOptions]="{standalone: true}"
+              />
             </td>
             <td>{{ bill.consumerNo }}</td>
-            <td>{{ bill.billNumber }}</td>
+            <td>{{ bill.billId }}</td>
             <td>
               <span [ngClass]="bill.paymentStatus === 'Paid' ? 'text-success' : 'text-danger'">
                 {{ bill.paymentStatus }}
@@ -65,12 +109,12 @@
             </td>
             <td>{{ bill.connectionType }}</td>
             <td>{{ bill.connectionStatus }}</td>
-            <td>{{ bill.mobileNumber }}</td>
+            <!-- <td>{{ bill.mobileNumber }}</td> -->
             <td>{{ bill.billPeriod }}</td>
             <td>{{ bill.billDate | date }}</td>
             <td>{{ bill.dueDate | date }}</td>
             <td>{{ bill.disconnectionDate | date }}</td>
-            <td>{{ bill.dueAmount | number: '1.2-2' }}</td>
+            <td>{{ bill.dueAmount | number:'1.2-2' }}</td>
             <td>
               <input
                 type="number"
@@ -79,6 +123,7 @@
                 [disabled]="!bill.selected"
                 (input)="updateTotal()"
                 min="0"
+                [ngModelOptions]="{standalone: true}"
               />
             </td>
           </tr>
@@ -86,10 +131,16 @@
       </table>
     </div>
 
+    <!-- ✅ Total + Proceed -->
     <div class="d-flex justify-content-between align-items-center mt-3">
       <h5>Total Amount Payable: ₹{{ totalAmount | number: '1.2-2' }}</h5>
-      <button class="btn btn-success" [disabled]="totalAmount <= 0" (click)="proceedToPay()">
-        Proceed to Pay
+      <button
+        class="btn btn-success"
+        (click)="proceedToSummary()"
+        [disabled]="!hasSelected"
+        title="Select at least one bill to proceed"
+      >
+        Proceed
       </button>
     </div>
   </div>

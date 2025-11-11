@@ -28,7 +28,7 @@ body{
 }
 .brand { display:flex; align-items:center; gap:10px; }
 .logo .bolt { width:34px; height:34px; color:#F59E0B; }
-.brand-name { font-weight:700; font-size:1.05rem; letter-spacing:0.2px; }
+.brand-name { font-weight:700; font-size:1.05rem; letter-spacing:0.2px; text-decoration: none;}
 
 /* nav links */
 .nav-links { list-style:none; display:flex; gap:14px; margin:0; padding:0; align-items:center; }

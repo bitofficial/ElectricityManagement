@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { PayBillService } from '../../services/pay-bill.service'; // service we'll create
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-pay-bill',
   standalone:true,
-  imports:[FormsModule,CommonModule],
+  imports:[FormsModule,CommonModule, RouterLink],
   templateUrl: './pay-bill.component.html', 
   styleUrls: ['./pay-bill.component.css']
 })
