@@ -2,19 +2,23 @@
   <div class="wm-container">
     <div class="brand">
       <div class="logo" aria-hidden="true">
-        <!-- simple bolt icon -->
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
-          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path
+            d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"
+            stroke-width="1.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </div>
-       <a href="/"><span class="brand-name">PowerEase</span></a>
+      <a href="/"><span class="brand-name">PowerEase</span></a>
     </div>
 
     <ul class="nav-links">
       <li><a routerLink="/customer/home" style="color: #0EA5A4;">Home</a></li>
       <li><a routerLink="/customer/view-bill">View Bill</a></li>
       <li><a routerLink="/customer/pay-bill">Pay Bill</a></li>
-      <li><a routerLink="/customer/register-complaint" style="color:red">Register Complaint</a></li>
+      <li><a routerLink="/customer/register-complaint" style="color: red;">Register Complaint</a></li>
     </ul>
   </div>
 </nav>
@@ -22,42 +26,101 @@
 <div class="container mt-4">
   <h2 class="text-center mb-4">Complaint Status</h2>
 
-  <!-- Complaint Search -->
+  <!-- 🔍 Complaint Search -->
   <form (ngSubmit)="getComplaintStatus()" #statusForm="ngForm" class="mb-4">
     <div class="row justify-content-center">
       <div class="col-md-4">
-        <input 
-          type="number" 
-          [(ngModel)]="complaintId" 
-          name="complaintId" 
-          class="form-control" 
-          placeholder="Enter Complaint ID"
-          required>
+        <input
+          type="number"
+          [(ngModel)]="complaintId"
+          name="complaintId"
+          class="form-control"
+          placeholder="Enter Complaint ID (optional)"
+        />
       </div>
       <div class="col-md-2">
-        <button type="submit" class="btn btn-primary w-100">Check</button>
+        <button type="submit" class="btn btn-primary w-100">Search</button>
       </div>
     </div>
   </form>
 
-  <!-- Display Complaint Details -->
-  <div *ngIf="complaint" class="card p-4 shadow-sm">
-    <h5>Complaint ID: {{ complaint.id }}</h5>
-    <p><strong>Type:</strong> {{ complaint.type }}</p>
+  <!-- 🔹 Error message -->
+  <div *ngIf="errorMessage" class="alert alert-danger text-center">
+    {{ errorMessage }}
+  </div>
+
+  <!-- 🔹 Single Complaint (if searched by ID) -->
+  <div *ngIf="complaint && !allComplaints.length" class="card p-4 shadow-sm mb-4">
+    <h5>Complaint ID: {{ complaint.complaintId }}</h5>
+    <p><strong>Type:</strong> {{ complaint.category }}</p>
     <p><strong>Description:</strong> {{ complaint.description }}</p>
-    <p><strong>Status:</strong> 
+    <p>
+      <strong>Status:</strong>
       <span [class]="complaint.status === 'RESOLVED' ? 'text-success' : 'text-warning'">
         {{ complaint.status }}
       </span>
     </p>
-    <p><strong>Registered On:</strong> {{ complaint.date | date: 'dd-MM-yyyy' }}</p>
+    <p><strong>Registered On:</strong> {{ complaint.dateSubmitted | date: 'dd-MM-yyyy' }}</p>
     <p *ngIf="complaint.resolutionDetails">
       <strong>Resolution:</strong> {{ complaint.resolutionDetails }}
     </p>
   </div>
 
-  <!-- No Complaint Found -->
-  <div *ngIf="errorMessage" class="alert alert-danger mt-3 text-center">
-    {{ errorMessage }}
+  <!-- 🔹 All Complaints Table -->
+  <div *ngIf="allComplaints && allComplaints.length > 0" class="card shadow-sm p-3">
+    <h5 class="fw-semibold mb-3 text-center" style="color: #0EA5A4;">All Complaints</h5>
+
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Complaint ID</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Registered Date</th>
+            <th>Status</th>
+            <!-- <th>Resolved Date</th> -->
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of allComplaints">
+            <td>{{ c.complaintId }}</td>
+            <td>{{ c.category }}</td>
+            <td>{{ c.description }}</td>
+            <td>{{ c.dateSubmitted
+ | date: 'mediumDate' }}</td>
+            <td>
+              <span
+                class="badge"
+                [ngClass]="{
+                  'bg-warning text-dark': c.status === 'PENDING',
+                  'bg-info text-dark': c.status === 'IN_PROGRESS',
+                  'bg-success': c.status === 'RESOLVED',
+                  'bg-danger': c.status === 'REJECTED'
+                }"
+              >
+                {{ c.status }}
+              </span>
+            </td>
+            <!-- <td>{{ (c.status=='RESOLVED')   ? (c.lastUpdated | date: 'mediumDate') : '—' }}</td> -->
+            <td>{{ c.notes || 'N/A' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 🔹 No complaints found -->
+  <div
+    *ngIf="!loading && allComplaints && allComplaints.length === 0 && !errorMessage"
+    class="text-center mt-4 text-muted"
+  >
+    No complaints found for your account.
+  </div>
+
+  <div *ngIf="loading" class="text-center mt-3">
+    <div class="spinner-border text-info" role="status"></div>
+    <p>Loading complaint details...</p>
   </div>
 </div>

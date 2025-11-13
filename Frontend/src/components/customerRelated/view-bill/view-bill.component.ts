@@ -13,7 +13,7 @@ interface Bill {
   connectionStatus?: string;
   mobileNumber?: string;
   billPeriod: string;
-  billDate: Date;
+  billingMonth: Date;
   dueDate: Date;
   disconnectionDate?: Date;
   dueAmount?: number;
@@ -38,13 +38,6 @@ export class ViewBillComponent implements OnInit {
 
   private readonly rawUserId = localStorage.getItem('userId') ?? '';
   private readonly consumerNumber = this.parseConsumerNumber(this.rawUserId);
-
-  constructor(private router: Router, private billService: BillService) {}
-
-  ngOnInit(): void {
-    this.fetchAllMyBills();
-  }
-
   // --- Helpers ---
   private parseConsumerNumber(userId: string): string {
     // If your userId is "u-<number>", remove the first 2 chars ("u-")
@@ -52,11 +45,18 @@ export class ViewBillComponent implements OnInit {
     return userId.startsWith('u-') ? userId.slice(2) : userId;
   }
 
+  constructor(private router: Router, private billService: BillService) {}
+
+  ngOnInit(): void {
+    this.fetchAllMyBills();
+  }
+
+
   private mapBill(b: any): Bill {
   return {
     billId: String(b.billId ?? 'N/A'),   // 👈 force string
     billPeriod: b.billPeriod ?? '',
-    billDate: new Date(b.billDate),
+    billingMonth: new Date(b.billingMonth),
     dueDate: new Date(b.dueDate),
     disconnectionDate: b.disconnectionDate ? new Date(b.disconnectionDate) : undefined,
     paymentStatus: b.status ?? 'N/A',
@@ -82,6 +82,7 @@ export class ViewBillComponent implements OnInit {
         this.filtered = mapped.slice(); // show all initially
         this.updateTotal();
         this.loading = false;
+        console.log(data)
       },
       error: (err) => {
         this.loading = false;
@@ -91,7 +92,13 @@ export class ViewBillComponent implements OnInit {
         this.updateTotal();
       }
     });
-  }
+  } 
+  getDisconnectionDate(dueDate: string | Date): Date {
+  const date = new Date(dueDate);
+  date.setDate(date.getDate() + 15); // add 15 days
+  return date;
+}
+
 
   // --- Search (manual) ---
   // No-op kept only for compatibility if referenced elsewhere
@@ -145,4 +152,6 @@ export class ViewBillComponent implements OnInit {
       state: { selectedBills:selectedBills, totalAmount: this.totalAmount }
     });
   }
+
+  
 }

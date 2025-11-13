@@ -1,0 +1,86 @@
+<nav class="wm-navbar">
+  <div class="wm-container">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <!-- simple bolt icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+       <a href="/"><span class="brand-name">PowerEase</span></a>
+    </div>
+
+    <ul class="nav-links">
+      <li><a href="/customer/home" style="color: #0EA5A4;">Dashboard</a></li>
+      <li><a href="/customer/view-bill">View Bill</a></li>
+      <li><a href="/customer/complaint-status">Search Complaint</a></li>
+      <li><a href="/customer/register-complaint" style="color:red">Register Complaint</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="profile-container">
+  <h2 class="title"><i class="bi bi-gear"></i> Account Settings</h2>
+  
+  <div *ngIf="loading" class="loading">Loading profile...</div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  
+  <form (ngSubmit)="saveProfile()" #form="ngForm" class="profile-form" *ngIf="!loading">
+    
+    <section class="card-section">
+      <h3>Contact Details</h3>
+      <label>Full Name</label>
+      <input type="text" [(ngModel)]="profile.fullName" name="fullName" required>
+      
+      <label>Email</label>
+      <input type="email" [(ngModel)]="profile.email" name="email" required>
+      
+      <label>Mobile</label>
+      <input type="text" [(ngModel)]="profile.mobile" name="mobile" required>
+    </section>
+    
+    <section class="card-section">
+      <h3>Address</h3>
+      <label>Address</label>
+      <textarea [(ngModel)]="profile.address" name="address" rows="3" required></textarea>
+      
+      <label>City</label>
+      <input type="text" [(ngModel)]="profile.city" name="city" required>
+
+      <label>State</label>
+      <input type="text" [(ngModel)]="profile.state" name="state" required>
+      
+      <label>Pincode</label>
+      <input type="text" [(ngModel)]="profile.pincode" name="pincode" required>
+    </section>
+    
+    <section class="card-section">
+      <h3>Other Details</h3>
+      <label>Consumer Number</label>
+      <input type="text" [(ngModel)]="profile.consumerNumber" name="consumerNumber" disabled>
+      <label>Customer Type</label>
+      <input type="text" [(ngModel)]="profile.customerType" name="customerType" required>
+      
+      <label>Electrical Section</label>
+      <input type="text" [(ngModel)]="profile.electricalSection" name="electricalSection" required>
+      
+      <label>User ID</label>
+      <input type="text" [(ngModel)]="profile.userId" name="userId" disabled>
+    </section>
+    
+    <section class="card-section">
+      <h3>Change Password</h3>
+      <label>New Password</label>
+      <input type="password" [(ngModel)]="profile.newPassword" name="newPassword">
+      
+      <label>Confirm Password</label>
+      <input type="password" [(ngModel)]="profile.confirmPassword" name="confirmPassword">
+      
+      <p *ngIf="passwordMismatch" class="error-text">⚠ Passwords do not match!</p>
+    </section>
+
+    <button type="submit" class="save-btn" [disabled]="saving">
+      {{ saving ? 'Saving...' : 'Save Changes' }}
+    </button>
+  </form>
+</div>

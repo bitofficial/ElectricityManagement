@@ -14,6 +14,7 @@ import { ComplaintStatusComponent } from '../components/customerRelated/complain
 
 
 //admin
+import { AdminDashboardComponent } from '../components/adminRelated/admin-dashboard/admin-dashboard.component';
 import { AdminLoginComponent } from '../components/adminRelated/admin-login/admin-login.component';
 import { AddCustomerComponent } from '../components/adminRelated/add-customer/add-customer.component';
 import { AddBillComponent } from '../components/adminRelated/add-bill/add-bill.component';
@@ -27,6 +28,7 @@ import { AdminViewBillComponent } from '../components/adminRelated/admin-view-bi
 import { ListSmeComplaintComponent } from '../components/smeRelated/list-sme-complaints/list-sme-complaints.component';
 import { ResolveComplaintComponent } from '../components/smeRelated/resolve-complaint/resolve-complaint.component';
 import { SearchComplaintComponent } from '../components/smeRelated/search-complaint/search-complaint.component';
+import { ProfileComponent } from '../components/customerRelated/profile/profile.component';
 
 
 
@@ -39,6 +41,7 @@ export const routes: Routes = [
 
   // 👤 Customer Routes
   { path: 'customer/home', component: HomeComponent },
+  { path: 'customer/profile', component: ProfileComponent },
   { path: 'customer/view-bill', component: ViewBillComponent },
   { path: 'customer/bill-summary', component: ViewBillSummaryComponent },
   { path: 'customer/pay-bill', component: PayBillComponent },
@@ -47,6 +50,7 @@ export const routes: Routes = [
   { path: 'customer/complaint-status', component: ComplaintStatusComponent },
 
   // 🧑‍💼 Admin Routes
+  { path: 'admin/home', component:AdminDashboardComponent},
   { path: 'admin/login', component: AdminLoginComponent},
   { path: 'admin/add-customer', component: AddCustomerComponent },
   { path: 'admin/list-customer', component: ListCustomersComponent },

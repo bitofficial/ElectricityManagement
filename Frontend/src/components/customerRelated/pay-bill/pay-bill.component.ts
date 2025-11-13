@@ -1,8 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { PayBillService } from '../../services/pay-bill.service';
-import { FormsModule, NgForm } from '@angular/forms';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NgForm, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+import { PayBillService } from '../../services/pay-bill.service';
+import { BillService } from '../../services/bill.service';
+import { Subscription } from 'rxjs';
 
 interface SelectedBill {
   billId: string;
@@ -11,7 +16,7 @@ interface SelectedBill {
   dueDate?: string | Date;
   dueAmount?: number;
   payableAmount: number;
-  [key: string]: any; // allow extra fields from your app
+  [key: string]: any;
 }
 
 @Component({
@@ -21,72 +26,74 @@ interface SelectedBill {
   templateUrl: './pay-bill.component.html',
   styleUrls: ['./pay-bill.component.css']
 })
-export class PayBillComponent implements OnInit {
-
-  // Bills from localStorage
+export class PayBillComponent implements OnInit, OnDestroy {
   selectedBills: SelectedBill[] = [];
   totalAmount = 0;
 
-  // Consumer info (optional: derive from first bill or from storage)
+  // Snapshot of paid bills & amount for invoice / success display
+  paidBillsSnapshot: SelectedBill[] | null = null;
+  paidTotal = 0;
+
   consumerId = localStorage.getItem('consumerId') || 'CUST1001';
 
-  // Payment form model
-  payment: {
-    method: '' | 'UPI' | 'Card' | 'NetBanking';
-    upiId: string;
-    cardNumber: string;
-    expiry: string;
-    cvv: string;
-    bank?: string;
-  } = {
-    method: '',
+  payment = {
+    method: '' as '' | 'UPI' | 'Card' | 'NetBanking',
     upiId: '',
     cardNumber: '',
     expiry: '',
-    cvv: ''
+    cvv: '',
+    bank: ''
   };
 
-  // UI state
+  private readonly rawUserId = localStorage.getItem('userId') ?? '';
+  private readonly consumerNumber = this.parseConsumerNumber(this.rawUserId);
+
   paymentSuccess = false;
   paymentError = '';
   transactionId = '';
   isSubmitting = false;
 
-  constructor(private payBillService: PayBillService) {}
+  private subs: Subscription[] = [];
+
+  constructor(
+    private payBillService: PayBillService,
+    private billService: BillService
+  ) {}
 
   ngOnInit(): void {
     this.loadSelectedBills();
   }
 
-  // Load bills from localStorage and compute total
+  ngOnDestroy(): void {
+    this.subs.forEach(s => s.unsubscribe());
+  }
+
+  private parseConsumerNumber(userId: string): string {
+    if (!userId) return '';
+    return userId.startsWith('u-') ? userId.slice(2) : userId;
+  }
+
   loadSelectedBills(): void {
     try {
       const raw = localStorage.getItem('selectedBills') || '[]';
       this.selectedBills = JSON.parse(raw) as SelectedBill[];
-
-      // Normalize numeric fields just in case
       this.selectedBills = this.selectedBills.map(b => ({
         ...b,
         payableAmount: Number(b.payableAmount) || 0
       }));
-
-      console.log('Loaded selected bills:', this.selectedBills);
-
-      this.totalAmount = this.selectedBills.reduce((sum, b) => sum + (b.payableAmount || 0), 0);
+      this.totalAmount = this.selectedBills.reduce((sum, b) => sum + (Number(b.payableAmount) || 0), 0);
     } catch {
       this.selectedBills = [];
       this.totalAmount = 0;
     }
   }
 
-  // Optional helper: remove one bill from list (and localStorage)
   removeBill(billId: string): void {
     this.selectedBills = this.selectedBills.filter(b => b.billId !== billId);
     localStorage.setItem('selectedBills', JSON.stringify(this.selectedBills));
-    this.totalAmount = this.selectedBills.reduce((sum, b) => sum + (b.payableAmount || 0), 0);
+    this.totalAmount = this.selectedBills.reduce((sum, b) => sum + (Number(b.payableAmount) || 0), 0);
   }
 
-  // Simple validation depending on method
   private validatePaymentForm(): string | null {
     if (!this.payment.method) return 'Please select a payment method.';
 
@@ -97,19 +104,17 @@ export class PayBillComponent implements OnInit {
     }
 
     if (this.payment.method === 'Card') {
-      const digitsOnly = this.payment.cardNumber.replace(/\s+/g, '');
+      const digitsOnly = (this.payment.cardNumber || '').replace(/\s+/g, '');
       if (!/^\d{16}$/.test(digitsOnly)) return 'Card number must be 16 digits.';
       if (!/^\d{2}\/\d{2}$/.test(this.payment.expiry)) return 'Expiry must be in MM/YY format.';
       if (!/^\d{3,4}$/.test(this.payment.cvv)) return 'CVV must be 3 or 4 digits.';
     }
 
-    // NetBanking could require bank selection (optional)
     if (this.payment.method === 'NetBanking' && !this.payment.bank) {
       return 'Please select your bank for NetBanking.';
     }
 
     if (this.selectedBills.length === 0) return 'No bills selected. Please select bills to pay.';
-
     if (this.totalAmount <= 0) return 'Total amount must be greater than zero.';
 
     return null;
@@ -125,12 +130,14 @@ export class PayBillComponent implements OnInit {
       return;
     }
 
-    // Build request to backend using selected bills + total
+    // Ensure numeric values are correct
+    this.totalAmount = Number(this.totalAmount) || this.selectedBills.reduce((s, b) => s + (Number(b.payableAmount) || 0), 0);
+
     const paymentRequest = {
       consumerId: this.consumerId,
       bills: this.selectedBills.map(b => ({
         billId: b.billId,
-        payableAmount: b.payableAmount,
+        payableAmount: Number(b.payableAmount) || 0,
         dueDate: b.dueDate,
         billDate: b.billDate,
         billPeriod: b.billPeriod
@@ -148,15 +155,45 @@ export class PayBillComponent implements OnInit {
 
     this.isSubmitting = true;
 
-    this.payBillService.processPayment(paymentRequest).subscribe({
+    const paySub = this.payBillService.processPayment(paymentRequest).subscribe({
       next: (response) => {
-        // Expecting { transactionId: string, status?: 'SUCCESS'|'FAILED', ... }
-        this.transactionId = response?.transactionId || '';
+        // Always set transaction id first (from backend if present)
+        this.transactionId = response?.transactionId || 'TXN' + Math.floor(Math.random() * 1000000);
         this.paymentSuccess = true;
-        this.isSubmitting = false;
 
-        // (Optional) clear paid bills from storage, or keep as per your flow
-        // localStorage.removeItem('selectedBills');
+        // TAKE SNAPSHOT BEFORE clearing selected bills
+        this.paidBillsSnapshot = this.selectedBills.map(b => ({ ...b, payableAmount: Number(b.payableAmount) || 0 }));
+        this.paidTotal = Number(this.totalAmount) || this.paidBillsSnapshot.reduce((s, b) => s + (Number(b.payableAmount) || 0), 0);
+
+        // Prepare bill ids to mark as paid
+        const billIds = this.paidBillsSnapshot.map(b => b.billId);
+        const updatePayload = {
+          transactionId: this.transactionId,
+          method: this.payment.method,
+          amount: this.paidTotal,
+          consumerId: this.consumerId
+        };
+
+        // Call backend to mark these bills as paid
+        const markSub = this.billService.markBillsAsPaid(billIds, updatePayload).subscribe({
+          next: (res) => {
+            console.log('Bills marked as paid:', res);
+            // Clear selection and local storage (we keep snapshot for invoice)
+            localStorage.removeItem('selectedBills');
+            this.selectedBills = [];
+            this.totalAmount = 0;
+            this.isSubmitting = false;
+          },
+          error: (err) => {
+            console.error('Failed to mark bills as paid:', err);
+            // Payment succeeded but marking failed — keep snapshot and inform user
+            this.paymentError = 'Payment succeeded, but updating bill status failed. Please contact support or retry marking as paid.';
+            // do NOT clear snapshot so invoice still works
+            this.isSubmitting = false;
+          }
+        });
+
+        this.subs.push(markSub);
       },
       error: (err) => {
         console.error('Payment failed:', err);
@@ -165,5 +202,89 @@ export class PayBillComponent implements OnInit {
         this.isSubmitting = false;
       }
     });
+
+    this.subs.push(paySub);
+  }
+
+  /** Generate and download PDF invoice */
+  downloadInvoice(): void {
+    // Use snapshot if available; otherwise, if paymentSuccess and no snapshot, still allow but warn
+    const billsForInvoice = this.paidBillsSnapshot ?? this.selectedBills;
+    const invoiceTotal = this.paidBillsSnapshot ? this.paidTotal : this.totalAmount;
+
+    if (!this.paymentSuccess) {
+      alert('Please complete a payment before downloading the invoice.');
+      return;
+    }
+
+    if (!billsForInvoice || billsForInvoice.length === 0) {
+      alert('No paid bill data available for invoice.');
+      return;
+    }
+
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const left = 40;
+    let y = 40;
+
+    const invoiceNumber = 'INV' + Math.floor(100000 + Math.random() * 900000);
+    const paymentId = 'PAY' + Math.floor(100000 + Math.random() * 900000);
+    const receiptNumber = 'RCPT' + Math.floor(100000 + Math.random() * 900000);
+    const transactionDate = new Date();
+
+    // Header
+    doc.setFontSize(18);
+    doc.text('Electricity Bill Payment Invoice', 210, y, { align: 'center' });
+    y += 30;
+
+    doc.setFontSize(11);
+    doc.text(`Invoice No: ${invoiceNumber}`, left, y);
+    doc.text(`Payment ID: ${paymentId}`, 350, y);
+    y += 18;
+    doc.text(`Transaction ID: ${this.transactionId}`, left, y);
+    doc.text(`Receipt No: ${receiptNumber}`, 350, y);
+    y += 22;
+
+    // Consumer Info
+    doc.setFontSize(12);
+    doc.text('Consumer Details', left, y);
+    y += 16;
+    doc.setFontSize(10);
+    doc.text(`Consumer ID: ${this.consumerNumber || this.consumerId}`, left, y);
+    doc.text(`Payment Method: ${this.payment.method}`, 350, y);
+    y += 14;
+    doc.text(`Transaction Date: ${transactionDate.toLocaleString()}`, left, y);
+    y += 20;
+
+    // Bills Table
+    const tableData = billsForInvoice.map((b, i) => [
+      i + 1,
+      b.billId,
+      b.billPeriod || '-',
+      b.billDate ? new Date(b.billDate).toLocaleDateString() : '-',
+      b.dueDate ? new Date(b.dueDate).toLocaleDateString() : '-',
+      `₹ ${Number(b.payableAmount).toFixed(2)}`
+    ]);
+
+    const tableResult: any = (autoTable as any)(doc, {
+      startY: y,
+      head: [['#', 'Bill ID', 'Period', 'Bill Date', 'Due Date', 'Amount']],
+      body: tableData,
+      theme: 'striped',
+      styles: { fontSize: 10, cellPadding: 6 },
+      headStyles: { fillColor: [22, 160, 133] }
+    });
+
+    const finalY = (tableResult?.finalY) || (doc as any).lastAutoTable?.finalY || (y + 100);
+
+    doc.setFontSize(11);
+    doc.text(`Total Amount Paid: ₹ ${Number(invoiceTotal).toFixed(2)}`, left, finalY + 20);
+    doc.text('Payment Status: SUCCESS', left, finalY + 40);
+
+    doc.setFontSize(10);
+    doc.text('Thank you for your payment.', left, finalY + 70);
+    doc.text('This is a system-generated invoice.', left, finalY + 85);
+
+    const fileName = `Invoice_${this.consumerId}_${invoiceNumber}.pdf`;
+    doc.save(fileName);
   }
 }

@@ -11,10 +11,10 @@
     </div>
 
     <ul class="nav-links">
-      <li><a routerLink="/customer/home" style="color: #0EA5A4;">Home</a></li>
-      <li><a routerLink="/customer/view-bill">View Bill</a></li>
-      <li><a routerLink="/customer/complaint-status">Search Complaint</a></li>
-      <li><a routerLink="/customer/register-complaint" style="color:red">Register Complaint</a></li>
+      <li><a href="/customer/home" style="color: #0EA5A4;">Home</a></li>
+      <li><a href="/customer/view-bill">View Bill</a></li>
+      <li><a href="/customer/complaint-status">Search Complaint</a></li>
+      <li><a href="/customer/register-complaint" style="color:red">Register Complaint</a></li>
     </ul>
   </div>
 </nav>
@@ -72,7 +72,7 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>Consumer</th>
+            <th>Bill Number</th>
             <th (click)="toggleSort('billDate')" class="sortable">
               Bill Date
               <small *ngIf="sortColumn === 'billDate'">({{ sortDirection }})</small>
@@ -87,15 +87,15 @@
               <small *ngIf="sortColumn === 'billAmount'">({{ sortDirection }})</small>
             </th>
             <th>Payment Status</th>
-            <th>Payment Date</th>
-            <th>Mode of Payment</th>
-            <th>Actions</th>
+            <!-- <th>Payment Date</th> -->
+            <!-- <th>Mode of Payment</th> -->
+            <!-- <th>Actions</th> -->
           </tr>
         </thead>
 
         <tbody>
           <tr *ngFor="let b of filtered">
-            <td>{{ b.consumerNumber }}</td>
+            <td>{{ b.id }}</td>
             <td>{{ b.billDate }}</td>
             <td>{{ b.billingPeriod }}</td>
             <td>{{ b.dueDate }}</td>
@@ -107,13 +107,13 @@
                 'partial': b.paymentStatus === 'PARTIAL'
               }">{{ b.paymentStatus }}</span>
             </td>
-            <td>{{ b.paymentDate || '-' }}</td>
-            <td>{{ b.modeOfPayment || '-' }}</td>
-            <td>
+            <!-- <td>{{ b.paymentDate || '-' }}</td> -->
+            <!-- <td>{{ b.modeOfPayment || '-' }}</td> -->
+            <!-- <td>
               <button class="btn btn-sm btn-outline-primary" (click)="viewOrDownload(b)">
                 View / Download
               </button>
-            </td>
+            </td> -->
           </tr>
 
           <tr *ngIf="!filtered || filtered.length === 0">

@@ -4,16 +4,25 @@
       <div class="logo" aria-hidden="true">
         <!-- simple bolt icon -->
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
-          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
       <span class="brand-name">PowerEase</span>
     </div>
 
-    <ul class="nav-links">
+    <!-- Show Login/Register/Admin links only if NOT logged in -->
+    <ul *ngIf="!loginStatus" class="nav-links">
       <li><a routerLink="/login">Login</a></li>
       <li><a routerLink="/admin/login">Admin</a></li>
       <li><a routerLink="/register" class="cta">Register</a></li>
+    </ul>
+
+    <!-- Show Logout button only if logged in -->
+    <ul *ngIf="loginStatus" class="nav-links">
+      <li>
+        <button class="btn btn-outline-danger" (click)="logout()">Logout</button>
+      </li>
+      <li><a href="/customer/home" class="cta">Dashboard</a></li>
     </ul>
   </div>
 </nav>
@@ -27,7 +36,7 @@
       </p>
 
       <div class="nav-links">
-        <a routerLink="/register" class="cta">Get Started</a>
+        <a routerLink="/register" *ngIf="!loginStatus" class="cta">Get Started</a>
         <a routerLink="/features" class="btn-ghost">See Features</a>
       </div>
     </div>
@@ -43,7 +52,12 @@
           <div class="reading">3.42 kW</div>
           <div class="graph" aria-hidden="true">
             <svg viewBox="0 0 100 40" preserveAspectRatio="none">
-              <polyline points="0,30 15,24 30,18 45,12 60,16 75,10 90,18 100,8" fill="none" stroke-width="2" stroke-linecap="round"/>
+              <polyline
+                points="0,30 15,24 30,18 45,12 60,16 75,10 90,18 100,8"
+                fill="none"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
             </svg>
           </div>
         </div>
@@ -53,42 +67,47 @@
 </header>
 
 <section id="features" class="features wm-container">
-  <h2 class="section-title">Core services</h2>
+  <h2 class="section-title">Core Services</h2>
 
   <div class="features-grid">
     <article class="feature-card">
       <div class="icon" aria-hidden="true">
-        <!-- icon: analytics -->
-        <svg viewBox="0 0 24 24"><path d="M3 3v18h18" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24">
+          <path d="M3 3v18h18" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
       </div>
-      <h3 style="color:#0EA5A4">Real-time monitoring</h3>
+      <h3 style="color:#0EA5A4">Real-time Monitoring</h3>
       <p>Live consumption graphs, device-level breakdown and historical reports.</p>
     </article>
 
     <article class="feature-card">
       <div class="icon" aria-hidden="true">
-        <!-- icon: bolt/alerts -->
-        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24">
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
       </div>
-      <h3 style="color:#0EA5A4">Fault detection & alerts</h3>
+      <h3 style="color:#0EA5A4">Fault Detection & Alerts</h3>
       <p>Automatic detection of outages, spikes and potential wiring faults with instant notifications.</p>
     </article>
 
     <article class="feature-card">
       <div class="icon" aria-hidden="true">
-        <!-- icon: billing -->
-        <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24">
+          <path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"
+            stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
       </div>
-      <h3 style="color:#0EA5A4">Billing & payments</h3>
+      <h3 style="color:#0EA5A4">Billing & Payments</h3>
       <p>Generate accurate bills, accept online payments and offer clear usage-based invoices.</p>
     </article>
 
     <article class="feature-card">
       <div class="icon" aria-hidden="true">
-        <!-- icon: scheduling -->
-        <svg viewBox="0 0 24 24"><path d="M7 10h5v5" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24">
+          <path d="M7 10h5v5" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
       </div>
-      <h3 style="color:#0EA5A4">Load scheduling</h3>
+      <h3 style="color:#0EA5A4">Load Scheduling</h3>
       <p>Shift heavy loads to off-peak hours and optimise costs with intelligent schedules.</p>
     </article>
   </div>
@@ -98,7 +117,7 @@
   <div class="wm-container">
     <div>© {{ currentYear }} PowerEase — Built for smarter power</div>
     <div class="footer-links">
-      <a href="/privacy/privacy">Privacy&amp;Contact</a>
+      <a href="/privacy/privacy">Privacy & Contact</a>
     </div>
   </div>
 </footer>

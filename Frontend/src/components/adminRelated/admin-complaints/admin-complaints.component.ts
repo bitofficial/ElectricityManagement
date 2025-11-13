@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { AdminComplaintService } from '../../services/admin-complaint.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 
 @Component({
 
   selector: 'app-admin-complaints',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, RouterLink],
   standalone:true,
   templateUrl: './admin-complaints.component.html',
   styleUrls: ['./admin-complaints.component.css']

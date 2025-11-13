@@ -9,45 +9,55 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class LoginService {
 
-    // This service can now safely use the UserRepository
     @Autowired
     private UserRepository userRepository;
 
-    // It uses the same PasswordEncoder bean
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Handles user login authentication.
+     */
     public Map<String, Object> login(LoginRequest loginRequest) {
         Map<String, Object> response = new HashMap<>();
 
-        // 1. Find the user by their userId from the database
-        Optional<User> userOptional = userRepository.findByUserId(loginRequest.getUserId());
+        User user = userRepository.findByUserId(loginRequest.getUserId())
+                .orElse(null);
 
-        if (userOptional.isEmpty()) {
-            // User not found
-            response.put("error", "Invalid User ID or Password");
+        if (user == null) {
+            response.put("error", "User ID not found");
             return response;
         }
 
-        User user = userOptional.get();
-
-        // 2. Check if the provided password matches the stored hashed password
-        if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            // Passwords match - Login successful
-            response.put("message", "Login Successful");
-            response.put("userId", user.getUserId());
-            response.put("fullName", user.getFullName());
-            response.put("email", user.getEmail());
-        } else {
-            // Passwords do not match
-            response.put("error", "Invalid User ID or Password");
+        // Compare encoded passwords
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            response.put("error", "Invalid password");
+            return response;
         }
 
+        response.put("message", "Login successful");
+        response.put("consumerNumber", user.getConsumerNumber());
+//        response.put("firstLogin", user.isFirstLogin());
+        response.put("name", user.getFullName());
+        response.put("email", user.getEmail());
+
         return response;
+    }
+
+    /**
+     * Updates the user's password and sets firstLogin = false.
+     */
+    public User updatePassword(String userId, String newPassword) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+//        user.setFirstLogin(false);
+
+        return userRepository.save(user);
     }
 }

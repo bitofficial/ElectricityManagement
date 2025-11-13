@@ -7,7 +7,7 @@
           <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <a href="/"><span class="brand-name">PowerEase</span></a>
+      <span class="brand-name">PowerEase</span>
     </div>
 
     <ul class="nav-links">
@@ -30,26 +30,26 @@
 
     <form (ngSubmit)="onLogin()" #adminLoginForm="ngForm" autocomplete="off">
       <div class="form-group mb-3">
-        <label for="email" class="form-label">Email </label>
+        <label for="email" class="form-label" style="width:150px">User ID</label>
         <input
           id="userId"
           type="text"
           class="form-control custom-input"
-          placeholder="Enter your userId"
-          [(ngModel)]="loginData.userId"
+          placeholder="Enter your User ID"
+          [(ngModel)]="adminLoginData.userId"
           name="userId"
           required
         />
       </div>
 
       <div class="form-group mb-4">
-        <label for="password" class="form-label">Password</label>
+        <label for="password" class="form-label" style="width:150px">Password</label>
         <input
           id="password"
           type="password"
           class="form-control custom-input"
-          placeholder="Enter your password"
-          [(ngModel)]="loginData.password"
+          placeholder="Enter your Password"
+          [(ngModel)]="adminLoginData.password"
           name="password"
           required
         />
@@ -71,6 +71,13 @@
 
     <div *ngIf="successMessage" class="alert alert-success mt-3 text-center rounded-pill py-2">
       {{ successMessage }}
+    </div>
+
+ <div class="mt-3 small text-muted text-center">
+      Are you an User?
+      <a href="/login" class="text-primary text-decoration-none fw-semibold"
+        >Login here</a
+      >
     </div>
 
   </div>

@@ -47,6 +47,19 @@ public class ComplaintServiceImpl implements ComplaintService {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+    @Override
+    public ComplaintResponseDTO getComplaintById(String consumerNumber, Long complaintId) {
+        Complaint complaint = complaintRepo.findById(complaintId)
+                .orElseThrow(() -> new RuntimeException("Complaint not found"));
+
+        // Security check — ensure this complaint belongs to the same consumer
+        if (!complaint.getUser().getConsumerNumber().equals(consumerNumber)) {
+            throw new RuntimeException("Unauthorized access: Complaint does not belong to this consumer.");
+        }
+
+        return mapToResponse(complaint);
+    }
+
 
     @Override
     public ComplaintResponseDTO updateComplaintStatus(Long complaintId, String status, String notes) {

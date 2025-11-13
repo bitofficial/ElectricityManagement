@@ -1,16 +1,20 @@
 //package com.Auth_Service.service;
 //
-//import com.Auth_Service.dto.BillListItemDTO;
-//import com.Auth_Service.dto.BillSummaryDTO;
-//import com.Auth_Service.dto.DashboardResponseDTO;
+//import com.Auth_Service.dto.*;
 //import com.Auth_Service.model.Bill;
+//import com.Auth_Service.model.Payment;
 //import com.Auth_Service.model.User;
 //import com.Auth_Service.repository.BillRepository;
+//import com.Auth_Service.repository.PaymentRepository;
 //import com.Auth_Service.repository.UserRepository;
+//import jakarta.transaction.Transactional;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Service;
 //
+//import java.math.BigDecimal;
+//import java.time.LocalDateTime;
 //import java.util.List;
+//import java.util.UUID;
 //import java.util.stream.Collectors;
 //
 //@Service
@@ -22,8 +26,11 @@
 //    @Autowired
 //    private BillRepository billRepository;
 //
+//    @Autowired
+//    private PaymentRepository paymentRepository;
+//
 //    /**
-//     * This is your existing method for the main dashboard page.
+//     * Main dashboard data - user info + current bill summary.
 //     */
 //    public DashboardResponseDTO getDashboardInfo(String consumerNumber) {
 //
@@ -38,46 +45,165 @@
 //        return mapToDashboardResponse(user, billSummary);
 //    }
 //
-//
-//    // --- (NEW METHOD 1) ---
 //    /**
-//     * Gets a list of all bill summaries for a user.
-//     * This is for your "View All Bills" page.
-//     * @param consumerNumber The user's consumer number
-//     * @return A list of BillListItemDTOs
+//     * Gets a list of all bills for a consumer.
+//     * Used for the "View All Bills" page.
 //     */
 //    public List<BillListItemDTO> getAllBills(String consumerNumber) {
-//        // First, check if the user exists.
 //        if (!userRepository.existsByConsumerNumber(consumerNumber)) {
 //            throw new RuntimeException("User not found with consumer number: " + consumerNumber);
 //        }
 //
-//        // Find all bills and convert them to the simple DTO
 //        return billRepository.findByConsumerNumber(consumerNumber)
 //                .stream()
-//                .map(BillListItemDTO::fromEntity) // Uses the static helper method
+//                .map(BillListItemDTO::fromEntity)
 //                .collect(Collectors.toList());
 //    }
 //
-//
-//    // --- (NEW METHOD 2) ---
 //    /**
-//     * Gets the full details for a single, specific bill.
-//     * Includes a security check.
-//     * @param consumerNumber The user's consumer number
-//     * @param billId The ID of the bill they want to see
-//     * @return The full Bill entity
+//     * Gets the full details of a single bill.
+//     * Includes ownership check.
 //     */
 //    public Bill getBillDetails(String consumerNumber, Long billId) {
-//        // Use the new repository method to find the bill
-//        // This ensures the bill exists AND belongs to the consumerNumber
 //        return billRepository.findByBillIdAndConsumerNumber(billId, consumerNumber)
 //                .orElseThrow(() -> new RuntimeException("Bill not found or does not belong to user"));
 //    }
 //
+//    /**
+//     * Gets the "Bill History" (all "Paid" bills) for a user.
+//     */
+//    public List<BillListItemDTO> getBillHistory(String consumerNumber) {
+//        return billRepository.findByConsumerNumberAndStatus(consumerNumber, "Paid")
+//                .stream()
+//                .map(BillListItemDTO::fromEntity)
+//                .collect(Collectors.toList());
+//    }
 //
-//    // --- Helper Methods (unchanged) ---
+//    /**
+//     * Updates a bill status AND creates a new payment invoice record.
+//     * This is a "Transactional" operation.
+//     */
+//    @Transactional
+//    public Payment markBillAsPaid(String consumerNumber, Long billId, PaymentRequestDTO request) {
 //
+//        // Step 1: Find the bill AND verify it belongs to this user
+//        Bill billToUpdate = billRepository.findByBillIdAndConsumerNumber(billId, consumerNumber)
+//                .orElseThrow(() -> new RuntimeException("Bill not found or does not belong to user"));
+//
+//        // Step 2: Check if bill is already paid
+//        if ("Paid".equals(billToUpdate.getStatus())) {
+//            throw new RuntimeException("This bill is already paid.");
+//        }
+//
+//        // Step 3: Update the bill status
+//        billToUpdate.setStatus("Paid");
+//        billToUpdate.setPaymentDate(LocalDateTime.now());
+//        billRepository.save(billToUpdate);
+//
+//        // Step 4: Create the new Payment record
+//        Payment payment = new Payment();
+//        payment.setInvoiceNumber("INV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+//        payment.setTransactionId("TXN-" + UUID.randomUUID().toString().toUpperCase());
+//        payment.setPaymentId("PAY-" + UUID.randomUUID().toString().substring(0, 10).toUpperCase());
+//        payment.setReceiptNumber("RCT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+//
+//        payment.setPaymentMethod(request.getPaymentMethod());
+//        payment.setTransactionDate(LocalDateTime.now());
+//        payment.setBillId(billToUpdate.getBillId());
+//        payment.setConsumerNumber(consumerNumber);
+//
+//        payment.setAmount(billToUpdate.getAmount());
+//        payment.setBillingMonth(billToUpdate.getBillingMonth());
+//        payment.setUnitsConsumed(billToUpdate.getUnitsConsumed());
+//        payment.setGeneratedAt(LocalDateTime.now());
+//        payment.setStatus("Paid");
+//
+//        return paymentRepository.save(payment);
+//    }
+//
+//    /**
+//     * ADMIN FUNCTIONALITY:
+//     * Adds a new bill for a consumer.
+//     * Calculates amount = unitsConsumed × pricePerUnit.
+//     */
+//    public Bill addBill(BillRequestDTO dto) {
+//
+//        if (!userRepository.existsByConsumerNumber(dto.getConsumerNumber())) {
+//            throw new RuntimeException("Invalid consumer number: " + dto.getConsumerNumber());
+//        }
+//
+//        List<Bill> existingBills = billRepository.findByConsumerNumber(dto.getConsumerNumber());
+//        boolean duplicate = existingBills.stream()
+//                .anyMatch(b -> b.getBillingMonth().equalsIgnoreCase(dto.getBillingMonth()));
+//        if (duplicate) {
+//            throw new RuntimeException("A bill already exists for this consumer and billing month.");
+//        }
+//
+//        BigDecimal amount = dto.getUnitsConsumed().multiply(dto.getPricePerUnit());
+//
+//        Bill bill = new Bill();
+//        bill.setBillingMonth(dto.getBillingMonth());
+//        bill.setUnitsConsumed(dto.getUnitsConsumed());
+//        bill.setPricePerUnit(dto.getPricePerUnit());
+//        bill.setAmount(amount);
+//        bill.setDueDate(dto.getDueDate());
+//        bill.setConsumerNumber(dto.getConsumerNumber());
+//        bill.setPaymentDate(LocalDateTime.now());
+//        bill.setStatus("Unpaid");
+//
+//        return billRepository.save(bill);
+//    }
+//
+//    /**
+//     * ADMIN FUNCTIONALITY:
+//     * Adds a new customer to the system.
+//     */
+//    @Transactional
+//    public User addCustomer(AdminAddUserDTO dto) {
+//        if (userRepository.existsByEmail(dto.getEmail())) {
+//            throw new RuntimeException("Email already exists!");
+//        }
+//        if (userRepository.existsByUserId(dto.getUserId())) {
+//            throw new RuntimeException("User ID already exists!");
+//        }
+//        if (userRepository.existsByConsumerNumber(dto.getConsumerNumber())) {
+//            throw new RuntimeException("Consumer Number already exists!");
+//        }
+//
+//        User user = new User();
+//        user.setConsumerNumber(dto.getConsumerNumber());
+//        user.setFullName(dto.getFullName());
+//        user.setAddress(dto.getAddress());
+//        user.setCity(dto.getCity());
+//        user.setState(dto.getState());
+//        user.setPincode(dto.getPincode());
+//        user.setEmail(dto.getEmail());
+//        user.setMobile(dto.getMobile());
+//        user.setCustomerType(dto.getCustomerType());
+//        user.setElectricalSection(dto.getElectricalSection());
+//        user.setUserId(dto.getUserId());
+//
+//        if (dto.getPassword() == null || dto.getPassword().isBlank()) {
+//            String defaultPassword = dto.getConsumerNumber() + "@default";
+//            user.setPassword(defaultPassword);
+////            user.setFirstLogin(true);
+//        } else {
+//            user.setPassword(dto.getPassword());
+////            user.setFirstLogin(false);
+//        }
+//
+//        return userRepository.save(user);
+//    }
+//
+//    /**
+//     * Fetches the Payment Invoice for a specific bill and consumer.
+//     */
+//    public Payment getPaymentInvoice(String consumerNumber, Long billId) {
+//        return paymentRepository.findByBillIdAndConsumerNumber(billId, consumerNumber)
+//                .orElseThrow(() -> new RuntimeException("Payment invoice not found for this bill"));
+//    }
+//
+//    // --- Helper Methods ---
 //    private DashboardResponseDTO mapToDashboardResponse(User user, BillSummaryDTO billSummary) {
 //        DashboardResponseDTO response = new DashboardResponseDTO();
 //
@@ -85,13 +211,13 @@
 //        response.setConsumerNumber(user.getConsumerNumber());
 //
 //        String address = user.getAddress() + ", " + user.getCity() +
-//                         ", " + user.getState() + " - " + user.getPincode();
+//                ", " + user.getState() + " - " + user.getPincode();
 //        response.setBillingAddress(address);
 //
 //        response.setCurrentBill(billSummary);
-//
 //        return response;
 //    }
+//
 //
 //    private BillSummaryDTO mapEntityToBillSummaryDTO(Bill bill) {
 //        return new BillSummaryDTO(
@@ -102,23 +228,23 @@
 //        );
 //    }
 //}
-//
 
 package com.Auth_Service.service;
 
-import com.Auth_Service.dto.BillListItemDTO;
-import com.Auth_Service.dto.BillRequestDTO;
-import com.Auth_Service.dto.BillSummaryDTO;
-import com.Auth_Service.dto.DashboardResponseDTO;
+import com.Auth_Service.dto.*;
 import com.Auth_Service.model.Bill;
+import com.Auth_Service.model.Payment;
 import com.Auth_Service.model.User;
 import com.Auth_Service.repository.BillRepository;
+import com.Auth_Service.repository.PaymentRepository;
 import com.Auth_Service.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -129,6 +255,9 @@ public class DashboardService {
 
     @Autowired
     private BillRepository billRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     /**
      * Main dashboard data - user info + current bill summary.
@@ -146,7 +275,6 @@ public class DashboardService {
         return mapToDashboardResponse(user, billSummary);
     }
 
-    // --- (NEW METHOD 1) ---
     /**
      * Gets a list of all bills for a consumer.
      * Used for the "View All Bills" page.
@@ -162,7 +290,6 @@ public class DashboardService {
                 .collect(Collectors.toList());
     }
 
-    // --- (NEW METHOD 2) ---
     /**
      * Gets the full details of a single bill.
      * Includes ownership check.
@@ -172,7 +299,58 @@ public class DashboardService {
                 .orElseThrow(() -> new RuntimeException("Bill not found or does not belong to user"));
     }
 
-    // --- (NEW METHOD 3: Admin Feature) ---
+    /**
+     * Gets the "Bill History" (all "Paid" bills) for a user.
+     */
+    public List<BillListItemDTO> getBillHistory(String consumerNumber) {
+        return billRepository.findByConsumerNumberAndStatus(consumerNumber, "Paid")
+                .stream()
+                .map(BillListItemDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Updates a bill status AND creates a new payment invoice record.
+     * This is a "Transactional" operation.
+     */
+    @Transactional
+    public Payment markBillAsPaid(String consumerNumber, Long billId, PaymentRequestDTO request) {
+
+        // Step 1: Find the bill AND verify it belongs to this user
+        Bill billToUpdate = billRepository.findByBillIdAndConsumerNumber(billId, consumerNumber)
+                .orElseThrow(() -> new RuntimeException("Bill not found or does not belong to user"));
+
+        // Step 2: Check if bill is already paid
+        if ("Paid".equals(billToUpdate.getStatus())) {
+            throw new RuntimeException("This bill is already paid.");
+        }
+
+        // Step 3: Update the bill status
+        billToUpdate.setStatus("Paid");
+        billToUpdate.setPaymentDate(LocalDateTime.now());
+        billRepository.save(billToUpdate);
+
+        // Step 4: Create the new Payment record
+        Payment payment = new Payment();
+        payment.setInvoiceNumber("INV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        payment.setTransactionId("TXN-" + UUID.randomUUID().toString().toUpperCase());
+        payment.setPaymentId("PAY-" + UUID.randomUUID().toString().substring(0, 10).toUpperCase());
+        payment.setReceiptNumber("RCT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+
+        payment.setPaymentMethod(request.getPaymentMethod());
+        payment.setTransactionDate(LocalDateTime.now());
+        payment.setBillId(billToUpdate.getBillId());
+        payment.setConsumerNumber(consumerNumber);
+
+        payment.setAmount(billToUpdate.getAmount());
+        payment.setBillingMonth(billToUpdate.getBillingMonth());
+        payment.setUnitsConsumed(billToUpdate.getUnitsConsumed());
+        payment.setGeneratedAt(LocalDateTime.now());
+        payment.setStatus("Paid");
+
+        return paymentRepository.save(payment);
+    }
+
     /**
      * ADMIN FUNCTIONALITY:
      * Adds a new bill for a consumer.
@@ -180,12 +358,10 @@ public class DashboardService {
      */
     public Bill addBill(BillRequestDTO dto) {
 
-        // 1. Validate consumer
         if (!userRepository.existsByConsumerNumber(dto.getConsumerNumber())) {
             throw new RuntimeException("Invalid consumer number: " + dto.getConsumerNumber());
         }
 
-        // 2. Prevent duplicate bill for same consumer + month
         List<Bill> existingBills = billRepository.findByConsumerNumber(dto.getConsumerNumber());
         boolean duplicate = existingBills.stream()
                 .anyMatch(b -> b.getBillingMonth().equalsIgnoreCase(dto.getBillingMonth()));
@@ -193,10 +369,8 @@ public class DashboardService {
             throw new RuntimeException("A bill already exists for this consumer and billing month.");
         }
 
-        // 3. Calculate amount
         BigDecimal amount = dto.getUnitsConsumed().multiply(dto.getPricePerUnit());
 
-        // 4. Create Bill entity
         Bill bill = new Bill();
         bill.setBillingMonth(dto.getBillingMonth());
         bill.setUnitsConsumed(dto.getUnitsConsumed());
@@ -204,10 +378,62 @@ public class DashboardService {
         bill.setAmount(amount);
         bill.setDueDate(dto.getDueDate());
         bill.setConsumerNumber(dto.getConsumerNumber());
+        bill.setPaymentDate(LocalDateTime.now());
         bill.setStatus("Unpaid");
 
-        // 5. Save and return
         return billRepository.save(bill);
+    }
+
+    /**
+     * ADMIN FUNCTIONALITY:
+     * Adds a new customer to the system.
+     */
+    @Transactional
+    public User addCustomer(AdminAddUserDTO dto) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new RuntimeException("Email already exists!");
+        }
+        if (userRepository.existsByUserId(dto.getUserId())) {
+            throw new RuntimeException("User ID already exists!");
+        }
+        if (userRepository.existsByConsumerNumber(dto.getConsumerNumber())) {
+            throw new RuntimeException("Consumer Number already exists!");
+        }
+
+        User user = new User();
+        user.setConsumerNumber(dto.getConsumerNumber());
+        user.setFullName(dto.getFullName());
+        user.setAddress(dto.getAddress());
+        user.setCity(dto.getCity());
+        user.setState(dto.getState());
+        user.setPincode(dto.getPincode());
+        user.setEmail(dto.getEmail());
+        user.setMobile(dto.getMobile());
+        user.setCustomerType(dto.getCustomerType());
+        user.setElectricalSection(dto.getElectricalSection());
+        user.setUserId(dto.getUserId());
+
+        if (dto.getPassword() == null || dto.getPassword().isBlank()) {
+            String defaultPassword = dto.getConsumerNumber() + "@default";
+            user.setPassword(defaultPassword);
+//            user.setFirstLogin(true);
+        } else {
+            user.setPassword(dto.getPassword());
+//            user.setFirstLogin(false);
+        }
+
+        String consumerNumber = generateUniqueConsumerNumber();
+        user.setConsumerNumber(consumerNumber);
+
+        return userRepository.save(user);
+    }
+
+    /**
+     * Fetches the Payment Invoice for a specific bill and consumer.
+     */
+    public Payment getPaymentInvoice(String consumerNumber, Long billId) {
+        return paymentRepository.findByBillIdAndConsumerNumber(billId, consumerNumber)
+                .orElseThrow(() -> new RuntimeException("Payment invoice not found for this bill"));
     }
 
     // --- Helper Methods ---
@@ -233,4 +459,43 @@ public class DashboardService {
                 bill.getStatus()
         );
     }
+
+    public String generateUniqueConsumerNumber() {
+        String number;
+        Random random = new Random();
+
+        do {
+            number = String.format("%013d", Math.abs(random.nextLong()) % 10000000000000L);
+        } while (userRepository.existsByConsumerNumber(number));
+
+        return number;
+    }
+    // --- ADD THIS NEW METHOD FOR BATCH PAYMENTS ---
+    /**
+     * Marks multiple bills as "Paid" in a single transaction.
+     * @param consumerNumber The user's consumer number
+     * @param batchRequest The DTO containing the list of bill IDs
+     * @return A list of the new Payment records that were created
+     */
+    @Transactional // This is CRITICAL. If one bill fails, all are rolled back.
+    public List<Payment> markMultipleBillsAsPaid(String consumerNumber, PaymentBatchRequestDTO batchRequest) {
+
+        List<Payment> createdPayments = new ArrayList<>();
+
+        // Create a single DTO for the payment method
+        PaymentRequestDTO singlePaymentRequest = new PaymentRequestDTO();
+        singlePaymentRequest.setPaymentMethod(batchRequest.getPaymentMethod());
+
+        // Loop through every billId sent from the front-end
+        for (Long billId : batchRequest.getBillIds()) {
+            // Call your existing, single-payment logic for each bill
+            // This reuses your code and is very efficient
+            Payment paymentRecord = markBillAsPaid(consumerNumber, billId, singlePaymentRequest);
+            createdPayments.add(paymentRecord);
+        }
+
+        // Return the list of all payment records we just created
+        return createdPayments;
+    }
+
 }

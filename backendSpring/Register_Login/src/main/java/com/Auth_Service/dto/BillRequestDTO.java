@@ -35,4 +35,59 @@ public class BillRequestDTO {
     @NotBlank(message = "Consumer number is required.")
     @Pattern(regexp = "^[0-9]{13}$", message = "Consumer number must be 13 digits.")
     private String consumerNumber;
+
+	public BillRequestDTO(@NotBlank(message = "Billing month is required.") String billingMonth,
+			@NotNull(message = "Units consumed is required.") @DecimalMin(value = "0.01", message = "Units consumed must be greater than 0.") BigDecimal unitsConsumed,
+			@NotNull(message = "Price per unit is required.") @DecimalMin(value = "0.01", message = "Price per unit must be greater than 0.") BigDecimal pricePerUnit,
+			@NotNull(message = "Due date is required.") LocalDate dueDate,
+			@NotBlank(message = "Consumer number is required.") @Pattern(regexp = "^[0-9]{13}$", message = "Consumer number must be 13 digits.") String consumerNumber) {
+		super();
+		this.billingMonth = billingMonth;
+		this.unitsConsumed = unitsConsumed;
+		this.pricePerUnit = pricePerUnit;
+		this.dueDate = dueDate;
+		this.consumerNumber = consumerNumber;
+	}
+
+	public String getBillingMonth() {
+		return billingMonth;
+	}
+
+	public void setBillingMonth(String billingMonth) {
+		this.billingMonth = billingMonth;
+	}
+
+	public BigDecimal getUnitsConsumed() {
+		return unitsConsumed;
+	}
+
+	public void setUnitsConsumed(BigDecimal unitsConsumed) {
+		this.unitsConsumed = unitsConsumed;
+	}
+
+	public BigDecimal getPricePerUnit() {
+		return pricePerUnit;
+	}
+
+	public void setPricePerUnit(BigDecimal pricePerUnit) {
+		this.pricePerUnit = pricePerUnit;
+	}
+
+	public LocalDate getDueDate() {
+		return dueDate;
+	}
+
+	public void setDueDate(LocalDate dueDate) {
+		this.dueDate = dueDate;
+	}
+
+	public String getConsumerNumber() {
+		return consumerNumber;
+	}
+
+	public void setConsumerNumber(String consumerNumber) {
+		this.consumerNumber = consumerNumber;
+	}
+    
+    
 }

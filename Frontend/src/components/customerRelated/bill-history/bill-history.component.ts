@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BillHistoryService, BackendBill } from '../../services/bill-history.service'; // adjust path as needed
+import { finalize } from 'rxjs/operators';
 
 type PaymentStatus = 'PAID' | 'UNPAID' | 'PARTIAL';
 
@@ -9,7 +11,7 @@ interface BillHistory {
   id: string;
   consumerNumber: string;
   billDate: string;         // ISO string or yyyy-mm-dd
-  billingPeriod: string;    // e.g. "Aug 2025"
+  billingPeriod: string;    // e.g. "Oct 2025" or original string
   dueDate: string;          // ISO string
   billAmount: number;       // numeric
   paymentStatus: PaymentStatus;
@@ -30,20 +32,31 @@ export class BillHistoryComponent implements OnInit {
   filtered: BillHistory[] = [];
   loading = false;
   error = '';
-  // Date range controls (yyyy-mm-dd)
   fromDate: string = '';
   toDate: string = '';
 
-  // Filter & sort controls
   statusFilter: 'ALL' | PaymentStatus = 'ALL';
-  // keep as union including empty string to represent "no explicit sort"
   sortColumn: '' | 'billDate' | 'dueDate' | 'billAmount' = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
   // Simulated auth (replace with your AuthService)
   isAuthenticated = true;
 
-  constructor(private router: Router, private location: Location) {}
+  // If you have a real auth, replace this hard-coded id with actual customer id
+    private readonly rawUserId = localStorage.getItem('userId') ?? '';
+  private readonly customerId = this.parseConsumerNumber(this.rawUserId);
+  // --- Helpers ---
+  private parseConsumerNumber(userId: string): string {
+    // If your userId is "u-<number>", remove the first 2 chars ("u-")
+    if (!userId) return '';
+    return userId.startsWith('u-') ? userId.slice(2) : userId;
+  }
+
+  constructor(
+    private router: Router,
+    private location: Location,
+    private billService: BillHistoryService
+  ) {}
 
   ngOnInit(): void {
     if (!this.isAuthenticated) {
@@ -63,61 +76,91 @@ export class BillHistoryComponent implements OnInit {
     return { from: fmt(from), to: fmt(to) };
   }
 
+  /**
+   * Map backend status to PaymentStatus enum
+   */
+  private mapStatus(s: string | undefined): PaymentStatus {
+    if (!s) return 'UNPAID';
+    const key = s.trim().toLowerCase();
+    if (key === 'paid') return 'PAID';
+    if (key === 'partial' || key === 'partially paid' || key === 'partialpaid') return 'PARTIAL';
+    return 'UNPAID';
+  }
+  private parseBillingMonth(billingMonth: string | undefined): { billDate: string; billingPeriod: string } {
+    if (!billingMonth) {
+      const d = new Date();
+      return { billDate: d.toISOString().slice(0,10), billingPeriod: '' };
+    }
+    // Accept formats like "OCT-2025", "OCT-2025", "Oct-2025", "2025-10"
+    const s = billingMonth.trim();
+    // try "MON-YYYY"
+    const monYearMatch = s.match(/^([A-Za-z]{3,})-?(\d{4})$/);
+    if (monYearMatch) {
+      const monStr = monYearMatch[1].slice(0,3);
+      const year = Number(monYearMatch[2]);
+      const monthIndex = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
+        .indexOf(monStr.toLowerCase());
+      if (monthIndex >= 0) {
+        const date = new Date(year, monthIndex, 1);
+        const billDate = date.toISOString().slice(0,10);
+        const billingPeriod = date.toLocaleString(undefined, { month: 'short', year: 'numeric' });
+        return { billDate, billingPeriod };
+      }
+    }
+    // try "YYYY-MM" or "YYYY-MM-DD"
+    const ymd = new Date(s);
+    if (!isNaN(ymd.getTime())) {
+      const billDate = new Date(ymd.getFullYear(), ymd.getMonth(), 1).toISOString().slice(0,10);
+      const billingPeriod = ymd.toLocaleString(undefined, { month: 'short', year: 'numeric' });
+      return { billDate, billingPeriod };
+    }
+
+    // fallback
+    return { billDate: new Date().toISOString().slice(0,10), billingPeriod: s };
+  }
+
   loadBills(): void {
     this.loading = true;
     this.error = '';
     this.bills = [];
     this.filtered = [];
 
-    setTimeout(() => {
-      const simulateFailure = false;
-      if (simulateFailure) {
-        this.loading = false;
-        this.error = 'Failed to load billing history. Please retry.';
-        return;
-      }
+    // Use the service to fetch backend bills
+    this.billService.getBillHistory(this.customerId)
+      .pipe(finalize(() => this.loading = false))
+      .subscribe({
+        next: (backend: BackendBill[]) => {
+          // console.log(backend)
+          // Map backend array into our BillHistory[] shape
+          const mapped: BillHistory[] = backend.map(b => {
+            const { billDate, billingPeriod } = this.parseBillingMonth(b.billingMonth);
+            // Use backend dueDate as ISO string (if it's already yyyy-mm-dd it's fine)
+            const dueDateIso = b.dueDate ? new Date(b.dueDate).toISOString().slice(0,10) : '';
+            // Construct a pdfUrl if your API provides one; otherwise leave undefined or point to a route
+            const pdfUrl = `/api/dashboard/bill/${b.billId}/pdf`; // adjust if your backend has endpoint
+            return {
+              id: String(b.billId),
+              consumerNumber: `${this.customerId.toString().padStart(4, '0')}`, // or get from backend if available
+              billDate,
+              billingPeriod,
+              dueDate: dueDateIso,
+              billAmount: Number(b.amount ?? 0),
+              paymentStatus: this.mapStatus(b.status),
+              // backend doesn't send paymentDate/modeOfPayment in given sample; leave undefined
+              pdfUrl
+            } as BillHistory;
+          });
 
-      const example: BillHistory[] = [
-        {
-          id: 'B1001',
-          consumerNumber: 'C-0001',
-          billDate: '2025-10-01',
-          billingPeriod: 'Sep 2025',
-          dueDate: '2025-10-20',
-          billAmount: 120.5,
-          paymentStatus: 'PAID',
-          paymentDate: '2025-10-10',
-          modeOfPayment: 'Net Banking',
-          pdfUrl: '/assets/sample-bills/B1001.pdf'
+          // assign and apply filters / sort
+          this.bills = mapped;
+          this.applyFiltersAndSort();
+          console.log(this.bills);
         },
-        {
-          id: 'B1000',
-          consumerNumber: 'C-0001',
-          billDate: '2025-09-01',
-          billingPeriod: 'Aug 2025',
-          dueDate: '2025-09-20',
-          billAmount: 98,
-          paymentStatus: 'UNPAID',
-          pdfUrl: '/assets/sample-bills/B1000.pdf'
-        },
-        {
-          id: 'B0999',
-          consumerNumber: 'C-0001',
-          billDate: '2025-08-01',
-          billingPeriod: 'Jul 2025',
-          dueDate: '2025-08-20',
-          billAmount: 75.75,
-          paymentStatus: 'PARTIAL',
-          paymentDate: '2025-08-18',
-          modeOfPayment: 'Credit Card',
-          pdfUrl: '/assets/sample-bills/B0999.pdf'
+        error: (err) => {
+          console.error('Failed to load bills', err);
+          this.error = 'Failed to load billing history. Please try again later.';
         }
-      ];
-
-      this.bills = example;
-      this.applyFiltersAndSort();
-      this.loading = false;
-    }, 600);
+      });
   }
 
   applyFiltersAndSort(): void {
@@ -137,9 +180,8 @@ export class BillHistoryComponent implements OnInit {
       out = out.filter(b => b.paymentStatus === this.statusFilter);
     }
 
-    // If a sort column is set, use a type-safe comparator
     if (this.sortColumn) {
-      const col = this.sortColumn; // typed as one of the three allowed values (not empty here)
+      const col = this.sortColumn;
       out.sort((a, b) => {
         const cmp = this.compareByColumn(a, b, col);
         return this.sortDirection === 'asc' ? cmp : -cmp;
@@ -151,7 +193,6 @@ export class BillHistoryComponent implements OnInit {
     this.filtered = out;
   }
 
-  // Compare two bills based on an explicitly-known column (type safe)
   private compareByColumn(a: BillHistory, b: BillHistory, col: 'billDate' | 'dueDate' | 'billAmount'): number {
     if (col === 'billAmount') {
       const av = Number(a.billAmount);
@@ -160,7 +201,6 @@ export class BillHistoryComponent implements OnInit {
       if (av > bv) return 1;
       return 0;
     } else {
-      // col is a date field
       const av = new Date(a[col]).getTime();
       const bv = new Date(b[col]).getTime();
       if (av < bv) return -1;
@@ -169,9 +209,7 @@ export class BillHistoryComponent implements OnInit {
     }
   }
 
-  onFilterChange(): void {
-    this.applyFiltersAndSort();
-  }
+  onFilterChange(): void { this.applyFiltersAndSort(); }
 
   toggleSort(column: 'billDate' | 'dueDate' | 'billAmount'): void {
     if (this.sortColumn === column) {

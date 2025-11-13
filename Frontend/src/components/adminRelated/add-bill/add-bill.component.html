@@ -1,3 +1,32 @@
+<nav class="wm-navbar">
+  <div class="wm-container">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          class="bolt"
+        >
+          <path
+            d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"
+            stroke-width="1.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <a href="/"><span class="brand-name">PowerEase Admin</span></a>
+    </div>
+
+    <ul class="nav-links">
+      <li><a routerLink="/admin/home" style="color:#0EA5A4;">Dashboard</a></li>
+      <li><a routerLink="/admin/add-customer">Add Customers</a></li>
+      <li><a routerLink="/admin/complaints"  style="color:red">View Complaints</a></li>
+    </ul>
+  </div>
+</nav>
+
 <div class="container mt-4">
   <h2 class="text-center mb-4">Add New Bill</h2>
 
@@ -7,10 +36,10 @@
       <label for="customerId">Customer ID:</label>
       <input
         type="text"
-        id="customerId"
-        name="customerId"
+        id="consumerNumber"
+        name="consumerNumber"
         class="form-control"
-        [(ngModel)]="bill.customerId"
+        [(ngModel)]="bill.consumerNumber"
         placeholder="Enter Customer ID"
         required
       />
@@ -21,10 +50,22 @@
       <label for="month">Billing Month:</label>
       <input
         type="month"
-        id="month"
-        name="month"
+        id="billingMonth"
+        name="billingMonth"
         class="form-control"
-        [(ngModel)]="bill.month"
+        [(ngModel)]="bill.billingMonth"
+        required
+      />
+    </div>
+    <!-- Due Date -->
+    <div class="form-group mb-3">
+      <label for="dueDate">Due Date:</label>
+      <input
+        type="date"
+        id="dueDate"
+        name="dueDate"
+        class="form-control"
+        [(ngModel)]="bill.dueDate"
         required
       />
     </div>
@@ -34,10 +75,10 @@
       <label for="units">Units Consumed:</label>
       <input
         type="number"
-        id="units"
-        name="units"
+        id="unitsConsumed"
+        name="unitsConsumed"
         class="form-control"
-        [(ngModel)]="bill.units"
+        [(ngModel)]="bill.unitsConsumed"
         placeholder="Enter number of units"
         required
       />
@@ -45,32 +86,16 @@
 
     <!-- Amount -->
     <div class="form-group mb-3">
-      <label for="amount">Amount (₹):</label>
+      <label for="amount">Price Per Unit:</label>
       <input
         type="number"
-        id="amount"
-        name="amount"
+        id="pricePerUnit"
+        name="pricePerUnit"
         class="form-control"
-        [(ngModel)]="bill.amount"
-        placeholder="Enter total bill amount"
+        [(ngModel)]="bill.pricePerUnit"
+        placeholder="Enter total price/unit"
         required
       />
-    </div>
-
-    <!-- Status -->
-    <div class="form-group mb-3">
-      <label for="status">Status:</label>
-      <select
-        id="status"
-        name="status"
-        class="form-control"
-        [(ngModel)]="bill.status"
-        required
-      >
-        <option value="">-- Select Status --</option>
-        <option value="Unpaid">Unpaid</option>
-        <option value="Paid">Paid</option>
-      </select>
     </div>
 
     <button class="btn btn-primary w-100" [disabled]="!billForm.form.valid">

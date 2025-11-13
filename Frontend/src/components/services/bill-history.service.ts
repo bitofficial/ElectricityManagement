@@ -2,16 +2,26 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface BackendBill {
+  billId: number;
+  billingMonth: string;   // e.g. "OCT-2025"
+  unitsConsumed: number;
+  pricePerUnit: number;
+  amount: number;
+  dueDate: string;        // ISO or yyyy-mm-dd
+  status: string;         // e.g. "Paid"
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class BillHistoryService {
-
-  private baseUrl = 'http://localhost:8080/api/bills'; // Spring Boot endpoint
+  private baseUrl = 'http://localhost:8085/api/dashboard'; // Spring Boot endpoint
 
   constructor(private http: HttpClient) {}
 
-  getBillHistory(customerId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/history/${customerId}`);
+  // return typed Observable
+  getBillHistory(customerId: string): Observable<BackendBill[]> {
+    return this.http.get<BackendBill[]>(`${this.baseUrl}/${customerId}/billhistory`);
   }
 }

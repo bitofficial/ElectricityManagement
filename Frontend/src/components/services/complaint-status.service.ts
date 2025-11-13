@@ -6,12 +6,15 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ComplaintStatusService {
-
-  private baseUrl = 'http://localhost:8080/api/complaints'; // Spring Boot endpoint
+  private baseUrl = 'http://localhost:8085/api/complaints';
 
   constructor(private http: HttpClient) {}
 
-  getComplaintById(complaintId: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/${complaintId}`);
+  getComplaintById(skey: number,cusNo:string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/${cusNo}/${skey}`);
+  }
+
+  getComplaintsByConsumer(consumerNumber: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/consumer/${consumerNumber}`);
   }
 }

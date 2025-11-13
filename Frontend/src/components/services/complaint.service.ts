@@ -6,15 +6,15 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ComplaintService {
-  private baseUrl = 'http://localhost:8080/api/complaints';
+  private baseUrl = 'http://localhost:8085/api/complaints';
 
   constructor(private http: HttpClient) {}
 
   registerComplaint(complaint: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/register`, complaint);
+    return this.http.post<any>(`${this.baseUrl}/raise`, complaint);
   }
   getComplaintById(id: string): Observable<any> {
-  return this.http.get<any>(`${this.baseUrl}/${id}`);
+  return this.http.get<any>(`${this.baseUrl}/${id}/status`);
 }
 
 updateComplaint(complaint: any): Observable<any> {

@@ -33,4 +33,6 @@ public interface ComplaintService {
             LocalDate startDate,
             LocalDate endDate
     );
+    
+    ComplaintResponseDTO getComplaintById(String consumerNumber, Long complaintId);
 }

@@ -11,6 +11,7 @@ export class BillService {
   // e.g. GET http://localhost:8080/api/dashboard/1234567890123/bills
   private readonly baseUrl = `http://localhost:8085/api/dashboard/${this.consumerNumber}/bills`;
   private readonly customerUrl = 'http://localhost:8085/api/customers';
+  private readonly adminUrl = 'http://localhost:8085/api/admin/bills';
 
   constructor(private http: HttpClient) {}
 
@@ -39,8 +40,23 @@ export class BillService {
   }
 
   addBill(bill: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/add`, bill);
+    return this.http.post<any>(`${this.adminUrl}/add`, bill);
   }
+/** Mark given bills as paid for the current consumer */
+markBillsAsPaid(billIds: string[], payload?: { transactionId?: string; method?: string; amount?: number; consumerId?: string; }): Observable<any> {
+  if (!this.consumerNumber) {
+    return throwError(() => new Error('Missing consumer number in localStorage (userId).'));
+  }
+  const url = `${this.baseUrl}/pay-batch`; // adjust endpoint if your backend uses a different path
+  const body = {
+    billIds,
+    transactionId: payload?.transactionId,
+    paymentMethod: payload?.method,
+    amount: payload?.amount,
+    consumerId: payload?.consumerId
+  };
+  return this.http.post<any>(url, body);
+}
 
   /** Dummy fallback */
   getBillByConsumerNumber(consumerNumber: number): Observable<any[]> {

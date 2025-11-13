@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class AddCustomerService {
 
-  private baseUrl = 'http://localhost:8080/api/customers'; // Spring Boot endpoint
+  private baseUrl = 'http://localhost:8085/api/admin/users'; // Spring Boot endpoint
 
   constructor(private http: HttpClient) {}
 

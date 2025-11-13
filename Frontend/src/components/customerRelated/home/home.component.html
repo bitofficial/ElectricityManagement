@@ -11,7 +11,7 @@
     </div>
 
     <ul class="nav-links">
-      <li><a routerLink="/customer/home" style="color:#0EA5A4;">Home</a></li>
+      <li><a routerLink="/customer/home" style="color:#0EA5A4;">Dashboard</a></li>
       <li><a routerLink="/customer/view-bill">View Bill</a></li>
       <li><a routerLink="/customer/complaint-status">Search Complaint</a></li>
       <li><a routerLink="/customer/register-complaint" style="color:red">Register Complaint</a></li>
@@ -72,14 +72,14 @@
     </div>
 
     <div class="text-end">
-      <span class="badge" [ngClass]="currentBill.paid ? 'bg-success' : 'bg-warning text-dark'">
-        {{ currentBill.paid ? 'Paid' : 'Unpaid' }}
+      <span class="badge" [ngClass]="(currentBill.status=='Paid') ? 'bg-success' : 'bg-warning text-dark'">
+        {{ currentBill.status }}
       </span>
     </div>
   </div>
 
   <div class="d-flex gap-2">
-    <a *ngIf="!currentBill.paid" class="btn btn-primary btn-sm flex-grow-1" href="/customer/pay-bill">
+    <a *ngIf="!currentBill.status" class="btn btn-primary btn-sm flex-grow-1" href="/customer/pay-bill">
       Pay Now
     </a>
   </div>

@@ -12,9 +12,9 @@
 
     <ul class="nav-links">
       <li><a routerLink="/customer/home" style="color: #0EA5A4;">Home</a></li>
-      <li><a routerLink="customer/view-bill">View Bill</a></li>
-      <li><a routerLink="customer/pay-bill">Pay Bill</a></li>
-      <li><a routerLink="customer/complaint-status">Search Complaint</a></li>
+      <li><a routerLink="/customer/view-bill">View Bill</a></li>
+      <li><a routerLink="/customer/pay-bill">Pay Bill</a></li>
+      <li><a routerLink="/customer/complaint-status">Search Complaint</a></li>
     </ul>
   </div>
 </nav>
@@ -27,12 +27,13 @@
       <label for="customerId">Customer ID:</label>
       <input
         type="text"
-        id="customerId"
-        name="customerId"
+        id="consumerNumber"
+        name="consumerNumber"
         class="form-control"
-        [(ngModel)]="complaint.customerId"
+        [(ngModel)]="complaint.consumerNumber"
         placeholder="Enter your Customer ID"
         required
+        disabled
       />
     </div>
 
@@ -52,19 +53,34 @@
         <option value="Other">Other</option>
       </select>
     </div>
+    <div class="form-group mb-3">
+      <label for="preferredContact">Preferred Contact:</label>
+      <select
+        id="preferredContact"
+        name="preferredContact"
+        class="form-control"
+        [(ngModel)]="complaint.preferredContact"
+        required
+      >
+        <option value="">-- Select Category --</option>
+        <option value="Email">Email</option>
+        <option value="Phone">Phone</option>
+      </select>
+    </div>
 
     <div class="form-group mb-3">
-      <label for="details">Complaint Details:</label>
+      <label for="description">Complaint Details:</label>
       <textarea
-        id="details"
-        name="details"
+        id="description"
+        name="description"
         class="form-control"
         rows="4"
-        [(ngModel)]="complaint.details"
+        [(ngModel)]="complaint.description"
         placeholder="Describe your issue here"
         required
       ></textarea>
     </div>
+
 
     <button type="submit" class="btn btn-primary w-100" [disabled]="!complaintForm.form.valid">
       Submit Complaint

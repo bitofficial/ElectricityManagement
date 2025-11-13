@@ -12,28 +12,47 @@ import { CommonModule } from '@angular/common';
   styleUrl: './admin-login.component.css'
 })
 export class AdminLoginComponent {
-  loginData = { userId: '', password: '' };
+  adminLoginData = { userId: '', password: '' };
   successMessage = '';
   errorMessage = '';
+  adminLoginStatus = false;
 
   constructor(private authService: AuthService, private router: Router) { }
 
   onLogin(): void {
-    this.authService.login(this.loginData).subscribe({
-      next: (response) => {
+    console.log('Attempting login with:', this.adminLoginData);
+
+    this.authService.login(this.adminLoginData).subscribe({
+      next: (response: any) => {
+        console.log('API Response:', response);
+
         // ✅ Handle API success directly
-        if (response && response.message === 'Login successful') {
+        if (response && response.message === 'Login Successful') {
           this.successMessage = 'Login successful!';
           this.errorMessage = '';
-          this.router.navigate(['/admin/add-customer']);
+          this.adminLoginStatus = true;
+
+           localStorage.setItem('AdminSession', JSON.stringify(response));
+
+          // If API sends token or userId, store them separately
+          if (response.userId) {
+            localStorage.setItem('email', response.userId);
+          }
+          if (response.token) {
+            localStorage.setItem('token', response.token);
+          }
+
+          setTimeout(() => {this.router.navigate(['/admin/home']);
+          });
         } else {
           this.errorMessage = response.message || 'Login failed. Please try again.';
           this.successMessage = '';
+          this.adminLoginStatus = false;
         }
       },
       error: (error) => {
         console.error('Login error:', error);
-        this.errorMessage = 'Invalid userId or password.';
+        this.errorMessage = 'Invalid email or password.';
         this.successMessage = '';
       }
     });

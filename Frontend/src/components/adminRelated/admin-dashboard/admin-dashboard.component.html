@@ -1,0 +1,73 @@
+<nav class="wm-navbar">
+  <div class="wm-container">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          class="bolt"
+        >
+          <path
+            d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"
+            stroke-width="1.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <a href="/"><span class="brand-name">PowerEase Admin</span></a>
+    </div>
+
+    <ul class="nav-links">
+      <li><a routerLink="/login" style="color:#0EA5A4;">User</a></li>
+      <li><a routerLink="/admin/add-bill">Add Bill</a></li>
+      <li><a routerLink="/admin/add-customer">Add Customer</a></li>
+      <li><a routerLink="/admin/complaints"  style="color:red">View Complaints</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Dashboard content -->
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+    <div class="admin-info">
+      <h1 class="welcome mb-1">Welcome, Admin</h1>
+      <div class="muted small">
+        <div>Admin ID: <strong>{{ adminId }}</strong></div>
+        <div>Role: <span class="text-primary fw-semibold">{{ role }}</span></div>
+      </div>
+    </div>
+
+    <div class="action-buttons d-flex align-items-center gap-2">
+      <button class="btn btn-danger btn-sm" (click)="logout()">
+        <i class="bi bi-box-arrow-right me-1"></i> Logout
+      </button>
+    </div>
+  </div>
+
+  <div class="row gx-3 gy-3">
+
+    <!-- Right column: Feature cards -->
+    <div class="col-lg-8">
+      <div class="row gx-3 gy-3">
+        <div class="col-md-6" *ngFor="let feature of features">
+          <a [routerLink]="feature.route" class="card feature-card h-100 text-decoration-none">
+            <div class="card-body d-flex gap-3 align-items-start">
+              <div class="icon-wrap">
+                <i [class]="feature.icon + ' feature-icon'"></i>
+              </div>
+              <div class="flex-grow-1">
+                <h6 class="mb-1 feature-title">{{ feature.title }}</h6>
+                <p class="mb-0 small text-muted">{{ feature.description }}</p>
+              </div>
+              <div class="align-self-center">
+                <i class="bi bi-chevron-right text-muted"></i>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

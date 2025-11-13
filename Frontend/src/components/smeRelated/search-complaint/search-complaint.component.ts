@@ -10,20 +10,28 @@ import { CommonModule } from '@angular/common';
   templateUrl: './search-complaint.component.html',
   styleUrls: ['./search-complaint.component.css']
 })
+
 export class SearchComplaintComponent {
   searchKey: string = '';
   complaint: any = null;
   loading = false;
   errorMessage = '';
 
+   private readonly rawUserId = localStorage.getItem('userId') ?? '';
+   consumerNumber = this.parseConsumerNumber(this.rawUserId);
+   private parseConsumerNumber(userId: string): string {
+    // If your userId is "u-<number>", remove the first 2 chars ("u-")
+    if (!userId) return '';
+    return userId.startsWith('u-') ? userId.slice(2) : userId;
+  }
   constructor(private smeService: SmeService) {}
 
   searchComplaint(): void {
     this.complaint = null;
     this.errorMessage = '';
     this.loading = true;
-
-    this.smeService.getComplaintById(this.searchKey).subscribe({
+    console.log("...."+this.consumerNumber)
+    this.smeService.getComplaintById(this.searchKey,this.consumerNumber).subscribe({
       next: (data) => {
         this.complaint = data;
         this.loading = false;

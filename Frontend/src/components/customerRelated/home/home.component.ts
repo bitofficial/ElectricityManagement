@@ -23,7 +23,7 @@ interface BillDetails {
   billingMonth: string;
   dueDate: string;
   amount: number;
-  paid: boolean;
+  status: string;
 }
 
 @Component({
@@ -81,7 +81,7 @@ export class HomeComponent implements OnInit {
     {
       title: 'Account Settings',
       description: 'Edit contact details, change address and preferences.',
-      route: '/profile/profile',
+      route: '/customer/profile',
       icon: 'bi bi-gear',
     },
   ];
@@ -118,29 +118,36 @@ loadCurrentBill(consumerNumber: string): void {
         console.log('Fetched Bills:', bills);
 
         if (bills && bills.length > 0) {
-          // Sort bills by billingMonth (you can adjust sorting logic if needed)
+
+          // SORT bills by billing month & year (latest first)
           const sortedBills = bills.sort((a, b) => {
-            const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-                            'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+            const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
             const [aMonth, aYear] = a.billingMonth.split('-');
             const [bMonth, bYear] = b.billingMonth.split('-');
 
             const aIndex = months.indexOf(aMonth);
             const bIndex = months.indexOf(bMonth);
 
-            // Sort by year first, then month
+            // Sort by year first (desc), then month (desc)
             if (aYear !== bYear) return Number(bYear) - Number(aYear);
             return bIndex - aIndex;
           });
 
-          // ✅ Pick the most recent (first after sort)
-          this.currentBill = sortedBills[0];
-          console.log('Latest Bill Selected:', this.currentBill);
-        } else {
+          // ✅ Pick the latest unpaid bill
+          for(let i in sortedBills){
+            console.log(sortedBills[i]);
+          }
+          this.currentBill = sortedBills.find(bill => bill.status === 'Unpaid') || null;
+
+          console.log('Latest Unpaid Bill Selected:', this.currentBill);
+        } 
+        else {
           console.warn('No bills found for this consumer');
           this.currentBill = null;
         }
       },
+
       error: (error) => {
         console.error('Error fetching current bill:', error);
         this.currentBill = null;
@@ -149,11 +156,13 @@ loadCurrentBill(consumerNumber: string): void {
 }
 
 
+
   /** ✅ Logout functionality */
-  logout(): void {
-    console.log('Logout clicked - clearing session and redirecting to /login');
-    localStorage.removeItem('token');
+   logout(): void {
     localStorage.removeItem('userId');
-    this.router.navigate(['/login']);
+    localStorage.removeItem('UserSession');
+
+    // Optional: redirect to home or login page
+    this.router.navigate(['/']);
   }
 }

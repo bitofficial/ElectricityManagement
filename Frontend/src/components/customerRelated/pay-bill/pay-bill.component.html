@@ -129,9 +129,18 @@
   </div>
 
   <!-- Success -->
-  <div *ngIf="paymentSuccess" class="alert alert-success mt-4">
-    ✅ Payment successful!<br />
-    Transaction ID: <strong>{{ transactionId }}</strong><br />
-    Amount: <strong>{{ totalAmount | currency:'INR' }}</strong>
+  <div *ngIf="paymentSuccess" class="alert alert-success mt-4" style="display:flex;justify-content:space-between;align-items:flex-start;">
+    <div>
+      ✅ Payment successful!<br />
+      Transaction ID: <strong>{{ transactionId }}</strong><br />
+      Amount: <strong>
+        {{ (paidTotal || totalAmount) | currency:'INR' }}
+      </strong>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button (click)="downloadInvoice()" class="btn btn-success">Download Invoice</button>
+      <!-- Optional: a "View paid bills" button could go here, linking to a paid-bills page -->
+    </div>
   </div>
 </div>

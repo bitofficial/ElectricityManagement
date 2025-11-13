@@ -27,7 +27,7 @@ export class LoginComponent {
         console.log('API Response:', response);
 
         // ✅ Check for successful login (adjust key names based on your backend)
-        if (response && (response.message === 'Login Successful' || response.status === 'success')) {
+        if (response && (response.message === 'Login successful' || response.status === 'success')) {
           this.successMessage = 'Login Successful!';
           this.errorMessage = '';
           this.loginStatus = true;
@@ -36,8 +36,8 @@ export class LoginComponent {
           localStorage.setItem('UserSession', JSON.stringify(response));
 
           // If API sends token or userId, store them separately
-          if (response.userId) {
-            localStorage.setItem('userId', response.userId);
+          if (response.consumerNumber) {
+            localStorage.setItem('userId',"u-"+ response.consumerNumber);
           }
           if (response.token) {
             localStorage.setItem('token', response.token);
