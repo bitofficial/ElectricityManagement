@@ -1,8 +1,31 @@
-<p>resolve-complaint works!</p>
+<nav class="wm-navbar">
+  <div class="wm-container">
+    <a href="/">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
+            <path
+              d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"
+              stroke-width="1.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <span class="brand-name">PowerEase SME</span>
+      </div>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="/sme/home" style="color:#0EA5A4;">Dashboard</a></li>
+    </ul>
+  </div>
+</nav>
+
 <div class="container mt-4">
   <h2 class="text-center mb-4">Resolve Complaint</h2>
 
-  <!-- Search Form -->
+  <!-- Single Complaint Search Card -->
   <form (ngSubmit)="getComplaint()" #searchForm="ngForm" class="card p-4 shadow-sm mb-4">
     <div class="form-group mb-3">
       <label for="complaintId">Complaint ID:</label>
@@ -21,65 +44,142 @@
     </button>
   </form>
 
-  <!-- Complaint Details -->
-  <div *ngIf="complaint" class="card shadow-sm p-4">
+  <!-- Single Complaint Details (top) -->
+  <div *ngIf="complaint" class="card shadow-sm p-4 mb-4">
     <h4>Complaint Details</h4>
     <hr />
-    <p><strong>ID:</strong> {{ complaint.id }}</p>
-    <p><strong>Customer ID:</strong> {{ complaint.customerId }}</p>
+    <p><strong>ID:</strong> {{ complaint.complaintId }}</p>
+    <p><strong>Consumer #:</strong> {{ complaint.consumerNumber }}</p>
+    <p><strong>Customer:</strong> {{ complaint.fullName }}</p>
     <p><strong>Category:</strong> {{ complaint.category }}</p>
-    <p><strong>Details:</strong> {{ complaint.details }}</p>
-    <p><strong>Status:</strong> 
-      <span
-        class="badge"
-        [ngClass]="{
-          'bg-warning': complaint.status === 'Pending',
-          'bg-success': complaint.status === 'Resolved'
-        }"
-      >
-        {{ complaint.status }}
-      </span>
-    </p>
+    <p><strong>Details:</strong> {{ complaint.description }}</p>
 
-    <!-- Resolution Form -->
-    <div class="mt-4">
-      <h5>Add Resolution</h5>
-      <form (ngSubmit)="resolveComplaint()" #resolveForm="ngForm">
-        <div class="form-group mb-3">
-          <label for="remarks">Remarks:</label>
-          <textarea
-            id="remarks"
-            name="remarks"
-            class="form-control"
-            rows="3"
-            [(ngModel)]="remarks"
-            placeholder="Enter remarks or action taken"
-            required
-          ></textarea>
-        </div>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label for="statusTop">Update Status:</label>
+        <select id="statusTop" class="form-control" [(ngModel)]="complaint.editStatus" name="statusTop" required>
+          <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+        </select>
+      </div>
 
-        <div class="form-group mb-3">
-          <label for="status">Update Status:</label>
-          <select
-            id="status"
-            name="status"
-            class="form-control"
-            [(ngModel)]="complaint.status"
-            required
-          >
-            <option value="Pending">Pending</option>
-            <option value="Resolved">Resolved</option>
-          </select>
-        </div>
+      <div class="col-md-6">
+        <label for="notesTop">Remarks / Notes:</label>
+        <input id="notesTop" class="form-control" [(ngModel)]="complaint.editNotes" name="notesTop" />
+      </div>
 
-        <button class="btn btn-success w-100" [disabled]="!resolveForm.form.valid">
-          Update Complaint
-        </button>
-      </form>
+      <div class="col-12 mt-3">
+        <button class="btn btn-success" type="button" (click)="resolveComplaint()">Update Complaint</button>
+      </div>
     </div>
   </div>
 
   <!-- Messages -->
-  <div *ngIf="successMessage" class="alert alert-success mt-4">{{ successMessage }}</div>
-  <div *ngIf="errorMessage" class="alert alert-danger mt-4">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="alert alert-success mt-2">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert alert-danger mt-2">{{ errorMessage }}</div>
+
+  <!-- Pending Complaints Table -->
+  <div class="card p-3 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Pending Complaints</h5>
+
+      <div class="d-flex gap-2 align-items-center">
+        <input
+          type="text"
+          class="form-control form-control-sm"
+          placeholder="Search by id / consumer / name / details..."
+          [(ngModel)]="tableSearch"
+          name="tableSearch"
+          (keyup.enter)="searchPending()"
+        />
+        <button class="btn btn-sm btn-outline-primary" type="button" (click)="searchPending()">Search</button>
+        <button class="btn btn-sm btn-outline-secondary" type="button" (click)="loadPendingComplaints()">Reset</button>
+      </div>
+    </div>
+
+    <div *ngIf="tableLoading" class="text-center py-3">Loading...</div>
+    <div *ngIf="tableError" class="alert alert-danger">{{ tableError }}</div>
+
+    <div *ngIf="!tableLoading && pendingComplaints.length === 0" class="text-muted text-center py-3">
+      No pending complaints found.
+    </div>
+
+    <div class="table-responsive" *ngIf="pendingComplaints.length > 0">
+      <table class="table table-sm table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Consumer</th>
+            <th>Customer</th>
+            <th>Category</th>
+            <th>Details</th>
+            <th>Status</th>
+            <th>Notes</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of pendingComplaints; let i = index">
+            <td>{{ row.complaintId }}</td>
+            <td>{{ row.consumerNumber }}</td>
+            <td>{{ row.fullName }}</td>
+            <td>{{ row.category }}</td>
+            <td class="text-truncate" style="max-width: 220px;">{{ row.description }}</td>
+
+            <!-- Status -->
+            <td style="min-width: 140px;">
+              <div *ngIf="!row.isEditing">
+                <span class="badge"
+                      [ngClass]="{
+                        'bg-warning text-dark': row.status === 'Pending',
+                        'bg-info text-dark': row.status === 'InProgress',
+                        'bg-success': row.status === 'Resolved'
+                      }">
+                  {{ row.status }}
+                </span>
+              </div>
+
+              <div *ngIf="row.isEditing">
+                <select class="form-control form-control-sm" [(ngModel)]="row.editStatus" name="status{{i}}">
+                  <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+                </select>
+              </div>
+            </td>
+
+            <!-- Notes -->
+            <td style="max-width: 300px;">
+              <div *ngIf="!row.isEditing" class="text-truncate" style="max-width: 300px;">
+                {{ row.notes || '-' }}
+              </div>
+              <div *ngIf="row.isEditing">
+                <input class="form-control form-control-sm" [(ngModel)]="row.editNotes" name="notes{{i}}" />
+              </div>
+            </td>
+
+            <!-- Actions -->
+            <td class="text-end" style="width: 200px;">
+              <div *ngIf="!row.isEditing" class="d-flex gap-2 justify-content-end">
+                <button class="btn btn-sm btn-outline-primary" type="button" (click)="enableEdit(row)">Edit</button>
+                <button class="btn btn-sm btn-outline-secondary" type="button" (click)="viewDetails(row)">View</button>
+              </div>
+
+              <div *ngIf="row.isEditing" class="d-flex gap-2 justify-content-end align-items-center">
+                <button class="btn btn-sm btn-success"
+                        [disabled]="row.saving"
+                        type="button"
+                        (click)="saveRow(row)">
+                  <span *ngIf="!row.saving">Save</span>
+                  <span *ngIf="row.saving">Saving...</span>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" [disabled]="row.saving" type="button" (click)="cancelEdit(row)">Cancel</button>
+              </div>
+
+              <div *ngIf="row.saveError" class="text-danger small mt-1 text-end">
+                {{ row.saveError }}
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

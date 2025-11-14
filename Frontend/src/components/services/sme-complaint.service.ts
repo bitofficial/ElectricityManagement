@@ -6,11 +6,11 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class SmeComplaintService {
-  private baseUrl = 'http://localhost:8080/api/sme/complaints'; // backend endpoint
+  private baseUrl = 'http://localhost:8085/api/sme/'; // backend endpoint
 
   constructor(private http: HttpClient) {}
 
-  getAllComplaints(): Observable<any[]> {
-    return this.http.get<any[]>(this.baseUrl);
+  getAllComplaints(smeId:String): Observable<any[]> {
+    return this.http.get<any[]>(this.baseUrl + smeId+'/dashboard');
   }
 }

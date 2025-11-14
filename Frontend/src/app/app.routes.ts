@@ -65,7 +65,6 @@ export const routes: Routes = [
   // 🧰 SME Routes
   { path: 'sme/complaints', component: ListSmeComplaintComponent },
   { path: 'sme/resolve-complaint', component: ResolveComplaintComponent },
-  { path: 'sme/search-complaint', component: SearchComplaintComponent },
   {path: 'sme/home', component: DashboardComponent},
   {path: 'sme/login', component: SmeLoginComponent},
 

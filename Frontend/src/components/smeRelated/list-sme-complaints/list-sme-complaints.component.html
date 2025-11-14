@@ -1,3 +1,27 @@
+<nav class="wm-navbar">
+  <div class="wm-container">
+     <a href="/">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
+          <path
+            d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"
+            stroke-width="1.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+       <span class="brand-name">PowerEase SME</span>
+    </div>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="/sme/home" style="color:#0EA5A4;">Dashboard</a></li>
+    </ul>
+  </div>
+</nav>
+
 <div class="container mt-4">
   <h2 class="text-center mb-3">SME Complaint List</h2>
 
@@ -19,22 +43,22 @@
     <tbody>
       <tr *ngFor="let complaint of complaints">
         <td>{{ complaint.complaintId }}</td>
-        <td>{{ complaint.customerId }}</td>
-        <td>{{ complaint.issue }}</td>
+        <td>{{ complaint.user.consumerNumber }}</td>
+        <td>{{ complaint.category }}</td>
         <td>{{ complaint.description }}</td>
         <td>
           <span 
             class="badge"
             [ngClass]="{
-              'bg-success': complaint.status === 'Resolved',
-              'bg-warning': complaint.status === 'Pending',
-              'bg-danger': complaint.status === 'Rejected'
+              'bg-success': complaint.status === 'RESOLVED',
+              'bg-warning': complaint.status === 'PENDING',
+              'bg-danger': complaint.status === 'INPROGRESS'
             }"
           >
             {{ complaint.status }}
           </span>
         </td>
-        <td>{{ complaint.date | date:'mediumDate' }}</td>
+        <td>{{ complaint.dateSubmitted }}</td>
       </tr>
     </tbody>
   </table>
