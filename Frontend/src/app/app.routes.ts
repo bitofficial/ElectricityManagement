@@ -29,6 +29,8 @@ import { ListSmeComplaintComponent } from '../components/smeRelated/list-sme-com
 import { ResolveComplaintComponent } from '../components/smeRelated/resolve-complaint/resolve-complaint.component';
 import { SearchComplaintComponent } from '../components/smeRelated/search-complaint/search-complaint.component';
 import { ProfileComponent } from '../components/customerRelated/profile/profile.component';
+import { DashboardComponent } from '../components/smeRelated/dashboard/dashboard.component';
+import { SmeLoginComponent } from '../components/smeRelated/sme-login/sme-login.component';
 
 
 
@@ -64,6 +66,8 @@ export const routes: Routes = [
   { path: 'sme/complaints', component: ListSmeComplaintComponent },
   { path: 'sme/resolve-complaint', component: ResolveComplaintComponent },
   { path: 'sme/search-complaint', component: SearchComplaintComponent },
+  {path: 'sme/home', component: DashboardComponent},
+  {path: 'sme/login', component: SmeLoginComponent},
 
   // 🌐 Fallback
   { path: '**', redirectTo: '' },

@@ -49,7 +49,7 @@ export class AdminLoginComponent {
     },
     error: (error) => {
       console.error('Login error:', error);
-      this.errorMessage = 'Invalid adminId, email or password.';
+      this.errorMessage = 'Invalid adminId or password.';
       this.successMessage = '';
     }
   });

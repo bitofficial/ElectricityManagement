@@ -17,6 +17,9 @@ export class AuthService {
    adminlogin(credentials:{adminId:string;email:string;password:string}):Observable<any>{
     return this.http.post<any>(`${this.baseUrl}/admin/login`,credentials);
   }
+   smelogin(credentials:{smeId:string;password:string}):Observable<any>{
+    return this.http.post<any>(`${this.baseUrl}/sme/login`,credentials);
+  }
 
   // ✅ Register new customer
   register(user: any): Observable<any> {
