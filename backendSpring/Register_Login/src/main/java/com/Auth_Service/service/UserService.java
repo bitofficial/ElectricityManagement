@@ -52,7 +52,9 @@ public class UserService {
                 throw new RuntimeException("Error: Passwords do not match.");
             }
             // Hash the new password before saving
+
             user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+            System.out.println(dto.getConfirmPassword());
         }
 
         // 6. Save and return the updated user

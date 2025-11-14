@@ -12,50 +12,48 @@ import { CommonModule } from '@angular/common';
   styleUrl: './admin-login.component.css'
 })
 export class AdminLoginComponent {
-  adminLoginData = { userId: '', password: '' };
+  adminLoginData = { adminId: '',email:'null@null.com', password: '' };
   successMessage = '';
   errorMessage = '';
   adminLoginStatus = false;
 
   constructor(private authService: AuthService, private router: Router) { }
-
+  
   onLogin(): void {
-    console.log('Attempting login with:', this.adminLoginData);
+  console.log('Attempting login with:', this.adminLoginData);
 
-    this.authService.login(this.adminLoginData).subscribe({
-      next: (response: any) => {
-        console.log('API Response:', response);
+  this.authService.adminlogin(this.adminLoginData).subscribe({
+    next: (response: any) => {
+      console.log('API Response:', response);
 
-        // ✅ Handle API success directly
-        if (response && response.message === 'Login Successful') {
-          this.successMessage = 'Login successful!';
-          this.errorMessage = '';
-          this.adminLoginStatus = true;
+      if (response && response.message === 'Admin login successful') {
+        this.successMessage = 'Login successful!';
+        this.errorMessage = '';
+        this.adminLoginStatus = true;
 
-           localStorage.setItem('AdminSession', JSON.stringify(response));
-
-          // If API sends token or userId, store them separately
-          if (response.userId) {
-            localStorage.setItem('email', response.userId);
-          }
-          if (response.token) {
-            localStorage.setItem('token', response.token);
-          }
-
-          setTimeout(() => {this.router.navigate(['/admin/home']);
-          });
-        } else {
-          this.errorMessage = response.message || 'Login failed. Please try again.';
-          this.successMessage = '';
-          this.adminLoginStatus = false;
+        // Save admin session
+        localStorage.setItem('AdminSession', JSON.stringify(response));
+        
+        if (response.adminId) {
+          localStorage.setItem('adminId', response.adminId);
         }
-      },
-      error: (error) => {
-        console.error('Login error:', error);
-        this.errorMessage = 'Invalid email or password.';
+
+        setTimeout(() => {
+          this.router.navigate(['/admin/home']);
+        }, 500);
+      } else {
+        this.errorMessage = response.message || 'Login failed. Please try again.';
         this.successMessage = '';
+        this.adminLoginStatus = false;
       }
-    });
-  }
+    },
+    error: (error) => {
+      console.error('Login error:', error);
+      this.errorMessage = 'Invalid adminId, email or password.';
+      this.successMessage = '';
+    }
+  });
+}
+
 }
 

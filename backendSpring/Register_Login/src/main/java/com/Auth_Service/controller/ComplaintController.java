@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins="*")
 @RequestMapping("/api/complaints")
 public class ComplaintController {
 
@@ -67,6 +66,10 @@ public class ComplaintController {
         return ResponseEntity.ok(
                 complaintService.getComplaintHistory(consumerNumber, status, type, startDate, endDate)
         );
+    }
+    @GetMapping("/admin/all")
+    public ResponseEntity<List<ComplaintResponseDTO>> getAllComplaints() {
+        return ResponseEntity.ok(complaintService.getAllComplaints());
     }
 
 

@@ -2,7 +2,6 @@
   <div class="wm-container">
     <div class="brand">
       <div class="logo" aria-hidden="true">
-        <!-- simple bolt icon -->
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
           <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -16,7 +15,6 @@
   </div>
 </nav>
 
-
 <div class="login-wrapper d-flex justify-content-center align-items-center">
   <div class="login-card shadow-lg p-4">
     <div class="text-center mb-4">
@@ -25,30 +23,47 @@
           <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <h3 class="fw-bold text-dark mb-1" style="text-align: center;">Login to Admin</h3>
+      <h3 class="fw-bold text-dark mb-1" style="text-align:center;">Login to Admin</h3>
     </div>
 
     <form (ngSubmit)="onLogin()" #adminLoginForm="ngForm" autocomplete="off">
+
+      <!-- Admin ID -->
       <div class="form-group mb-3">
-        <label for="email" class="form-label" style="width:150px">User ID</label>
+        <label for="adminId" class="form-label" style="width:150px">Admin ID</label>
         <input
-          id="userId"
+          id="adminId"
           type="text"
           class="form-control custom-input"
-          placeholder="Enter your User ID"
-          [(ngModel)]="adminLoginData.userId"
-          name="userId"
+          placeholder="Enter Admin ID"
+          [(ngModel)]="adminLoginData.adminId"
+          name="adminId"
           required
         />
       </div>
 
+      <!-- Email
+      <div class="form-group mb-3">
+        <label for="email" class="form-label" style="width:150px">Email</label>
+        <input
+          id="email"
+          type="email"
+          class="form-control custom-input"
+          placeholder="Enter Email"
+          [(ngModel)]="adminLoginData.email"
+          name="email"
+          required
+        />
+      </div> -->
+
+      <!-- Password -->
       <div class="form-group mb-4">
         <label for="password" class="form-label" style="width:150px">Password</label>
         <input
           id="password"
           type="password"
           class="form-control custom-input"
-          placeholder="Enter your Password"
+          placeholder="Enter Password"
           [(ngModel)]="adminLoginData.password"
           name="password"
           required
@@ -59,7 +74,6 @@
         type="submit"
         class="btn btn-primary w-100 gradient-btn"
         [disabled]="adminLoginForm.invalid"
-        (click)="onLogin()"
       >
         <span>Login</span>
       </button>
@@ -73,11 +87,11 @@
       {{ successMessage }}
     </div>
 
- <div class="mt-3 small text-muted text-center">
-      Are you an User?
-      <a href="/login" class="text-primary text-decoration-none fw-semibold"
-        >Login here</a
-      >
+    <div class="mt-3 small text-muted text-center">
+      Are you a User?
+      <a href="/login" class="text-primary text-decoration-none fw-semibold">
+        Login here
+      </a>
     </div>
 
   </div>

@@ -59,10 +59,14 @@ public class User {
     private String userId;
 
     @NotBlank
+    @Column
     private String password;
 
     @Transient
     private String confirmPassword;
+
+    @Column(name = "connection_status")
+    private String connection_status = "Active";
 
 
     // --- Constructors ---
@@ -197,6 +201,14 @@ public class User {
 
     public String getUserId() {
         return userId;
+    }
+
+    public String getConnection_status() {
+        return connection_status;
+    }
+
+    public void setConnection_status(String connection_status) {
+        this.connection_status = connection_status;
     }
 
     public void setUserId(String userId) {

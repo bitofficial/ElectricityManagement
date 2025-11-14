@@ -1,5 +1,6 @@
 package com.Auth_Service.service;
 
+import com.Auth_Service.exception.ApiException;
 import com.Auth_Service.model.User;
 import com.Auth_Service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,22 +51,18 @@ public class RegistrationService {
 
     public Map<String, Object> registerUser(User userInput) {
 
-        Map<String, Object> response = new HashMap<>();
-
         // 1. Check if consumer number exists (must be added by admin earlier)
         Optional<User> optionalUser = userRepository.findByConsumerNumber(userInput.getConsumerNumber());
 
         if (optionalUser.isEmpty()) {
-            response.put("error", "Invalid Consumer Number. Contact Admin.");
-            return response;
+            throw new ApiException("Invalid Consumer Number. Contact Admin.", 400);
         }
 
         User user = optionalUser.get();
 
-        // 2. Check if already registered (password not null)
+        // 2. Check if already registered (password exists)
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            response.put("error", "This consumer is already registered. Please login.");
-            return response;
+            throw new ApiException("This consumer is already registered. Please login.", 409);
         }
 
         // 3. Email already taken by another user?
@@ -73,24 +70,23 @@ public class RegistrationService {
                 userRepository.existsByEmail(userInput.getEmail()) &&
                 !userInput.getEmail().equals(user.getEmail())) {
 
-            response.put("error", "Email already exists.");
-            return response;
+            throw new ApiException("Email already exists.", 409);
         }
 
         // 4. Validate matching passwords
         if (!userInput.getPassword().equals(userInput.getConfirmPassword())) {
-            response.put("error", "Passwords do not match.");
-            return response;
+            throw new ApiException("Passwords do not match.", 400);
         }
 
         // 5. Save new registration details into existing DB entry
         user.setFullName(userInput.getFullName());
         user.setEmail(userInput.getEmail());
-//        user.setPhone(userInput.getPhone());  // Important fix
         user.setPassword(passwordEncoder.encode(userInput.getPassword()));
 
         userRepository.save(user);
 
+        // SUCCESS RESPONSE
+        Map<String, Object> response = new HashMap<>();
         response.put("message", "Registration successful");
         response.put("consumerNumber", user.getConsumerNumber());
         response.put("name", user.getFullName());

@@ -16,6 +16,22 @@ public class PaymentBatchRequestDTO {
     @NotBlank(message = "Payment method is required")
     private String paymentMethod;
 
+    @NotBlank(message = "Transaction ID is required")
+    private String transactionId;
+
+    @NotBlank(message = "Payment ID is required")
+    private String paymentId;
+
+    @NotBlank(message = "Invoice number is required")
+    private String invoiceNumber;
+
+    @NotBlank(message = "Receipt number is required")
+    private String receiptNumber;
+
+
+
+
+
     // --- Getters and Setters ---
 
     public List<Long> getBillIds() {
@@ -32,5 +48,37 @@ public class PaymentBatchRequestDTO {
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public String getPaymentId() {
+        return paymentId;
+    }
+
+    public void setPaymentId(String paymentId) {
+        this.paymentId = paymentId;
+    }
+
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
+    }
+
+    public String getReceiptNumber() {
+        return receiptNumber;
+    }
+
+    public void setReceiptNumber(String receiptNumber) {
+        this.receiptNumber = receiptNumber;
     }
 }

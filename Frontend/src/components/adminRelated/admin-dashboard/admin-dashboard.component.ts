@@ -57,12 +57,12 @@ export class AdminDashboardComponent implements OnInit {
   constructor(private router: Router, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.adminId = localStorage.getItem('adminUserId') || 'ada';
+    this.adminId = localStorage.getItem('adminId') || 'ada';
   }
 
   /** ✅ Logout */
   logout(): void {
-    localStorage.removeItem('adminUserId');
+    localStorage.clear();
     this.router.navigate(['/admin/login']);
   }
 }

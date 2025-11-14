@@ -87,6 +87,70 @@ export class PayBillComponent implements OnInit, OnDestroy {
       this.totalAmount = 0;
     }
   }
+  // Format card number as XXXX XXXX XXXX XXXX
+  formatCardNumber() {
+    let value = this.payment.cardNumber.replace(/\D/g, ''); // remove non-digits
+
+    if (value.length > 16) value = value.substring(0, 16);
+
+    // Insert spaces every 4 digits → XXXX XXXX XXXX XXXX
+    const formatted = value.match(/.{1,4}/g)?.join(' ') || '';
+    this.payment.cardNumber = formatted;
+  }
+
+  // Auto-format expiry as MM/YY
+  formatExpiry() {
+    let value = this.payment.expiry.replace(/\D/g, '');
+
+    if (value.length >= 3) {
+      value = value.substring(0, 4);
+      value = value.replace(/(\d{2})(\d{1,2})/, "$1/$2");
+    }
+
+    this.payment.expiry = value;
+  }
+
+  // Validate Before Payment
+  validatePayment(): boolean {
+    this.paymentError = '';
+
+    // UPI
+    if (this.payment.method === 'UPI' && !this.payment.upiId.includes('@')) {
+      this.paymentError = 'Invalid UPI ID. It must contain @';
+      return false;
+    }
+
+    // Card number (16 digits with spaces)
+    if (this.payment.method === 'Card') {
+      const raw = this.payment.cardNumber.replace(/\s+/g, '');
+      if (raw.length !== 16) {
+        this.paymentError = 'Card number must be exactly 16 digits.';
+        return false;
+      }
+
+      // Expiry
+      const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+      if (!expiryRegex.test(this.payment.expiry)) {
+        this.paymentError = 'Expiry format must be MM/YY and valid month.';
+        return false;
+      }
+
+      // CVV
+      if (!/^\d{3}$/.test(this.payment.cvv)) {
+        this.paymentError = 'CVV must be exactly 3 digits.';
+        return false;
+      }
+    }
+
+    // NetBanking
+    if (this.payment.method === 'NetBanking' && !this.payment.bank) {
+      this.paymentError = 'Please select a bank.';
+      return false;
+    }
+
+    return true;
+  }
+
 
   removeBill(billId: string): void {
     this.selectedBills = this.selectedBills.filter(b => b.billId !== billId);
@@ -119,6 +183,8 @@ export class PayBillComponent implements OnInit, OnDestroy {
 
     return null;
   }
+
+  
 
   makePayment(form?: NgForm): void {
     this.paymentSuccess = false;

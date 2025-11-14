@@ -35,4 +35,6 @@ public interface ComplaintService {
     );
     
     ComplaintResponseDTO getComplaintById(String consumerNumber, Long complaintId);
+
+    List<ComplaintResponseDTO> getAllComplaints();
 }

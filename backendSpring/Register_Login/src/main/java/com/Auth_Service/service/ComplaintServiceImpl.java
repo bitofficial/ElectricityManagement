@@ -86,6 +86,13 @@ public class ComplaintServiceImpl implements ComplaintService {
                 .map(this::mapToResponse)
                 .toList();
     }
+    @Override
+    public List<ComplaintResponseDTO> getAllComplaints() {
+        return complaintRepo.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
 
 
     private ComplaintResponseDTO mapToResponse(Complaint c) {

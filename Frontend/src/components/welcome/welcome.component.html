@@ -22,7 +22,9 @@
       <li>
         <button class="btn btn-outline-danger" (click)="logout()">Logout</button>
       </li>
-      <li><a href="/customer/home" class="cta">Dashboard</a></li>
+      <li> <a [routerLink]="isAdmin ? '/admin/home' : '/customer/home'" class="cta">
+    Dashboard
+  </a></li>
     </ul>
   </div>
 </nav>

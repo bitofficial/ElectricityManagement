@@ -1,14 +1,10 @@
 <nav class="wm-navbar">
   <div class="wm-container">
     <div class="brand">
-      <div class="logo" aria-hidden="true">
+      <div class="logo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
-          <path
-            d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"
-            stroke-width="1.2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"
+                stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
       <a href="/"><span class="brand-name">PowerEase</span></a>
@@ -22,273 +18,151 @@
 </nav>
 
 <div class="register-wrapper d-flex justify-content-center align-items-center">
-  <div class="register-card shadow-lg p-4">
+  <div class="register-card shadow-lg p-4" style="width:700px;">
+
     <div class="text-center mb-4">
-      <div class="register-logo mb-2">
-        <svg viewBox="0 0 24 24" class="bolt-icon" fill="none" stroke="currentColor">
-          <path
-            d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"
-            stroke-width="1.4"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </div>
+      <svg viewBox="0 0 24 24" class="bolt-icon" fill="none" stroke="currentColor">
+        <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"
+              stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
       <h3 class="fw-bold text-dark mb-1">Customer Registration</h3>
-      <p class="text-muted mb-0">Create your account to manage electricity services</p>
     </div>
 
-    <form (ngSubmit)="registerUser()" #registerForm="ngForm" novalidate>
+    <form (ngSubmit)="registerUser()" class="p-4">
+
       <!-- Consumer Number -->
       <div class="form-group mb-3">
-        <label for="consumerNumber" class="form-label" style>Consumer Number</label>
-        <input
-          id="consumerNumber"
-          type="text"
-          class="form-control custom-input"
-          name="consumerNumber"
-          maxlength="13"
-          minlength="13"
-          pattern="^[1-9][0-9]{12}$"
-          [(ngModel)]="user.consumerNumber"
-          placeholder="Enter 13-digit Consumer Number"
-          required
-          #consumerRef="ngModel"
-        />
-        <small class="text-danger" *ngIf="consumerRef.invalid && consumerRef.touched">
-          Must be 13 digits and cannot start with 0.
-        </small>
+        <label>Consumer Number</label>
+        <input type="text" class="form-control" [(ngModel)]="user.consumerNumber"
+               name="consumerNumber" (change)="fetchUserDetails()"
+               placeholder="Enter Consumer Number">
       </div>
 
       <!-- Full Name -->
       <div class="form-group mb-3">
-        <label for="fullName" class="form-label">Full Name</label>
-        <input
-          id="fullName"
-          type="text"
-          class="form-control custom-input"
-          name="fullName"
-          pattern="^[A-Za-z ]+$"
-          [(ngModel)]="user.fullName"
-          placeholder="Enter your Full Name"
-          required
-          #nameRef="ngModel"
-        />
-        <small class="text-danger" *ngIf="nameRef.invalid && nameRef.touched">
-          Name should contain alphabets only.
-        </small>
+        <label>Full Name</label>
+        <input type="text" class="form-control" [(ngModel)]="user.fullName" name="fullName">
       </div>
 
       <!-- Email -->
       <div class="form-group mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input
-          id="email"
-          type="email"
-          class="form-control custom-input"
-          name="email"
-          [(ngModel)]="user.email"
-          required
-          email
-          placeholder="Enter your Email"
-          #emailRef="ngModel"
-        />
-        <small class="text-danger" *ngIf="emailRef.invalid && emailRef.touched">
-          Please enter a valid email address.
-        </small>
-      </div>
-
-      <!-- Password -->
-      <div class="form-group mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input
-          id="password"
-          type="password"
-          class="form-control custom-input"
-          name="password"
-          [(ngModel)]="user.password"
-          placeholder="Create a strong password"
-          required
-          minlength="6"
-          #passRef="ngModel"
-        />
-        <small class="text-danger" *ngIf="passRef.invalid && passRef.touched">
-          Password must be at least 6 characters long.
-        </small>
-      </div>
-
-      <!-- Confirm Password -->
-      <div class="form-group mb-3" style="position: relative;">
-        <label for="confirmPassword" class="form-label">Confirm Password</label>
-        <input
-          id="confirmPassword"
-          type="password"
-          class="form-control custom-input"
-          name="confirmPassword"
-          [(ngModel)]="user.confirmPassword"
-          placeholder="Re-enter your password"
-          required
-          (input)="validatePasswords()"
-        />
-        <small class="text-danger" *ngIf="passwordMismatch">
-          Passwords do not match.
-        </small>
-      </div>
-
-      <!-- Pincode -->
-      <div class="form-group mb-3">
-        <label for="pincode" class="form-label">Pincode</label>
-        <input
-          id="pincode"
-          type="text"
-          maxlength="6"
-          minlength="6"
-          pattern="^[1-9][0-9]{5}$"
-          class="form-control custom-input"
-          name="pincode"
-          [(ngModel)]="user.pincode"
-          (blur)="fetchLocationByPincode()"
-          placeholder="Enter your Pincode"
-          required
-          #pincodeRef="ngModel"
-        />
-        <small class="text-danger" *ngIf="pincodeRef.invalid && pincodeRef.touched">
-          Enter a valid 6-digit pincode (cannot start with 0).
-        </small>
-      </div>
-
-      <!-- State & City -->
-      <div class="form-group mb-3">
-        <label for="state" class="form-label">State</label>
-        <select
-          id="state"
-          name="state"
-          class="form-control custom_input"
-          [(ngModel)]="user.state"
-          (change)="onStateChange()"
-          style="width:300px;"
-          required
-        >
-          <option value="">Select your State</option>
-          <option *ngFor="let s of states" [value]="s.name">{{ s.name }}</option>
-        </select>
-      </div>
-
-      <div class="form-group mb-3">
-        <label for="city" class="form-label">City</label>
-        <select
-          id="city"
-          name="city"
-          class="form-control custom_input"
-          [(ngModel)]="user.city"
-          required
-          style="width:300px;"
-        >
-          <option value="">Select your City</option>
-          <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
-        </select>
+        <label>Email</label>
+        <input type="email" class="form-control" [(ngModel)]="user.email" name="email">
       </div>
 
       <!-- Phone -->
       <div class="form-group mb-3">
-        <label for="mobile" class="form-label">Phone Number</label>
-        <input
-          id="mobile"
-          type="text"
-          maxlength="10"
-          minlength="10"
-          pattern="^(?!([0-9])\1{9})[6-9][0-9]{9}$"
-          class="form-control custom-input"
-          name="mobile"
-          [(ngModel)]="user.mobile"
-          placeholder="Enter your 10-digit phone number"
-          required
-          #mobileRef="ngModel"
-        />
-        <small class="text-danger" *ngIf="mobileRef.invalid && mobileRef.touched">
-          Must be 10 digits and not repetitive (e.g., 9999999999).
-        </small>
-      </div>
-
-      <!-- Address -->
-      <div class="form-group mb-3">
-        <label for="address" class="form-label">Address</label>
-        <input
-          id="address"
-          type="text"
-          class="form-control custom-input"
-          name="address"
-          [(ngModel)]="user.address"
-          required
-          placeholder="Enter your Address"
-        />
+        <label>Phone Number</label>
+        <input type="text" class="form-control" [(ngModel)]="user.mobile" name="mobile">
       </div>
 
       <!-- Connection Type -->
       <div class="form-group mb-3">
-        <label for="customerType" class="form-label">Connection Type</label>
-        <select
-          id="customerType"
-          name="customerType"
-          class="form-control custom_input"
-          [(ngModel)]="user.customerType"
-          style="width:300px;"
-          required
-        >
-          <option value="">Select your Type</option>
+        <label>Connection Type</label>
+        <select class="form-control" [(ngModel)]="user.customerType" name="customerType">
+          <option value="">Choose Type</option>
           <option value="Residential">Residential</option>
           <option value="Commercial">Commercial</option>
         </select>
       </div>
-     <!--Electrical Section Type -->
+
+      <!-- Ward -->
       <div class="form-group mb-3">
-        <label for="Electrical Section" class="form-label">Electrical Section</label>
-        <select
-          id="ElectricalSection"
-          name="ElectricalSection"
-          class="form-control custom_input"
-          [(ngModel)]="user.electricalSection"
-          style="width:300px;"
-          required
-        >
-          <option value="">Select your Section</option>
+        <label>Region Ward</label>
+        <select class="form-control" [(ngModel)]="user.electricalSection" name="electricalSection">
+          <option value="">Choose Ward</option>
           <option value="Ward A">Ward A</option>
           <option value="Ward B">Ward B</option>
-           <option value="Ward C">Ward C</option>
+          <option value="Ward C">Ward C</option>
         </select>
       </div>
 
-      <!-- Register Button -->
-      <button
-        type="submit"
-        class="btn btn-success w-100 gradient-btn"
-        style="max-width: 400px;"
-        [disabled]="registerForm.invalid || passwordMismatch"
-      >
-        Register
-      </button>
+      <!-- PINCODE -->
+      <div class="form-group mb-3">
+        <label>Pincode</label>
+        <input type="text" class="form-control" [(ngModel)]="user.pincode" name="pincode">
+      </div>
+
+      <!-- CITY -->
+      <div class="form-group mb-3">
+        <label>City</label>
+        <input type="text" class="form-control" [(ngModel)]="user.city" name="city">
+      </div>
+
+      <!-- STATE -->
+      <div class="form-group mb-3">
+        <label>State</label>
+        <input type="text" class="form-control" [(ngModel)]="user.state" name="state">
+      </div>
+
+      <!-- ADDRESS -->
+      <div class="form-group mb-3">
+        <label>Address</label>
+        <textarea class="form-control" [(ngModel)]="user.address" name="address"></textarea>
+      </div>
+
+      <!-- FIRST LOGIN PASSWORD -->
+      <div class="form-group mb-3 d-flex align-items-center">
+        <div style="flex:1">
+          <label>Enter First Login Password</label>
+          <input type="password" class="form-control"
+                 [(ngModel)]="firstPassword" name="firstPassword">
+        </div>
+
+        <div class="ms-3 mt-4">
+          <button type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="verifyPass($event)">
+            Verify
+          </button>
+        </div>
+      </div>
+
+      <!-- NEW PASSWORD -->
+      <div class="form-group mb-3">
+        <label>Create Password</label>
+        <input type="password" class="form-control"
+               [(ngModel)]="user.newPassword"
+               name="newPassword"
+               [disabled]="!isPasswordVerified">
+      </div>
+
+      <!-- CONFIRM PASSWORD -->
+      <div class="form-group mb-3">
+        <label>Confirm Password</label>
+        <input type="password" class="form-control"
+               [(ngModel)]="user.confirmPassword"
+               name="confirmPassword"
+               [disabled]="!isPasswordVerified">
+      </div>
+
+      <div class="d-flex justify-content-between mt-3">
+        <span class="text-danger">{{ errorMessage }}</span>
+        <button class="btn btn-primary" type="submit" [disabled]="isLoading">
+          {{ isLoading ? 'Registering...' : 'Register' }}
+        </button>
+      </div>
+
     </form>
+  </div>
+</div>
 
-    <!-- Alerts -->
-    <div
-      *ngIf="errorMessage"
-      class="alert alert-danger mt-3 text-center rounded-pill py-2"
-    >
-      {{ errorMessage }}
-    </div>
+<!-- SUCCESS MODAL -->
+<div class="custom-modal-backdrop" *ngIf="showUserIdModal">
+  <div class="custom-modal">
+    <h4 style="color:green">Registration Success!</h4>
+    <p><b>{{ user.userId }}</b></p>
 
-    <div
-      *ngIf="successMessage"
-      class="alert alert-success mt-3 text-center rounded-pill py-2"
-    >
-      {{ successMessage }}
-    </div>
+    <button class="btn btn-success btn-sm" (click)="copyUserId()">Copy</button>
+    <a href="/login" class="btn btn-info btn-sm mx-2">Proceed to Login</a>
+  </div>
+</div>
 
-    <div class="mt-3 small text-muted text-center">
-      Already have an account?
-      <a href="/login" class="text-primary text-decoration-none fw-semibold"
-        >Login here</a
-      >
-    </div>
+<!-- ERROR MODAL -->
+<div class="custom-modal-backdrop" *ngIf="showErrorIdModal">
+  <div class="custom-modal">
+    <h4 style="color:red">Registration Failed</h4>
+    <p><b>Duplicate entry or invalid data!</b></p>
+    <button class="btn btn-danger btn-sm" (click)="registerAgain()">Try Again</button>
   </div>
 </div>

@@ -82,22 +82,40 @@
       <!-- UPI fields -->
       <div *ngIf="payment.method === 'UPI'" class="mb-3">
         <label class="form-label">UPI ID</label>
-        <input class="form-control" [(ngModel)]="payment.upiId" name="upiId" placeholder="name@bank" />
+        <input class="form-control" [(ngModel)]="payment.upiId" name="upiId" placeholder="name@bank" required
+          pattern=".+@.+" #upiRef="ngModel">
+        <small *ngIf="upiRef.invalid && upiRef.touched" class="text-danger">
+          Enter a valid UPI ID (must contain &#64;)
+        </small>
       </div>
 
       <!-- Card fields -->
       <div *ngIf="payment.method === 'Card'" class="row g-3 mb-1">
         <div class="col-md-6">
           <label class="form-label">Card Number</label>
-          <input class="form-control" [(ngModel)]="payment.cardNumber" name="cardNumber" maxlength="19" placeholder="1111 2222 3333 4444" />
+          <input class="form-control" [(ngModel)]="payment.cardNumber" name="cardNumber" maxlength="19"
+            placeholder="XXXX XXXX XXXX XXXX" (change)="formatCardNumber()" #cardRef="ngModel"
+            pattern="^(\d{4} \d{4} \d{4} \d{4})$">
+          <small *ngIf="cardRef.invalid && cardRef.touched" class="text-danger">
+            Enter a valid 16-digit card number (format XXXX XXXX XXXX XXXX)
+          </small>
         </div>
         <div class="col-md-3">
           <label class="form-label">Expiry (MM/YY)</label>
-          <input class="form-control" [(ngModel)]="payment.expiry" name="expiry" placeholder="MM/YY" />
+          <input class="form-control" [(ngModel)]="payment.expiry" name="expiry" placeholder="MM/YY" maxlength="5"
+            (input)="formatExpiry()" #expRef="ngModel" pattern="^(0[1-9]|1[0-2])\/\d{2}$">
+
+          <small *ngIf="expRef.invalid && expRef.touched" class="text-danger">
+            Format must be MM/YY (01–12 allowed)
+          </small>
         </div>
         <div class="col-md-3">
           <label class="form-label">CVV</label>
-          <input class="form-control" [(ngModel)]="payment.cvv" name="cvv" maxlength="4" placeholder="123" />
+          <input class="form-control" [(ngModel)]="payment.cvv" name="cvv" placeholder="CVV" maxlength="3"
+            pattern="^[0-9]{3}$" #cvvRef="ngModel">
+          <small *ngIf="cvvRef.invalid && cvvRef.touched" class="text-danger">
+            CVV must be exactly 3 digits
+          </small>
         </div>
       </div>
 
@@ -118,15 +136,13 @@
         {{ paymentError }}
       </div>
 
-      <button
-        class="btn btn-success mt-3"
-        (click)="makePayment()"
-        [disabled]="isSubmitting || selectedBills.length === 0"
-      >
+      <button class="btn btn-success mt-3" (click)="makePayment()"
+        [disabled]="isSubmitting || selectedBills.length === 0">
         {{ isSubmitting ? 'Processing...' : ('Pay ' + (totalAmount | currency:'INR')) }}
       </button>
     </div>
   </div>
+
 
   <!-- Success -->
   <div *ngIf="paymentSuccess" class="alert alert-success mt-4" style="display:flex;justify-content:space-between;align-items:flex-start;">

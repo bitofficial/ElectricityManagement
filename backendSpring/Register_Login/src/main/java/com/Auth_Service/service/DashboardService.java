@@ -232,6 +232,7 @@
 package com.Auth_Service.service;
 
 import com.Auth_Service.dto.*;
+import com.Auth_Service.exception.ApiException;
 import com.Auth_Service.model.Bill;
 import com.Auth_Service.model.Payment;
 import com.Auth_Service.model.User;
@@ -390,15 +391,19 @@ public class DashboardService {
      */
     @Transactional
     public User addCustomer(AdminAddUserDTO dto) {
-        if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("Email already exists!");
-        }
-        if (userRepository.existsByUserId(dto.getUserId())) {
-            throw new RuntimeException("User ID already exists!");
-        }
         if (userRepository.existsByConsumerNumber(dto.getConsumerNumber())) {
-            throw new RuntimeException("Consumer Number already exists!");
+            throw new ApiException("Consumer Number already exists!",409);
         }
+
+        if (userRepository.existsByUserId(dto.getUserId())) {
+            throw new ApiException("User ID already exists!",409);
+        }
+
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new ApiException("Email already exists!",409);
+        }
+
+
 
         User user = new User();
         user.setConsumerNumber(dto.getConsumerNumber());
@@ -477,21 +482,71 @@ public class DashboardService {
      * @param batchRequest The DTO containing the list of bill IDs
      * @return A list of the new Payment records that were created
      */
+//    @Transactional // This is CRITICAL. If one bill fails, all are rolled back.
+//    public List<Payment> markMultipleBillsAsPaid(String consumerNumber, PaymentBatchRequestDTO batchRequest) {
+//
+//        List<Payment> createdPayments = new ArrayList<>();
+//
+//        // Create a single DTO for the payment method
+//        PaymentRequestDTO singlePaymentRequest = new PaymentRequestDTO();
+//        singlePaymentRequest.setPaymentMethod(batchRequest.getPaymentMethod());
+//
+//        // Loop through every billId sent from the front-end
+//        for (Long billId : batchRequest.getBillIds()) {
+//            // Call your existing, single-payment logic for each bill
+//            // This reuses your code and is very efficient
+//            Payment paymentRecord = markBillAsPaid(consumerNumber, billId, singlePaymentRequest);
+//            createdPayments.add(paymentRecord);
+//        }
+//
+//        // Return the list of all payment records we just created
+//        return createdPayments;
+//    }
     @Transactional // This is CRITICAL. If one bill fails, all are rolled back.
     public List<Payment> markMultipleBillsAsPaid(String consumerNumber, PaymentBatchRequestDTO batchRequest) {
 
         List<Payment> createdPayments = new ArrayList<>();
 
-        // Create a single DTO for the payment method
-        PaymentRequestDTO singlePaymentRequest = new PaymentRequestDTO();
-        singlePaymentRequest.setPaymentMethod(batchRequest.getPaymentMethod());
-
         // Loop through every billId sent from the front-end
         for (Long billId : batchRequest.getBillIds()) {
-            // Call your existing, single-payment logic for each bill
-            // This reuses your code and is very efficient
-            Payment paymentRecord = markBillAsPaid(consumerNumber, billId, singlePaymentRequest);
-            createdPayments.add(paymentRecord);
+
+            // Step 1: Find the bill AND verify it belongs to this user
+            Bill billToUpdate = billRepository.findByBillIdAndConsumerNumber(billId, consumerNumber)
+                    .orElseThrow(() -> new RuntimeException("Bill not found or does not belong to user: " + billId));
+
+            // Step 2: Check if bill is already paid
+            if ("Paid".equals(billToUpdate.getStatus())) {
+                throw new RuntimeException("Bill with ID " + billId + " is already paid.");
+            }
+
+            // Step 3: Update the bill status and payment date
+            billToUpdate.setStatus("Paid");
+            billToUpdate.setPaymentDate(LocalDateTime.now());
+            billRepository.save(billToUpdate);
+
+            // Step 4: Create a new Payment record for this bill
+            Payment payment = new Payment();
+
+            // Set the SHARED details from the DTO
+            payment.setPaymentMethod(batchRequest.getPaymentMethod());
+            payment.setTransactionId(batchRequest.getTransactionId());
+            payment.setInvoiceNumber(batchRequest.getInvoiceNumber());
+            payment.setPaymentId(batchRequest.getPaymentId());
+            payment.setReceiptNumber(batchRequest.getReceiptNumber());
+
+            // Set other details
+            payment.setTransactionDate(LocalDateTime.now());
+            payment.setBillId(billToUpdate.getBillId());
+            payment.setConsumerNumber(consumerNumber);
+            payment.setAmount(billToUpdate.getAmount());
+            payment.setBillingMonth(billToUpdate.getBillingMonth());
+            payment.setUnitsConsumed(billToUpdate.getUnitsConsumed());
+            payment.setStatus("Paid");
+            // 'generatedAt' will be set automatically by @CreationTimestamp
+            payment.setGeneratedAt(LocalDateTime.now());
+
+            // Step 5: Save the new payment and add to our list
+            createdPayments.add(paymentRepository.save(payment));
         }
 
         // Return the list of all payment records we just created

@@ -1,6 +1,7 @@
 package com.Auth_Service.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -12,34 +13,37 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String invoiceNumber; // e.g., "INV-a1b2c3d4"
+    // --- THIS IS THE FIX ---
+    // We remove 'unique = true' from all fields
+    // that are shared in a batch payment.
 
-    @Column(nullable = false, unique = true)
-    private String transactionId; // e.g., "TXN-..."
+    @Column(nullable = false, unique = false)
+    private String invoiceNumber;
 
-    @Column(nullable = false, unique = true)
-    private String paymentId; // e.g., "PAY-..."
+    @Column(nullable = false, unique = false)
+    private String transactionId;
 
-    @Column(nullable = false, unique = true)
-    private String receiptNumber; // e.g., "RCT-..."
+    @Column(nullable = false, unique = false)
+    private String paymentId;
+
+    @Column(nullable = false, unique = false)
+    private String receiptNumber;
+    // --- END OF FIX ---
 
     @Column(nullable = false)
-    private String paymentMethod; // e.g., "UPI", "Credit Card"
+    private String paymentMethod;
 
     @Column(nullable = false)
     private LocalDateTime transactionDate;
 
     // --- Foreign Keys ---
-    
     @Column(nullable = false)
-    private Long billId; // Foreign key to bills table
+    private Long billId;
 
     @Column(nullable = false)
-    private String consumerNumber; // Foreign key to user table
+    private String consumerNumber;
 
     // --- Bill Details (copied for the invoice) ---
-    
     @Column(nullable = false)
     private String billingMonth;
 
@@ -50,40 +54,16 @@ public class Payment {
     private BigDecimal unitsConsumed;
 
     @Column(nullable = false)
-    private String status = "Paid"; // Status will always be "Paid"
+    private String status = "Paid";
 
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime generatedAt;
 
-    
-    // --- Constructors ---
-    public Payment() {
-    }
-    public Payment(Long id, String invoiceNumber, String transactionId, String paymentId, String receiptNumber,
-			String paymentMethod, LocalDateTime transactionDate, Long billId, String consumerNumber,
-			String billingMonth, BigDecimal amount, BigDecimal unitsConsumed, String status,
-			LocalDateTime generatedAt) {
-		super();
-		this.id = id;
-		this.invoiceNumber = invoiceNumber;
-		this.transactionId = transactionId;
-		this.paymentId = paymentId;
-		this.receiptNumber = receiptNumber;
-		this.paymentMethod = paymentMethod;
-		this.transactionDate = transactionDate;
-		this.billId = billId;
-		this.consumerNumber = consumerNumber;
-		this.billingMonth = billingMonth;
-		this.amount = amount;
-		this.unitsConsumed = unitsConsumed;
-		this.status = status;
-		this.generatedAt = generatedAt;
-	}
-    
 
-    // --- Getters and Setters ---
-    // (Your IDE can generate these, or I can provide them)
-    // ...
+    // --- (Constructors, Getters, and Setters are unchanged) ---
+    public Payment() {}
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getInvoiceNumber() { return invoiceNumber; }
@@ -112,7 +92,4 @@ public class Payment {
     public void setStatus(String status) { this.status = status; }
     public LocalDateTime getGeneratedAt() { return generatedAt; }
     public void setGeneratedAt(LocalDateTime generatedAt) { this.generatedAt = generatedAt; }
-
-	
-    
 }

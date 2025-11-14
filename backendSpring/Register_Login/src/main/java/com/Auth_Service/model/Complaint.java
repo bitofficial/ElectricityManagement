@@ -39,6 +39,8 @@ public class Complaint {
 
     private String notes; // Admin/SME notes
     
+    private String assignedSmeId;
+    
     
 
 	public Complaint(Long complaintId, User user, String complaintType, String category, String description,
@@ -140,6 +142,14 @@ public class Complaint {
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
+	
+	public String getAssignedSmeId() {
+        return assignedSmeId;
+    }
+
+    public void setAssignedSmeId(String assignedSmeId) {
+        this.assignedSmeId = assignedSmeId;
+    }
     
     
 }

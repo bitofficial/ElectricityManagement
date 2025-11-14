@@ -1,6 +1,7 @@
 package com.Auth_Service.service;
 
 import com.Auth_Service.dto.AdminLoginRequestDTO;
+import com.Auth_Service.dto.UserStatusUpdateDTO;
 import com.Auth_Service.dto.UserUpdateDTO; // <-- ADD IMPORT
 import com.Auth_Service.model.Admin;
 import com.Auth_Service.model.User; // <-- ADD IMPORT
@@ -37,10 +38,10 @@ public class AdminService {
             return response;
         }
         Admin admin = adminOptional.get();
-        if (!admin.getEmail().equals(request.getEmail())) {
-            response.put("error", "Invalid credentials");
-            return response;
-        }
+//        if (!admin.getEmail().equals(request.getEmail())) {
+//            response.put("error", "Invalid credentials");
+//            return response;
+//        }
         if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
             response.put("error", "Invalid credentials");
             return response;
@@ -62,7 +63,7 @@ public class AdminService {
         User user = userRepository.findByConsumerNumber(consumerNumber)
                 .orElseThrow(() -> new RuntimeException("User not found with consumer number: " + consumerNumber));
 
-        // Check for email conflicts
+//         Check for email conflicts
         if (!user.getEmail().equals(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Error: Email address is already in use.");
         }
@@ -84,6 +85,22 @@ public class AdminService {
         user.setElectricalSection(dto.getElectricalSection());
         user.setUserId(dto.getUserId());
 
+        return userRepository.save(user);
+    }
+    public User searchByConsumerNumber(String consumerNumber)
+    {
+        return userRepository.findByConsumerNumber(consumerNumber).orElseThrow(()-> new RuntimeException("User not found with consumer number" + consumerNumber));
+    }
+
+    public User serachByUserId(String userId)
+    {
+        return userRepository.findByUserId(userId).orElseThrow(()-> new RuntimeException("UserId is not found" + userId));
+    }
+    @Transactional
+    public User updateUserStatus(String consumerNumber, UserStatusUpdateDTO dto)
+    {
+        User user = userRepository.findByConsumerNumber(consumerNumber).orElseThrow(()-> new RuntimeException("Consumer number is not found " + consumerNumber));
+        user.setConnection_status(dto.getNewStatus());
         return userRepository.save(user);
     }
 }

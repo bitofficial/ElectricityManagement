@@ -1,6 +1,7 @@
 package com.Auth_Service.controller;
 
 import com.Auth_Service.dto.AdminLoginRequestDTO;
+import com.Auth_Service.dto.UserStatusUpdateDTO;
 import com.Auth_Service.dto.UserUpdateDTO; // <-- ADD IMPORT
 import com.Auth_Service.model.User; // <-- ADD IMPORT
 import com.Auth_Service.service.AdminService;
@@ -45,4 +46,23 @@ public class AdminController {
         User updatedUser = adminService.updateUser(consumerNumber, request);
         return ResponseEntity.ok(updatedUser);
     }
+    @GetMapping("/users/by-customer/{consumerNumber}")
+    public ResponseEntity<User> serachByConsumerNumber(@PathVariable String consumerNumber)
+    {
+        User user = adminService.searchByConsumerNumber(consumerNumber);
+        return ResponseEntity.ok(user);
+    }
+    @GetMapping("/users/by-userid/{userid}")
+    public ResponseEntity<User> serachbyUserID(@PathVariable String userid)
+    {
+        User user = adminService.serachByUserId(userid);
+        return ResponseEntity.ok(user);
+    }
+    @PatchMapping("/users/{consumerNumber}/status")
+    public ResponseEntity<User> updateStatus(@PathVariable String consumerNumber, @Valid @RequestBody UserStatusUpdateDTO request)
+    {
+        User update = adminService.updateUserStatus(consumerNumber,request);
+        return ResponseEntity.ok(update);
+    }
+
 }

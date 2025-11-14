@@ -7,4 +7,10 @@ import java.util.List;
 
 public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
     List<Complaint> findByUserConsumerNumber(String consumerNumber);
+    List<Complaint> findAll();
+    List<Complaint> findByAssignedSmeId(String smeId);
+
+    // --- FOR THE ADMIN SEARCH ---
+    List<Complaint> findByUser_ConsumerNumber(String consumerNumber);
+    List<Complaint> findByComplaintType(String complaintType);
 }
