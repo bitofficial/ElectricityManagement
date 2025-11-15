@@ -67,13 +67,15 @@
       [(ngModel)]="smeLoginData.password"
       name="password"
       required
-      pattern="^(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{6,}$"
+      
       #passwordCtrl="ngModel"
     />
 
     <!-- Password Errors -->
-    <div class="text-danger small mt-1" *ngIf="passwordCtrl.invalid && passwordCtrl.touched">
-      <div *ngIf="passwordCtrl.errors?.['required']">Password is required.</div>
+    <!-- <div class="text-danger small mt-1" *ngIf="passwordCtrl.invalid && passwordCtrl.touched">
+      <div *ngIf="passwordCtrl.errors?.['required']">
+        Password is required.
+      </div>
       <div *ngIf="passwordCtrl.errors?.['pattern']">
         Password must contain:
         <ul class="m-0 ps-3">
@@ -83,7 +85,7 @@
           <li>Minimum 6 characters</li>
         </ul>
       </div>
-    </div>
+    </div> -->
   </div>
 
   <!-- SUBMIT BUTTON -->

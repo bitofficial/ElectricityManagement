@@ -135,28 +135,14 @@ export class AddCustomerComponent {
     
     this.addCustomerService.addCustomer(this.user).subscribe({
       next: () => {
-        this.successMessage = 'Customer added successfully!';
+        this.successMessage = 'Customer added successfully !';
         this.errorMessage = '';
         // reset form model
-        this.user = {
-          consumerNumber: '',
-          fullName: '',
-          address: '',
-          city: '',
-          state: '',
-          pincode: '',
-          email: '',
-          mobile: '',
-          customerType: '',
-          electricalSection: '',
-          userId: '',
-          password: ''
-        };
+        
         setTimeout(() => {
           this.successMessage = '';
           this.errorMessage = '';
-          this.router.navigate(['/admin/add-customer']);
-        }, 3000);
+        }, 2000);
       },
       error: (err) => {
         setTimeout(() => {

@@ -93,7 +93,7 @@ export class AdminComplaintsComponent implements OnInit {
     } else if (category.includes('billing')) {
       this.filteredSME = this.smeList.filter(s => s.department.toLowerCase() === 'billing');
     } else if (category.includes('power')) {
-      this.filteredSME = this.smeList.filter(s => s.department.toLowerCase() === 'power cut');
+      this.filteredSME = this.smeList.filter(s => s.department.toLowerCase() === 'power');
     } else {
       this.filteredSME = this.smeList;
     }

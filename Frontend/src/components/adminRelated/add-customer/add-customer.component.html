@@ -193,16 +193,20 @@
         <button type="submit" class="btn btn-success gradient-btn px-4" [disabled]="customerForm.invalid">
           Add Customer
         </button>
+        &nbsp;
+        <button type="reset" class="btn btn-warning gradient-btn px-4" [disabled]="customerForm.invalid">
+          Reset
+        </button>
       </div>
     </form>
 
     <div *ngIf="successMessage" class="alert alert-success text-center top-alert mt-4">
-  {{ successMessage }}
-</div>
+      {{ successMessage }}
+    </div>
 
-<div *ngIf="errorMessage" class="alert alert-danger text-center top-alert mt-4">
-  {{ errorMessage }}
-</div>
+    <div *ngIf="errorMessage" class="alert alert-danger text-center top-alert mt-4">
+      {{ errorMessage }}
+    </div>
 
 
 

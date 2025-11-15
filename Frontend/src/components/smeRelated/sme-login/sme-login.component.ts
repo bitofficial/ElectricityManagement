@@ -27,7 +27,7 @@ smeLoginData = { smeId: '', password: '' };
       console.log('API Response:', response);
 
       if (response && response.message === 'Login Successful') {
-        this.successMessage = 'Login successful!';
+        this.successMessage = 'Logged In successfully !';
         this.errorMessage = '';
         this.smeLoginStatus = true;
 

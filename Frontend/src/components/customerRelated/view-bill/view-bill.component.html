@@ -118,7 +118,7 @@
                 type="number"
                 class="form-control text-center"
                 [(ngModel)]="bill.payableAmount"
-                [disabled]="!bill.selected"
+                disabled
                 (input)="updateTotal()"
                 min="0"
                 [ngModelOptions]="{standalone: true}"

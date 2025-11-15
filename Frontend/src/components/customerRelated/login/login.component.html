@@ -39,22 +39,15 @@
       id="userId"
       type="text"
       class="form-control custom-input"
-      placeholder="Enter your User ID"
+      placeholder="u-xxxxxxxxxxxxx"
       [(ngModel)]="loginData.userId"
       name="userId"
       required
       pattern="u-\d{13}"
       #userIdCtrl="ngModel"
       style="width: 250px;"
+      maxlength="15"
     />
-
-    <!-- Error Messages -->
-    <div class="text-danger small mt-1" *ngIf="userIdCtrl.invalid && userIdCtrl.touched">
-      <div *ngIf="userIdCtrl.errors?.['required']">User ID is required.</div>
-      <div *ngIf="userIdCtrl.errors?.['pattern']">
-        User ID must start with <strong>u-</strong> followed by <strong>13 digits</strong> (e.g., u-1234567890123).
-      </div>
-    </div>
   </div>
 
   <!-- PASSWORD -->
@@ -69,24 +62,9 @@
       [(ngModel)]="loginData.password"
       name="password"
       required
-      pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
       #passwordCtrl="ngModel"
       style="width: 250px;"
     />
-
-    <!-- Error Messages -->
-    <div class="text-danger small mt-1" *ngIf="passwordCtrl.invalid && passwordCtrl.touched">
-      <div *ngIf="passwordCtrl.errors?.['required']">Password is required.</div>
-      <div *ngIf="passwordCtrl.errors?.['pattern']">
-        Password must contain:
-        <ul class="m-0 ps-3">
-          <li>At least 1 uppercase letter</li>
-          <li>At least 1 number</li>
-          <li>At least 1 symbol</li>
-          <li>Minimum 8 characters</li>
-        </ul>
-      </div>
-    </div>
   </div>
 
   <!-- SUBMIT -->
