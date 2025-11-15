@@ -15,6 +15,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class AddCustomerComponent {
 
+  // user model
   user = {
     consumerNumber: '',
     fullName: '',
@@ -30,53 +31,13 @@ export class AddCustomerComponent {
     password: ''
   };
 
-  successMessage = '';
-  errorMessage = '';
-
+  // optional lists (if you use them elsewhere)
+  states: { name: string, cities: string[] }[] = [];
   cities: string[] = [];
 
- states = [
-    { name: 'Andhra Pradesh', cities: ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Nellore', 'Kurnool', 'Tirupati', 'Rajahmundry', 'Kadapa', 'Anantapur', 'Eluru'] },
-    { name: 'Arunachal Pradesh', cities: ['Itanagar', 'Naharlagun', 'Tawang', 'Roing', 'Pasighat', 'Ziro', 'Bomdila', 'Tezu', 'Aalo', 'Namsai'] },
-    { name: 'Assam', cities: ['Guwahati', 'Silchar', 'Dibrugarh', 'Jorhat', 'Tezpur', 'Nagaon', 'Tinsukia', 'Sivasagar', 'Karimganj', 'Goalpara'] },
-    { name: 'Bihar', cities: ['Patna', 'Gaya', 'Bhagalpur', 'Muzaffarpur', 'Purnea', 'Darbhanga', 'Arrah', 'Begusarai', 'Katihar', 'Munger'] },
-    { name: 'Chhattisgarh', cities: ['Raipur', 'Bhilai', 'Bilaspur', 'Korba', 'Durg', 'Rajnandgaon', 'Jagdalpur', 'Raigarh', 'Ambikapur', 'Mahasamund'] },
-    { name: 'Goa', cities: ['Panaji', 'Margao', 'Vasco da Gama', 'Mapusa', 'Ponda', 'Bicholim', 'Curchorem', 'Sanquelim', 'Valpoi', 'Cuncolim'] },
-    { name: 'Gujarat', cities: ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar', 'Jamnagar', 'Gandhinagar', 'Junagadh', 'Anand', 'Navsari'] },
-    { name: 'Haryana', cities: ['Gurugram', 'Faridabad', 'Panipat', 'Ambala', 'Hisar', 'Karnal', 'Yamunanagar', 'Rohtak', 'Sirsa', 'Kurukshetra'] },
-    { name: 'Himachal Pradesh', cities: ['Shimla', 'Dharamshala', 'Mandi', 'Solan', 'Kangra', 'Bilaspur', 'Una', 'Hamirpur', 'Chamba', 'Kullu'] },
-    { name: 'Jharkhand', cities: ['Ranchi', 'Jamshedpur', 'Dhanbad', 'Bokaro', 'Hazaribagh', 'Deoghar', 'Giridih', 'Ramgarh', 'Phusro', 'Jhumri Telaiya'] },
-    { name: 'Karnataka', cities: ['Bengaluru', 'Mysuru', 'Mangaluru', 'Hubballi', 'Belagavi', 'Kalaburagi', 'Davangere', 'Shivamogga', 'Ballari', 'Udupi'] },
-    { name: 'Kerala', cities: ['Thiruvananthapuram', 'Kochi', 'Kozhikode', 'Thrissur', 'Kollam', 'Alappuzha', 'Palakkad', 'Malappuram', 'Kannur', 'Kottayam'] },
-    { name: 'Madhya Pradesh', cities: ['Indore', 'Bhopal', 'Jabalpur', 'Gwalior', 'Ujjain', 'Sagar', 'Dewas', 'Satna', 'Ratlam', 'Rewa'] },
-    { name: 'Maharashtra', cities: ['Mumbai', 'Pune', 'Nagpur', 'Nashik', 'Thane', 'Aurangabad', 'Solapur', 'Amravati', 'Kolhapur', 'Sangli'] },
-    { name: 'Manipur', cities: ['Imphal', 'Thoubal', 'Bishnupur', 'Churachandpur', 'Senapati', 'Ukhrul', 'Kakching', 'Tamenglong', 'Jiribam', 'Moreh'] },
-    { name: 'Meghalaya', cities: ['Shillong', 'Tura', 'Nongpoh', 'Jowai', 'Baghmara', 'Williamnagar', 'Mairang', 'Resubelpara', 'Khliehriat', 'Nongstoin'] },
-    { name: 'Mizoram', cities: ['Aizawl', 'Lunglei', 'Saiha', 'Serchhip', 'Kolasib', 'Champhai', 'Mamit', 'Lawngtlai', 'Bairabi', 'Hnahthial'] },
-    { name: 'Nagaland', cities: ['Kohima', 'Dimapur', 'Mokokchung', 'Tuensang', 'Wokha', 'Zunheboto', 'Mon', 'Phek', 'Kiphire', 'Longleng'] },
-    { name: 'Odisha', cities: ['Bhubaneswar', 'Cuttack', 'Rourkela', 'Berhampur', 'Sambalpur', 'Balasore', 'Puri', 'Jeypore', 'Baripada', 'Jharsuguda'] },
-    { name: 'Punjab', cities: ['Ludhiana', 'Amritsar', 'Jalandhar', 'Patiala', 'Bathinda', 'Mohali', 'Pathankot', 'Hoshiarpur', 'Moga', 'Firozpur'] },
-    { name: 'Rajasthan', cities: ['Jaipur', 'Jodhpur', 'Kota', 'Udaipur', 'Ajmer', 'Bikaner', 'Alwar', 'Sikar', 'Bhilwara', 'Pali'] },
-    { name: 'Sikkim', cities: ['Gangtok', 'Namchi', 'Mangan', 'Geyzing', 'Singtam', 'Rangpo', 'Jorethang', 'Ravangla', 'Soreng', 'Yuksom'] },
-    { name: 'Tamil Nadu', cities: ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Tirunelveli', 'Salem', 'Vellore', 'Erode', 'Dindigul', 'Thoothukudi'] },
-    { name: 'Telangana', cities: ['Hyderabad', 'Warangal', 'Nizamabad', 'Khammam', 'Karimnagar', 'Ramagundam', 'Mahbubnagar', 'Adilabad', 'Suryapet', 'Miryalaguda'] },
-    { name: 'Tripura', cities: ['Agartala', 'Udaipur', 'Dharmanagar', 'Kailasahar', 'Belonia', 'Ambassa', 'Khowai', 'Sonamura', 'Ranirbazar', 'Kamalpur'] },
-    { name: 'Uttar Pradesh', cities: ['Lucknow', 'Kanpur', 'Varanasi', 'Prayagraj', 'Agra', 'Ghaziabad', 'Noida', 'Meerut', 'Bareilly', 'Aligarh'] },
-    { name: 'Uttarakhand', cities: ['Dehradun', 'Haridwar', 'Roorkee', 'Haldwani', 'Rishikesh', 'Kashipur', 'Rudrapur', 'Nainital', 'Pithoragarh', 'Mussoorie'] },
-    { name: 'West Bengal', cities: ['Kolkata', 'Howrah', 'Durgapur', 'Asansol', 'Siliguri', 'Bardhaman', 'Malda', 'Kharagpur', 'Berhampore', 'Haldia'] },
-
-    // -------------------- UNION TERRITORIES ---------------------
-
-    { name: 'Andaman and Nicobar Islands', cities: ['Port Blair', 'Rangat', 'Diglipur', 'Mayabunder', 'Hut Bay', 'Neil Island', 'Havelock', 'Car Nicobar', 'Campbell Bay', 'Bambooflat'] },
-    { name: 'Chandigarh', cities: ['Chandigarh', 'Manimajra', 'Sector 17', 'Sector 22', 'Sector 43', 'Dhanas', 'Burail', 'Sarangpur', 'Maloya', 'Khuda Lahora'] },
-    { name: 'Dadra and Nagar Haveli and Daman and Diu', cities: ['Silvassa', 'Daman', 'Diu', 'Naroli', 'Samarvarni', 'Varkund', 'Kadaiya', 'Athola', 'Kachigam', 'Moti Daman'] },
-    { name: 'Delhi', cities: ['New Delhi', 'Dwarka', 'Rohini', 'Saket', 'Karol Bagh', 'Vasant Kunj', 'Lajpat Nagar', 'Mayur Vihar', 'Connaught Place', 'Pitampura'] },
-    { name: 'Jammu and Kashmir', cities: ['Srinagar', 'Jammu', 'Udhampur', 'Anantnag', 'Baramulla', 'Kathua', 'Sopore', 'Kupwara', 'Rajouri', 'Poonch'] },
-    { name: 'Ladakh', cities: ['Leh', 'Kargil', 'Diskit', 'Padum', 'Nubra Valley', 'Shey', 'Choglamsar', 'Sakti', 'Hemis', 'Turtuk'] },
-    { name: 'Lakshadweep', cities: ['Kavaratti', 'Agatti', 'Minicoy', 'Amini', 'Kadmat', 'Kalpeni', 'Andrott', 'Chetlat', 'Bitra', 'Kiltan'] },
-    { name: 'Puducherry', cities: ['Puducherry', 'Karaikal', 'Mahe', 'Yanam', 'Ozhukarai', 'Villiyanur', 'Bahour', 'Mangalam', 'Kottucherry', 'T.R. Pattinam'] }
-  ];
-
+  successMessage = '';
+  errorMessage = '';
+  showPassword = false;
 
   constructor(
     private authService: AuthService,
@@ -85,6 +46,7 @@ export class AddCustomerComponent {
     private addCustomerService: AddCustomerService
   ) {}
 
+  // kept in case you still want to populate cities when using select -> input no longer calls this
   onStateChange(): void {
     const selected = this.states.find(s => s.name === this.user.state);
     this.cities = selected ? selected.cities : [];
@@ -98,19 +60,19 @@ export class AddCustomerComponent {
     this.http.get<any[]>(`https://api.postalpincode.in/pincode/${pincode}`).subscribe({
       next: (res) => {
         const info = res[0];
-        if (info.Status === 'Success') {
+        if (info && info.Status === 'Success' && info.PostOffice && info.PostOffice.length) {
           const postOffice = info.PostOffice[0];
 
-          // Set state & city from pincode API
-          this.user.state = postOffice.State;
-          this.user.city = postOffice.District;
+          // Set state & city from pincode API (these will populate the text inputs)
+          this.user.state = postOffice.State || this.user.state;
+          this.user.city = postOffice.District || this.user.city;
 
-          // Update cities based on the detected state
+          // Update cities list if you want to use it elsewhere
           const matchState = this.states.find(s => s.name === this.user.state);
           this.cities = matchState ? [...matchState.cities] : [];
 
-          // If city from API is not in the list, add it
-          if (!this.cities.includes(this.user.city)) {
+          // ensure city is present in cities list
+          if (this.user.city && !this.cities.includes(this.user.city)) {
             this.cities.push(this.user.city);
           }
         }
@@ -119,12 +81,29 @@ export class AddCustomerComponent {
     });
   }
 
+  generateConsumerNo(): void {
+    const url =
+      'https://www.random.org/integers/?num=1&min=100000000&max=999999999&col=1&base=10&format=plain&rnd=new';
+    this.http.get(url, { responseType: 'text' }).subscribe({
+      next: (res: string) => {
+        const first9 = res.trim();
+        const last4 = Math.floor(1000 + Math.random() * 9000).toString();
+        this.user.consumerNumber = first9 + last4;
+      },
+
+      error: (err) => {
+        console.error('Error generating consumer number', err);
+        this.user.consumerNumber =
+          (Math.floor(1000000000000 + Math.random() * 9000000000000)).toString();
+      }
+    });
+  }
+
   addCustomer(): void {
     this.successMessage = '';
     this.errorMessage = '';
 
     // Hard Validation in TypeScript also
-
     if (!/^(?!0{13})([1-9][0-9]{12})$/.test(this.user.consumerNumber)) {
       this.errorMessage = "Invalid consumer number.";
       return;
@@ -150,12 +129,15 @@ export class AddCustomerComponent {
       return;
     }
 
-    this.user.userId = 'u-' + this.user.consumerNumber;
-
+    this.user.userId = 'N-' + this.user.consumerNumber;
+    this.user.city= this.user.city.toUpperCase();
+    this.user.state= this.user.state.toUpperCase();
+    
     this.addCustomerService.addCustomer(this.user).subscribe({
       next: () => {
         this.successMessage = 'Customer added successfully!';
         this.errorMessage = '';
+        // reset form model
         this.user = {
           consumerNumber: '',
           fullName: '',
@@ -170,8 +152,17 @@ export class AddCustomerComponent {
           userId: '',
           password: ''
         };
+        setTimeout(() => {
+          this.successMessage = '';
+          this.errorMessage = '';
+          this.router.navigate(['/admin/add-customer']);
+        }, 3000);
       },
       error: (err) => {
+        setTimeout(() => {
+          this.successMessage = '';
+          this.errorMessage = '';
+        }, 3000);
         console.error('Error adding customer:', err);
         this.errorMessage = 'Failed to add customer. Please try again.';
       }

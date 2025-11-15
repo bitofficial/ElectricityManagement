@@ -11,33 +11,48 @@ public class SME {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String smeId; // e.g., "SME_METER_01"
+    private String smeId;
 
     @Column(nullable = false)
-    private String fullName;
+    private String fullName; // <-- FIELD
+
+    @Column(nullable = false, unique = true)
+    private String email; // <-- FIELD
 
     @Column(nullable = false)
-    private String email;
+    private String password;
 
     @Column(nullable = false)
-    private String password; // Hashed password
-
-    @Column(nullable = false)
-    private String department; // e.g., "Meter", "Billing", "Voltage"
-
-    // --- Constructors, Getters, Setters ---
+    private String department; // <-- FIELD
+    
+    // --- Constructors ---
     public SME() {}
+    
+    public SME(String smeId, String fullName, String email, String password, String department) {
+        this.smeId = smeId;
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.department = department;
+    }
 
+    // --- Getters and Setters ---
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    
     public String getSmeId() { return smeId; }
     public void setSmeId(String smeId) { this.smeId = smeId; }
+
+    // --- THESE 3 GETTERS MUST MATCH THE DTO ---
     public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
     public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getDepartment() { return department; }
+    // ---
+    
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
-    public String getDepartment() { return department; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
+    public void setEmail(String email) { this.email = email; }
     public void setDepartment(String department) { this.department = department; }
 }

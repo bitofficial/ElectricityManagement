@@ -43,7 +43,7 @@ export class BillService {
     return this.http.post<any>(`${this.adminUrl}/add`, bill);
   }
 /** Mark given bills as paid for the current consumer */
-markBillsAsPaid(billIds: string[], payload?: { transactionId?: string; method?: string; amount?: number; consumerId?: string; }): Observable<any> {
+markBillsAsPaid(billIds: string[], payload?: { transactionId?: string; method?: string; amount?: number;invoiceNumber?:string;receiptNumber?:string;paymentId?:string; }): Observable<any> {
   if (!this.consumerNumber) {
     return throwError(() => new Error('Missing consumer number in localStorage (userId).'));
   }
@@ -53,7 +53,9 @@ markBillsAsPaid(billIds: string[], payload?: { transactionId?: string; method?: 
     transactionId: payload?.transactionId,
     paymentMethod: payload?.method,
     amount: payload?.amount,
-    consumerId: payload?.consumerId
+    invoiceNumber: payload?.invoiceNumber,
+    receiptNumber: payload?.receiptNumber,
+    paymentId: payload?.paymentId 
   };
   return this.http.post<any>(url, body);
 }

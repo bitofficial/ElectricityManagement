@@ -2,71 +2,130 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ManageConnectionService } from '../../services/manage-connection.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-manage-connection',
   standalone: true,
-  imports: [FormsModule,CommonModule],
+  imports: [FormsModule, CommonModule, RouterLink],
   templateUrl: './manage-connection.component.html',
-  styleUrl: './manage-connection.component.css'
+  styleUrls: ['./manage-connection.component.css']
 })
 export class ManageConnectionComponent {
 
-  consumerId!: number;
+  consumerId: string = '';
   consumer: any = null;
+
   successMessage: string = '';
   errorMessage: string = '';
 
+  isLoading = false;
+  isProcessing = false;
+
+  // Popup state
+  showPopup = false;
+  pendingStatus: 'Active' | 'Inactive' | '' = '';
+
   constructor(private connectionService: ManageConnectionService) {}
 
-  // Fetch consumer by ID
+  /** Search consumer */
   getConsumerById(): void {
     this.successMessage = '';
     this.errorMessage = '';
     this.consumer = null;
 
-    if (!this.consumerId) {
-      this.errorMessage = 'Please enter a valid consumer ID.';
+    if (!this.consumerId || this.consumerId.trim().length < 5) {
+      this.errorMessage = 'Please enter a valid consumer number.';
+      this.hideMessages();
       return;
     }
 
+    this.isLoading = true;
+
     this.connectionService.getConsumerById(this.consumerId).subscribe({
-      next: (data) => {
-        if (data) this.consumer = data;
-        else this.errorMessage = 'No consumer found with this ID.';
+      next: (res) => {
+        this.isLoading = false;
+
+        if (!res) {
+          this.errorMessage = 'No consumer found.';
+          this.hideMessages();
+          return;
+        }
+
+        this.consumer = {
+          consumerNumber: res.consumerNumber,
+          fullName: res.fullName,
+          customerType: res.customerType,
+          email: res.email,
+          mobile: res.mobile,
+          connection_status: res.connection_status
+        };
       },
-      error: (err) => {
-        console.error('Error fetching consumer:', err);
-        this.errorMessage = 'Error fetching consumer details.';
+      error: (err: any) => {
+        console.error("Fetch error:", err);
+        this.isLoading = false;
+        this.errorMessage = 'Failed to fetch consumer.';
+        this.hideMessages();
       }
     });
   }
 
-  // Disconnect Consumer
-  disconnectConsumer(): void {
-    this.connectionService.disconnectConsumer(this.consumerId).subscribe({
+  /** ===============================
+   *  OPEN POPUP (called by checkbox)
+   * =============================== */
+  openConfirmDialog(status: 'Active' | 'Inactive') {
+    this.pendingStatus = status;
+    this.showPopup = true;
+  }
+
+  /** ===============================
+   *  CLOSE POPUP (cancel button)
+   * =============================== */
+  closePopup() {
+    this.showPopup = false;
+    this.pendingStatus = '';
+  }
+
+  /** ===============================
+   *  CONFIRM POPUP → CALL API
+   * =============================== */
+  confirmStatusChange(): void {
+    if (!this.consumer || !this.pendingStatus) return;
+
+    this.isProcessing = true;
+
+    this.connectionService.updateConsumerStatus(
+      this.consumer.consumerNumber,
+      this.pendingStatus
+    ).subscribe({
       next: () => {
-        this.successMessage = 'Consumer disconnected successfully.';
-        this.consumer.connectionStatus = 'DISCONNECTED';
+        this.consumer.connection_status = this.pendingStatus;
+        this.successMessage = `Status updated to ${this.pendingStatus}!`;
+
+        this.showPopup = false;
+        this.pendingStatus = '';
+        this.isProcessing = false;
+
+        this.hideMessages();
       },
-      error: (err) => {
-        console.error('Error disconnecting consumer:', err);
-        this.errorMessage = 'Failed to disconnect consumer.';
+      error: (err: any) => {
+        console.error("Status update error:", err);
+        this.errorMessage = 'Failed to update status.';
+
+        this.showPopup = false;
+        this.pendingStatus = '';
+        this.isProcessing = false;
+
+        this.hideMessages();
       }
     });
   }
 
-  // Reconnect Consumer
-  reconnectConsumer(): void {
-    this.connectionService.reconnectConsumer(this.consumerId).subscribe({
-      next: () => {
-        this.successMessage = 'Consumer reconnected successfully.';
-        this.consumer.connectionStatus = 'ACTIVE';
-      },
-      error: (err) => {
-        console.error('Error reconnecting consumer:', err);
-        this.errorMessage = 'Failed to reconnect consumer.';
-      }
-    });
+  /** Auto-hide alerts */
+  hideMessages() {
+    setTimeout(() => {
+      this.successMessage = '';
+      this.errorMessage = '';
+    }, 2000);
   }
 }

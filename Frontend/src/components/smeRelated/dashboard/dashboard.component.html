@@ -1,5 +1,6 @@
 <nav class="wm-navbar">
   <div class="wm-container">
+      <a href="/">
     <div class="brand">
       <div class="logo" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
@@ -11,8 +12,9 @@
           />
         </svg>
       </div>
-      <span class="brand-name">PowerEase SME</span>
+       <span class="brand-name">PowerEase SME</span>
     </div>
+    </a>
 
     <!-- <ul class="nav-links">
       <li><a routerLink="/login" style="color:#0EA5A4;">User</a></li>
@@ -42,26 +44,32 @@
   </div>
 
   <!-- Stats -->
-  <div class="row gx-3 gy-3 mb-4">
+  <div class="d-flex flex-row ">
 
-    <div class="col-md-4">
+    <div class="mx-5">
       <div class="stat-card">
         <h4>{{ stats.totalComplaints }}</h4>
         <p>Total Complaints</p>
       </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="mx-5">
       <div class="stat-card">
         <h4>{{ stats.resolvedComplaints }}</h4>
         <p>Resolved Complaints</p>
       </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="mx-5">
       <div class="stat-card">
         <h4>{{ stats.pendingComplaints }}</h4>
         <p>Pending Complaints</p>
+      </div>
+    </div>
+    <div class="mx-5">
+      <div class="stat-card">
+        <h4>{{ stats.inprogressComplaints }}</h4>
+        <p>Inprogress Complaints</p>
       </div>
     </div>
 

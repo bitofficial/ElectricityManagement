@@ -12,6 +12,7 @@
     <ul class="nav-links">
       <li><a routerLink="/admin/home" style="color:#0EA5A4;">Dashboard</a></li>
       <li><a routerLink="/admin/add-bill">Add Bill</a></li>
+      <li><a routerLink="/admin/manage-connection">Manage Connection</a></li>
       <li><a routerLink="/admin/complaints" style="color:red">View Complaints</a></li>
     </ul>
   </div>
@@ -29,22 +30,33 @@
       <div class="row">
         <div class="col-md-6 mb-3">
           <label class="form-label">Consumer Number</label>
-          <input id="consumerNumber" type="text" class="form-control custom-input" name="consumerNumber" maxlength="13"
-            minlength="13" pattern="^[1-9][0-9]{12}$" [(ngModel)]="user.consumerNumber"
-            placeholder="Enter 13-digit Consumer Number" required #consumerRef="ngModel" />
-          <small style="color:red" *ngIf="consumerRef.invalid && consumerRef.touched">
-            Consumer Number cannot start with 0</small>
+          <div class="d-flex">
+            <input id="consumerNumber" type="text" class="form-control custom-input" name="consumerNumber"
+              maxlength="13" minlength="13" pattern="^[1-9][0-9]{12}$" [(ngModel)]="user.consumerNumber"
+              placeholder="Enter 13-digit Consumer Number" required #consumerRef="ngModel" />
+            <button type="button" (click)="generateConsumerNo()"
+              class="btn btn-success bg-gradient px-4 ms-2">Fetch</button>
+          </div>
 
+          <small class="text-danger" *ngIf="consumerRef.touched && consumerRef.invalid">
+            <span *ngIf="consumerRef.errors?.['required']">Consumer number is required.</span>
+            <span *ngIf="consumerRef.errors?.['pattern']">Must be 13 digits and cannot start with 0.</span>
+            <span *ngIf="consumerRef.errors?.['minlength'] || consumerRef.errors?.['maxlength']">Consumer number must be
+              13 digits.</span>
+          </small>
         </div>
 
         <div class="col-md-6 mb-3">
           <label class="form-label">Full Name</label>
-          <input id="fullName" type="text" class="form-control custom-input" name="fullName" pattern="^[A-Za-z ]+$"
-            [(ngModel)]="user.fullName" placeholder="Enter full name" required #nameRef="ngModel" />
-        <small style="color:red" *ngIf="nameRef.invalid && nameRef.touched">
-            Name cannot start with numbers</small>
-          </div>
-        
+          <input id="fullName" type="text" class="form-control custom-input" name="fullName"
+            pattern="^[A-Za-z][A-Za-z ]*$" [(ngModel)]="user.fullName" placeholder="Enter full name" required
+            #nameRef="ngModel" />
+          <small class="text-danger" *ngIf="nameRef.touched && nameRef.invalid">
+            <span *ngIf="nameRef.errors?.['required']">Full name is required.</span>
+            <span *ngIf="nameRef.errors?.['pattern']">Name must start with a letter and contain only letters and
+              spaces.</span>
+          </small>
+        </div>
       </div>
 
       <!-- Row 2: Phone + Email -->
@@ -54,17 +66,28 @@
           <input id="mobile" type="text" class="form-control custom-input" name="mobile" maxlength="10" minlength="10"
             pattern="^(?!([0-9])\1{9})[6-9][0-9]{9}$" [(ngModel)]="user.mobile" placeholder="Enter phone number"
             required #mobileRef="ngModel" />
-          <small style="color:red" *ngIf="mobileRef.invalid && mobileRef.touched">Phone Number should start with
-            (6-9)</small>
+          <small class="text-danger" *ngIf="mobileRef.touched && mobileRef.invalid">
+            <span *ngIf="mobileRef.errors?.['required']">Phone number is required.</span>
+            <span *ngIf="mobileRef.errors?.['pattern']">Enter a valid 10-digit Indian mobile number.</span>
+            <div *ngIf="mobileRef.errors?.['pattern']">Cannot start with 0-5.</div>
+            <div *ngIf="mobileRef.errors?.['pattern']">Cannot be a repeated sequence.</div>
+            <div *ngIf="mobileRef.errors?.['minlength'] || mobileRef.errors?.['maxlength']">Phone number must be 10
+              digits.</div>
+          </small>
         </div>
 
         <div class="col-md-6 mb-3">
           <label class="form-label">Email</label>
           <input id="email" type="email" class="form-control custom-input" name="email" [(ngModel)]="user.email"
-            placeholder="Enter email" required #emailRef="ngModel" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$">
+            placeholder="Enter email" required #emailRef="ngModel"
+            pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com|mail)$" />
 
-            <small style="color:red" *ngIf="emailRef.invalid && emailRef.touched">
-            Enter a valid email</small>
+          <small class="text-danger" *ngIf="emailRef.touched && emailRef.invalid">
+            <span *ngIf="emailRef.errors?.['required']">Email is required.</span>
+            <span *ngIf="emailRef.errors?.['pattern']">Email must contain '&#64;' and end with .com or .mail</span>
+            <span *ngIf="emailRef.errors?.['email']">Enter a valid email address.</span>
+          </small>
+
         </div>
       </div>
 
@@ -72,59 +95,80 @@
       <div class="row">
         <div class="col-md-6 mb-3">
           <label class="form-label">Connection Type</label>
-          <select class="form-control custom_input" [(ngModel)]="user.customerType" name="customerType" required>
-            <option value="">Choose your Connection Type</option>
+          <select class="form-control custom_input" [(ngModel)]="user.customerType" name="customerType" required
+            #typeRef="ngModel">
+            <option value="" disabled>Choose your Connection Type</option>
             <option value="Residential">Residential</option>
             <option value="Commercial">Commercial</option>
           </select>
+          <small class="text-danger" *ngIf="typeRef.touched && typeRef.invalid">
+            <span *ngIf="typeRef.errors?.['required']">Connection Type is required.</span>
+          </small>
         </div>
 
         <div class="col-md-6 mb-3">
           <label class="form-label">Region Ward</label>
-          <select class="form-control custom_input" [(ngModel)]="user.electricalSection" name="ElectricalSection"
-            required>
-            <option value="">Choose your Ward</option>
+          <select class="form-control custom_input" [(ngModel)]="user.electricalSection" name="electricalSection"
+            required #wardRef="ngModel">
+            <option value="" disabled>Choose your Ward</option>
             <option value="Ward A">Ward A</option>
             <option value="Ward B">Ward B</option>
             <option value="Ward C">Ward C</option>
           </select>
+          <small class="text-danger" *ngIf="wardRef.touched && wardRef.invalid">
+            <span *ngIf="wardRef.errors?.['required']">Region Ward is required.</span>
+          </small>
         </div>
       </div>
 
-      <!-- Row 4: Pincode + State -->
+      <!-- Row 4: Pincode + State (now input) -->
       <div class="row">
         <div class="col-md-6 mb-3">
           <label class="form-label">Pincode</label>
           <input id="pincode" type="text" class="form-control custom-input" name="pincode" maxlength="6" minlength="6"
             pattern="^[1-9][0-9]{5}$" [(ngModel)]="user.pincode" (blur)="fetchLocationByPincode()"
             placeholder="Enter pincode" required #pincodeRef="ngModel" />
-            <small style="color:red" *ngIf="pincodeRef.invalid && pincodeRef.touched">
-            Enter a valid pincode</small>
+          <small class="text-danger" *ngIf="pincodeRef.touched && pincodeRef.invalid">
+            <span *ngIf="pincodeRef.errors?.['required']">Pincode is required.</span>
+            <span *ngIf="pincodeRef.errors?.['pattern']">Pincode must be 6 digits and cannot start with 0.</span>
+          </small>
         </div>
 
         <div class="col-md-6 mb-3">
           <label class="form-label">State / UT</label>
-          <select id="state" class="form-control custom_input" [(ngModel)]="user.state" name="state" readonly>
-            <option value="">{{ user.state || 'State / UT will auto-fill' }}</option>
-            <option *ngFor="let s of states" [value]="s.name">{{ s.name }}</option>
-          </select>
+          <input id="state" type="text" class="form-control custom-input" name="state" [(ngModel)]="user.state"
+            placeholder="State / UT will auto-fill" required #stateRef="ngModel" />
+          <small class="text-danger" *ngIf="stateRef.touched && stateRef.invalid">
+            <span *ngIf="stateRef.errors?.['required']">State is required.</span>
+          </small>
         </div>
       </div>
 
-      <!-- Row 5: City + Password -->
+      <!-- Row 5: City + Password (city now input) -->
       <div class="row">
         <div class="col-md-6 mb-3">
           <label class="form-label">City</label>
-          <select id="city" class="form-control custom_input" [(ngModel)]="user.city" name="city" readonly>
-            <option value="">{{ user.city || 'City will auto-fill' }}</option>
-            <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
-          </select>
+          <input id="city" type="text" class="form-control custom-input" name="city" [(ngModel)]="user.city"
+            placeholder="City will auto-fill" required #cityRef="ngModel" />
+          <small class="text-danger" *ngIf="cityRef.touched && cityRef.invalid">
+            <span *ngIf="cityRef.errors?.['required']">City is required.</span>
+          </small>
         </div>
 
         <div class="col-md-6 mb-3">
           <label class="form-label">Create Password</label>
-          <input id="password" type="password" class="form-control custom-input" name="password" minlength="6"
-            [(ngModel)]="user.password" placeholder="Default password" required />
+          <div class="password-wrapper" style="position:relative;">
+
+            <input id="password" [type]="showPassword ? 'text' : 'password'"
+              class="form-control custom-input password-input" name="password" minlength="6" maxlength="12"
+              [(ngModel)]="user.password" placeholder="Default password" required #passwordRef="ngModel" />
+
+
+
+          </div>
+
+
+
         </div>
       </div>
 
@@ -133,31 +177,71 @@
         <div class="col-12 mb-3">
           <label class="form-label">Address</label>
           <textarea class="form-control custom-input" [(ngModel)]="user.address" name="address" required
-            placeholder="Enter address" #addressRef="ngModel" pattern="^[a-zA-Z0-9\s,./#'-]+$"></textarea>
-            <small class="text-danger" *ngIf="addressRef.invalid && addressRef.touched">
-          Cannot start with numbers ( or repetitive ).
-        </small>
+            placeholder="Enter address" pattern="^(?!0)(?!.*(.)\1{4,})[A-Za-z0-9\s,./#'\-]+$"
+            #addressRef="ngModel"></textarea>
+          <small class="text-danger" *ngIf="addressRef.touched && addressRef.invalid">
+            <span *ngIf="addressRef.errors?.['required']">Address is required.</span><br />
+            <span *ngIf="addressRef.errors?.['pattern']">
+              Address cannot start with 0 and cannot contain long repeated characters (e.g. 666666...).
+              Allowed characters: letters, numbers, spaces, and / , . # - '
+            </span>
+          </small>
         </div>
       </div>
 
       <div class="d-flex justify-content-center">
-
         <button type="submit" class="btn btn-success gradient-btn px-4" [disabled]="customerForm.invalid">
           Add Customer
         </button>
       </div>
-
     </form>
+
+    <div *ngIf="successMessage" class="alert alert-success text-center top-alert mt-4">
+  {{ successMessage }}
+</div>
+
+<div *ngIf="errorMessage" class="alert alert-danger text-center top-alert mt-4">
+  {{ errorMessage }}
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   </div>
 
   <!-- Alerts -->
-  <div class="d-flex justify-content-center mt-3">
-    <div *ngIf="errorMessage" class="btn btn-danger text-center">
-      {{ errorMessage }}
-    </div>
-    <div *ngIf="successMessage" class="btn btn-success text-center">
-      {{ successMessage }}
-    </div>
+  <div *ngIf="errorMessage" class="alert alert-danger mt-4">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert alert-success mt-4">
+    {{ successMessage }}
   </div>
 
 </div>

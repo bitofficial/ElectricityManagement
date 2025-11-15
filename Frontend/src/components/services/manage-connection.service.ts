@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -7,22 +8,20 @@ import { Observable } from 'rxjs';
 })
 export class ManageConnectionService {
 
-  private baseUrl = 'http://localhost:8080/api/admin/connection';
+  private baseUrl = 'http://localhost:8085/api/admin/users';
 
   constructor(private http: HttpClient) {}
 
-  // Get consumer by ID
-  getConsumerById(consumerId: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/consumer/${consumerId}`);
+  /** Get consumer by consumerNumber */
+  getConsumerById(consumerId: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/by-customer/${consumerId}`);
   }
 
-  // Disconnect consumer
-  disconnectConsumer(consumerId: number): Observable<any> {
-    return this.http.put(`${this.baseUrl}/disconnect/${consumerId}`, {});
-  }
-
-  // Reconnect consumer
-  reconnectConsumer(consumerId: number): Observable<any> {
-    return this.http.put(`${this.baseUrl}/reconnect/${consumerId}`, {});
+  /** PATCH update connection status (Active / Inactive) */
+  updateConsumerStatus(consumerNumber: string, newStatus: string): Observable<any> {
+    return this.http.patch(
+      `${this.baseUrl}/${consumerNumber}/status`,
+      { newStatus: newStatus }   // Must match your backend DTO
+    );
   }
 }

@@ -3,7 +3,6 @@ package com.Auth_Service.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
-import com.Auth_Service.model.User; // ✅ Import your existing User entity
 
 @Data
 @Entity

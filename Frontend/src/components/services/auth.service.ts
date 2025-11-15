@@ -14,6 +14,9 @@ export class AuthService {
   login(credentials: { userId: string; password: string }): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/login`, credentials);
   }
+  verifyPass(credentials: { consumerNumber: string; password: string }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/user/verification`, credentials);
+  }
    adminlogin(credentials:{adminId:string;email:string;password:string}):Observable<any>{
     return this.http.post<any>(`${this.baseUrl}/admin/login`,credentials);
   }

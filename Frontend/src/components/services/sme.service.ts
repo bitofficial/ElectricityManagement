@@ -9,6 +9,7 @@ export class SmeService {
   private apiUrl = 'http://localhost:8085/api/complaints'; // backend endpoint
 
   constructor(private http: HttpClient) {}
+  
 
   getComplaintById(searchKey: string,consumerNumber:string): Observable<any> {
 

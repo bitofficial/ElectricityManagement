@@ -39,9 +39,9 @@
         <tr *ngFor="let b of selectedBills; index as i">
           <td>{{ i + 1 }}</td>
           <td>{{ b.billId }}</td>
-          <td>{{ b.billPeriod || '-' }}</td>
-          <td>{{ b.billDate | date:'mediumDate' }}</td>
-          <td>{{ b.dueDate | date:'mediumDate' }}</td>
+          <td>{{ b.billingMonth | date:'MMM-yyyy' }}</td>
+          <td>{{ b.generatedAt | date:'dd-MMM-yyyy' }}</td>
+          <td>{{ b.dueDate | date:'dd-MMM-yyyy' }}</td>
           <td class="text-end">{{ b.payableAmount | currency:'INR' }}</td>
           <td>
             <button class="btn btn-sm btn-outline-danger" (click)="removeBill(b.billId)">Remove</button>
@@ -59,7 +59,7 @@
   </div>
 
   <ng-template #noBills>
-    <div class="alert alert-info mt-3">
+    <div class="alert-info mt-3">
       No bills selected. Please go back and select bills to pay.
       <a routerLink="/customer/view-bill" class="ms-2">View Bills</a>
     </div>
@@ -145,7 +145,7 @@
 
 
   <!-- Success -->
-  <div *ngIf="paymentSuccess" class="alert alert-success mt-4" style="display:flex;justify-content:space-between;align-items:flex-start;">
+  <div *ngIf="paymentSuccess" class=" alert-success mt-4" style="display:flex;justify-content:space-between;align-items:flex-start;">
     <div>
       ✅ Payment successful!<br />
       Transaction ID: <strong>{{ transactionId }}</strong><br />

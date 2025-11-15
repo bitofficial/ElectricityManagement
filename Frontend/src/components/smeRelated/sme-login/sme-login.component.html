@@ -28,50 +28,75 @@
 
     <form (ngSubmit)="onLogin()" #smeLoginForm="ngForm" autocomplete="off">
 
-      <!-- SME ID -->
-      <div class="form-group mb-3">
-        <label for="smeId" class="form-label" style="width:150px">SME ID</label>
-        <input
-          id="smeId"
-          type="text"
-          class="form-control custom-input"
-          placeholder="Enter SME ID"
-          [(ngModel)]="smeLoginData.smeId"
-          name="smeId"
-          required
-        />
+  <!-- SME ID -->
+  <div class="form-group mb-3">
+    <label for="smeId" class="form-label" style="width:150px">SME ID</label>
+
+    <input
+      id="smeId"
+      type="text"
+      class="form-control custom-input"
+      placeholder="Enter SME ID"
+      [(ngModel)]="smeLoginData.smeId"
+      name="smeId"
+      required
+      maxlength="6"
+      pattern="^[A-Za-z0-9]{1,6}$"
+      #smeIdCtrl="ngModel"
+    />
+
+    <!-- SME ID Errors -->
+    <div class="text-danger small mt-1" *ngIf="smeIdCtrl.invalid && smeIdCtrl.touched">
+      <div *ngIf="smeIdCtrl.errors?.['required']">SME ID is required.</div>
+      <div *ngIf="smeIdCtrl.errors?.['maxlength']">SME ID cannot exceed 6 characters.</div>
+      <div *ngIf="smeIdCtrl.errors?.['pattern']">
+        SME ID must contain only letters and numbers (A–Z, a–z, 0–9).
       </div>
+    </div>
+  </div>
 
-      <!-- Password -->
-      <div class="form-group mb-4">
-        <label for="password" class="form-label" style="width:150px">Password</label>
-        <input
-          id="password"
-          type="password"
-          class="form-control custom-input"
-          placeholder="Enter Password"
-          [(ngModel)]="smeLoginData.password"
-          name="password"
-          required
-        />
+  <!-- PASSWORD -->
+  <div class="form-group mb-4">
+    <label for="password" class="form-label" style="width:150px">Password</label>
+
+    <input
+      id="password"
+      type="password"
+      class="form-control custom-input"
+      placeholder="Enter Password"
+      [(ngModel)]="smeLoginData.password"
+      name="password"
+      required
+      pattern="^(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{6,}$"
+      #passwordCtrl="ngModel"
+    />
+
+    <!-- Password Errors -->
+    <div class="text-danger small mt-1" *ngIf="passwordCtrl.invalid && passwordCtrl.touched">
+      <div *ngIf="passwordCtrl.errors?.['required']">Password is required.</div>
+      <div *ngIf="passwordCtrl.errors?.['pattern']">
+        Password must contain:
+        <ul class="m-0 ps-3">
+          <li>At least 1 uppercase letter</li>
+          <li>At least 1 number</li>
+          <li>At least 1 symbol</li>
+          <li>Minimum 6 characters</li>
+        </ul>
       </div>
-
-      <button
-        type="submit"
-        class="btn btn-primary w-100 gradient-btn"
-        [disabled]="smeLoginForm.invalid"
-      >
-        <span>Login</span>
-      </button>
-    </form>
-
-    <div *ngIf="errorMessage" class="alert alert-danger mt-3 text-center rounded-pill py-2">
-      {{ errorMessage }}
     </div>
+  </div>
 
-    <div *ngIf="successMessage" class="alert alert-success mt-3 text-center rounded-pill py-2">
-      {{ successMessage }}
-    </div>
+  <!-- SUBMIT BUTTON -->
+  <button
+    type="submit"
+    class="btn btn-primary w-100 gradient-btn"
+    [disabled]="smeLoginForm.invalid"
+  >
+    <span>Login</span>
+  </button>
+</form>
+
+
 
     <div class="mt-3 small text-muted text-center">
       Are you a User?
@@ -82,3 +107,12 @@
 
   </div>
 </div>
+
+
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3 text-center rounded-pill py-2">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="successMessage" class="alert alert-success mt-3 text-center rounded-pill py-2">
+      {{ successMessage }}
+    </div>

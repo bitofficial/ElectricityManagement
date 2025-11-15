@@ -16,6 +16,7 @@ export class AdminLoginComponent {
   successMessage = '';
   errorMessage = '';
   adminLoginStatus = false;
+  showPassword = false; 
 
   constructor(private authService: AuthService, private router: Router) { }
   
@@ -27,7 +28,7 @@ export class AdminLoginComponent {
       console.log('API Response:', response);
 
       if (response && response.message === 'Admin login successful') {
-        this.successMessage = 'Login successful!';
+        this.successMessage = 'Logged In Successfully !';
         this.errorMessage = '';
         this.adminLoginStatus = true;
 
@@ -40,7 +41,7 @@ export class AdminLoginComponent {
 
         setTimeout(() => {
           this.router.navigate(['/admin/home']);
-        }, 500);
+        }, 1000);
       } else {
         this.errorMessage = response.message || 'Login failed. Please try again.';
         this.successMessage = '';

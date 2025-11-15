@@ -31,61 +31,52 @@
       <!-- Admin ID -->
       <div class="form-group mb-3">
         <label for="adminId" class="form-label" style="width:150px">Admin ID</label>
-        <input
-          id="adminId"
-          type="text"
-          class="form-control custom-input"
-          placeholder="Enter Admin ID"
-          [(ngModel)]="adminLoginData.adminId"
-          name="adminId"
-          required
-        />
+        <div class="w-100">
+          <input id="adminId" type="text" class="form-control custom-input" placeholder="Enter Admin ID" required
+            pattern="^[1-9][0-9]{4,}$" [(ngModel)]="adminLoginData.adminId" name="adminId" #adminIdRef="ngModel" />
+          <div *ngIf="adminIdRef.invalid && adminIdRef.touched" class="text-danger mt-1">
+            <small *ngIf="adminIdRef.errors?.['required']">Admin ID is required.</small>
+            <small *ngIf="adminIdRef.errors?.['maxlength']">Max 5 digits.</small>
+            <small *ngIf="adminIdRef.errors?.['pattern']">
+              Must be at least 5 digits and cannot start with 0.
+            </small>
+
+          </div>
+        </div>
       </div>
 
-      <!-- Email
-      <div class="form-group mb-3">
-        <label for="email" class="form-label" style="width:150px">Email</label>
-        <input
-          id="email"
-          type="email"
-          class="form-control custom-input"
-          placeholder="Enter Email"
-          [(ngModel)]="adminLoginData.email"
-          name="email"
-          required
-        />
-      </div> -->
-
-      <!-- Password -->
-      <div class="form-group mb-4">
+     <div class="form-group mb-4">
         <label for="password" class="form-label" style="width:150px">Password</label>
-        <input
-          id="password"
-          type="password"
-          class="form-control custom-input"
-          placeholder="Enter Password"
-          [(ngModel)]="adminLoginData.password"
-          name="password"
-          required
-        />
+
+        <div class="w-100 password-wrapper">
+
+          <input id="password" [type]="showPassword ? 'text' : 'password'" class="form-control custom-input"
+            placeholder="Enter Password" name="password" required minlength="6" maxlength="12"
+            pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$" [(ngModel)]="adminLoginData.password"
+            #passwordRef="ngModel" />
+
+          <!-- 👁 EYE ICON -->
+          <span class="eye-icon" (click)="showPassword = !showPassword">
+            <ng-container *ngIf="!showPassword">👁</ng-container>
+            <ng-container *ngIf="showPassword">🙈</ng-container>
+          </span>
+
+          <!-- ERRORS -->
+          <div *ngIf="passwordRef.invalid && passwordRef.touched" class=" text-danger mt-1">
+            <small *ngIf="passwordRef.errors?.['required']">Password is required.</small>
+            <small *ngIf="passwordRef.errors?.['minlength']">Minimum 6 characters required.</small>
+            <small *ngIf="passwordRef.errors?.['maxlength']">Maximum 12 characters allowed.</small>
+            <small *ngIf="passwordRef.errors?.['pattern']">
+              Must contain letters, numbers, and at least one symbol.
+            </small>
+          </div>
+        </div>
       </div>
 
-      <button
-        type="submit"
-        class="btn btn-primary w-100 gradient-btn"
-        [disabled]="adminLoginForm.invalid"
-      >
+      <button type="submit" class="btn btn-primary w-100 gradient-btn" [disabled]="adminLoginForm.invalid">
         <span>Login</span>
       </button>
     </form>
-
-    <div *ngIf="errorMessage" class="alert alert-danger mt-3 text-center rounded-pill py-2">
-      {{ errorMessage }}
-    </div>
-
-    <div *ngIf="successMessage" class="alert alert-success mt-3 text-center rounded-pill py-2">
-      {{ successMessage }}
-    </div>
 
     <div class="mt-3 small text-muted text-center">
       Are you a User?
@@ -96,3 +87,11 @@
 
   </div>
 </div>
+
+    <div *ngIf="errorMessage" class="btn btn--danger mt-3 text-center py-2">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="successMessage" class="alert alert-success top-alert text-center py-2">
+      {{ successMessage }}
+    </div>

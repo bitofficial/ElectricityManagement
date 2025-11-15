@@ -12,10 +12,11 @@
 
     <!-- Show Login/Register/Admin links only if NOT logged in -->
     <ul *ngIf="!loginStatus" class="nav-links">
-      <li><a routerLink="/login">Login</a></li>
-      <li><a routerLink="/admin/login">Admin</a></li>
-      <li><a routerLink="/sme/login">SME</a></li>
+      <li><a routerLink="/login" style="color:white; background-color: rgb(54, 153, 189);">Login</a></li>
       <li><a routerLink="/register" class="cta">Register</a></li>
+      <li><a routerLink="/admin/login" class="btn btn-outline-secondary">Admin</a></li>
+      <li><a routerLink="/sme/login" class="btn btn-outline-warning">SME</a></li>
+      
     </ul>
 
     <!-- Show Logout button only if logged in -->
@@ -23,7 +24,7 @@
       <li>
         <button class="btn btn-outline-danger" (click)="logout()">Logout</button>
       </li>
-      <li> <a [routerLink]="isAdmin ? '/admin/home' : '/customer/home'" class="cta">
+      <li> <a [routerLink]="isAdmin ? '/admin/home' : isSME ? '/sme/home': '/customer/home'" class="cta">
     Dashboard
   </a></li>
     </ul>
@@ -35,7 +36,7 @@
     <div class="hero-left">
       <h1>Smart Electricity Bill Management</h1>
       <p class="lead">
-        Monitor usage, manage bills, detect faults and optimise energy — all from one platform.
+        Register, view and pay your electricity bills all from one platform.
       </p>
 
       <div class="nav-links">
@@ -79,8 +80,8 @@
           <path d="M3 3v18h18" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
-      <h3 style="color:#0EA5A4">Real-time Monitoring</h3>
-      <p>Live consumption graphs, device-level breakdown and historical reports.</p>
+      <h3 style="color:#0EA5A4">Registration</h3>
+      <p>Register once, care free for life.</p>
     </article>
 
     <article class="feature-card">
@@ -89,8 +90,8 @@
           <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
-      <h3 style="color:#0EA5A4">Fault Detection & Alerts</h3>
-      <p>Automatic detection of outages, spikes and potential wiring faults with instant notifications.</p>
+      <h3 style="color:#0EA5A4">Hassle free payments</h3>
+      <p>Pay electricity bills from anywhere anytime.</p>
     </article>
 
     <article class="feature-card">
@@ -100,8 +101,8 @@
             stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
-      <h3 style="color:#0EA5A4">Billing & Payments</h3>
-      <p>Generate accurate bills, accept online payments and offer clear usage-based invoices.</p>
+      <h3 style="color:#0EA5A4">Complaint Portal</h3>
+      <p>Something wrong about your bill? Write to us.</p>
     </article>
 
     <article class="feature-card">
@@ -110,8 +111,8 @@
           <path d="M7 10h5v5" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
-      <h3 style="color:#0EA5A4">Load Scheduling</h3>
-      <p>Shift heavy loads to off-peak hours and optimise costs with intelligent schedules.</p>
+      <h3 style="color:#0EA5A4">Contact Us</h3>
+      <p>Our executives are always ready to serve your needs.</p>
     </article>
   </div>
 </section>
@@ -120,7 +121,7 @@
   <div class="wm-container">
     <div>© {{ currentYear }} PowerEase — Built for smarter power</div>
     <div class="footer-links">
-      <a href="/privacy/privacy">Privacy & Contact</a>
+      <a href="/contact">Contact</a>
     </div>
   </div>
 </footer>

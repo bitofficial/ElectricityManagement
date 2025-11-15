@@ -5,7 +5,7 @@ import { ComplaintService } from '../../services/complaint.service';
 import { SmeComplaintService } from '../../services/sme-complaint.service';
 import { finalize } from 'rxjs/operators';
 
-type ComplaintStatus = 'Pending' | 'InProgress' | 'Resolved';
+type ComplaintStatus = 'PENDING' | 'INPROGRESS' | 'RESOLVED';
 
 /* API shapes */
 interface ApiUser {
@@ -64,6 +64,7 @@ export class ResolveComplaintComponent {
   complaintId: string = '';
   complaint: Complaint | null = null;
   smeId: string = '';
+  SearchComplaint:Complaint[]|null=null;
 
   // table: pending complaints list
   pendingComplaints: Complaint[] = [];
@@ -76,7 +77,7 @@ export class ResolveComplaintComponent {
   errorMessage = '';
 
   // allowed statuses for dropdown
-  statuses: ComplaintStatus[] = ['Pending', 'InProgress', 'Resolved'];
+  statuses: ComplaintStatus[] = ['PENDING', 'INPROGRESS', 'RESOLVED'];
 
   constructor(
     private complaintService: ComplaintService,
@@ -90,21 +91,21 @@ export class ResolveComplaintComponent {
 
   // ---------------------- Normalizers ----------------------
   private normalizeStatus(apiStatus?: string): ComplaintStatus {
-    if (!apiStatus) return 'Pending';
+    if (!apiStatus) return 'PENDING';
     const s = apiStatus.trim().toUpperCase();
-    if (s === 'PENDING') return 'Pending';
-    if (s === 'INPROGRESS' || s === 'IN_PROGRESS' || s === 'IN PROGRESS') return 'InProgress';
-    if (s === 'RESOLVED' || s === 'CLOSED') return 'Resolved';
-    return 'Pending';
+    if (s === 'PENDING') return 'PENDING';
+    if (s === 'INPROGRESS' || s === 'IN_PROGRESS' || s === 'IN PROGRESS') return 'INPROGRESS';
+    if (s === 'RESOLVED' || s === 'CLOSED') return 'RESOLVED';
+    return 'PENDING';
   }
 
   private apiStatusFromLocal(local: ComplaintStatus | string | undefined): string {
     // convert UI status back to backend uppercase
     if (!local) return 'PENDING';
     const s = String(local);
-    if (s === 'Pending') return 'PENDING';
-    if (s === 'InProgress') return 'INPROGRESS';
-    if (s === 'Resolved') return 'RESOLVED';
+    if (s === 'PENDING') return 'PENDING';
+    if (s === 'INPROGRESS') return 'INPROGRESS';
+    if (s === 'RESOLVED') return 'RESOLVED';
     return s.toUpperCase();
   }
 
@@ -132,17 +133,22 @@ export class ResolveComplaintComponent {
       return;
     }
 
-    this.complaintService.getComplaintById(this.complaintId).subscribe({
-      next: (data: ApiComplaint) => {
-        this.complaint = this.toComplaint(data);
-        this.errorMessage = '';
-      },
-      error: (err: any) => {
-        console.error('getComplaint error', err);
-        this.errorMessage = 'Complaint not found. Please check the ID.';
-        this.complaint = null;
-      }
-    });
+    this.smecomplaintService.getAllComplaints(this.smeId)
+      .pipe(finalize(() => (this.tableLoading = false)))
+      .subscribe({
+        next: (list: ApiComplaint[]) => {
+          const mapped = (list || []).map(c => this.toComplaint(c));
+          this.SearchComplaint = mapped.filter(c => c.complaintId == this.complaintId);
+          this.complaint=this.SearchComplaint[0];
+          console.log(this.SearchComplaint)
+        },
+        error: (err: any) => {
+          console.error('Failed to load complaints', err);
+          this.tableError = 'Failed to load complaints.';
+        }
+      });
+
+
   }
 
   // ---------- Load & filter pending complaints using smecomplaintService.getAllComplaints(smeId) ----------
@@ -156,7 +162,7 @@ export class ResolveComplaintComponent {
       .subscribe({
         next: (list: ApiComplaint[]) => {
           const mapped = (list || []).map(c => this.toComplaint(c));
-          this.pendingComplaints = mapped.filter(c => c.status === 'Pending');
+          this.pendingComplaints = mapped.filter(c => c.status === 'PENDING' || c.status==='INPROGRESS');
         },
         error: (err: any) => {
           console.error('Failed to load complaints', err);
@@ -185,7 +191,7 @@ export class ResolveComplaintComponent {
         .subscribe({
           next: (list: ApiComplaint[]) => {
             const mapped = (list || []).map(c => this.toComplaint(c));
-            this.pendingComplaints = mapped.filter(c => c.status === 'Pending');
+            this.pendingComplaints = mapped.filter(c => c.status === 'PENDING' || c.status==='INPROGRESS');
           },
           error: (err: any) => {
             console.error('Search failed', err);
@@ -206,7 +212,7 @@ export class ResolveComplaintComponent {
               (c.fullName || '').toLowerCase().includes(qLower) ||
               (c.description || '').toLowerCase().includes(qLower)
             );
-            this.pendingComplaints = filtered.filter(c => c.status === 'Pending');
+            this.pendingComplaints = filtered.filter(c => c.status === 'PENDING' || c.status==='INPROGRESS');
           },
           error: (err: any) => {
             console.error('Search (fallback) failed', err);
@@ -254,7 +260,7 @@ export class ResolveComplaintComponent {
           Object.assign(row, normalized);
           row.isEditing = false;
           this.successMessage = `Complaint ${row.complaintId} updated successfully.`;
-          if (row.status === 'Resolved') {
+          if (row.status === 'RESOLVED') {
             this.pendingComplaints = this.pendingComplaints.filter(c => c.complaintId !== row.complaintId);
           }
         },
@@ -282,8 +288,8 @@ export class ResolveComplaintComponent {
     }
 
     const payload = {
-      id: this.complaint.complaintId,
-      status: this.apiStatusFromLocal(this.complaint.editStatus),
+      complaintId: this.complaint.complaintId,
+      status: this.complaint.editStatus,
       notes: this.complaint.editNotes
     };
 
@@ -293,7 +299,7 @@ export class ResolveComplaintComponent {
         this.successMessage = 'Complaint updated successfully!';
         const idx = this.pendingComplaints.findIndex(c => c.complaintId === this.complaint!.complaintId);
         if (idx > -1) {
-          if (this.complaint!.status === 'Resolved') {
+          if (this.complaint!.status === 'RESOLVED') {
             this.pendingComplaints.splice(idx, 1);
           } else {
             this.pendingComplaints[idx] = this.toComplaint(this.complaint!);

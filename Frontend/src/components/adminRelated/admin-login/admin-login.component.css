@@ -26,6 +26,30 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
+/* 🔴 Red border when invalid */
+input.ng-invalid.ng-touched {
+  border: 2px solid #ff4d4d !important;
+}
+
+/* 👁 Eye icon container */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+}
+.eye-icon:hover {
+  color: #000;
+}
+
+
 /* Logo */
 .login-logo {
   width: 56px;

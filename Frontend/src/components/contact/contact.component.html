@@ -1,0 +1,67 @@
+<nav class="wm-navbar">
+  <div class="wm-container">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <!-- simple bolt icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <span class="brand-name">PowerEase</span>
+    </div>
+
+    <!-- Show Login/Register/Admin links only if NOT logged in -->
+    <ul class="nav-links">
+      <li><a href="">Home</a></li>
+      <li><a routerLink="/login" style="background-color: rgb(102, 147, 109); color:white;">Login</a></li>
+      <li><a routerLink="/register" class="cta">Register</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="contact-wrapper">
+
+  <h2 class="title">Contact Us</h2>
+
+  <p class="description">
+    PowerEase is an electricity service and billing management platform designed to simplify
+    consumer interactions, improve service visibility, and provide seamless access to utility
+    information and support.
+  </p>
+
+  <div class="contact-box">
+
+    <!-- Working Hours -->
+    <div class="contact-section">
+      <h4>Working Hours</h4>
+      <p>Monday – Saturday<br><strong>9:00 AM – 7:00 PM</strong></p>
+    </div>
+
+    <!-- Phone -->
+    <div class="contact-section">
+      <h4>Phone</h4>
+      <p>
+        <a href="" (click)="handlePhoneClick($event)">
+          {{ phoneNumber }}
+        </a>
+      </p>
+      <small *ngIf="copied" class="copy-msg">Phone number copied!</small>
+    </div>
+
+    <!-- Email -->
+    <div class="contact-section">
+      <h4>Email</h4>
+      <p>
+        <a [href]="gmailLink" target="_blank">
+          {{ email }}
+        </a>
+      </p>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <p>© 2025 PowerEase. All Rights Reserved.</p>
+  </footer>
+
+</div>

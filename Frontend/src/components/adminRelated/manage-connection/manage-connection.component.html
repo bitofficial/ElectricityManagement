@@ -1,25 +1,149 @@
+<nav class="wm-navbar">
+  <div class="wm-container">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <a href="/"><span class="brand-name">PowerEase Admin</span></a>
+    </div>
+
+    <ul class="nav-links">
+      <li><a routerLink="/admin/home" style="color:#0EA5A4;">Dashboard</a></li>
+      <li><a routerLink="/admin/add-bill">Add Bill</a></li>
+      <li><a routerLink="/admin/add-customer" >Add Customer</a></li>
+      <li><a routerLink="/admin/complaints" style="color:red">View Complaints</a></li>
+    </ul>
+  </div>
+</nav>
+
 <div class="container mt-4">
+
   <h2 class="text-center mb-4">Manage Consumer Connection</h2>
 
   <!-- Search Form -->
   <form (ngSubmit)="getConsumerById()" #searchForm="ngForm" class="card p-3 shadow-sm mb-4">
-    <div class="row justify-content-center">
+    <div class="row justify-content-center g-2 align-items-center">
       <div class="col-md-4">
         <input 
-          type="number" 
-          [(ngModel)]="consumerId" 
-          name="consumerId" 
-          placeholder="Enter Consumer ID" 
+          type="text" 
+          [(ngModel)]="consumerId"
+          name="consumerId"
           class="form-control"
-          required>
+          placeholder="Enter Consumer Number"
+          required
+        />
       </div>
-      <div class="col-md-2">
-        <button class="btn btn-primary w-100" type="submit">Search</button>
+
+      <div class="col-md-2 text-center">
+        <button class="btn btn-primary w-50" type="submit" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Search</span>
+          <span *ngIf="isLoading">Searching...</span>
+        </button>
       </div>
     </div>
   </form>
 
-  <!-- Consumer Info -->
-  <div *ngIf="consumer" class="card p-4 shadow-sm">
-    <h5><strong>Consumer Name:</strong> {{ consumer.name }}</h5>
-    <p><strong>
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger text-center">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success text-center">
+    {{ successMessage }}
+  </div>
+
+  <!-- Consumer Info Table -->
+  <div *ngIf="consumer" class="card p-4 shadow-sm mt-4">
+    <h4 class="mb-3 text-primary">
+      <i class="bi bi-person-lines-fill"></i> Consumer Details
+    </h4>
+
+    <table class="table table-hover table-striped text-center align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Consumer Number</th>
+          <th>Full Name</th>
+          <th>Type</th>
+          <th>Email</th>
+          <th>Mobile</th>
+          <th>Status</th>
+          <th>Action</th> <!-- new -->
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>{{ consumer.consumerNumber }}</td>
+          <td>{{ consumer.fullName }}</td>
+
+          <td>
+            <span class="badge bg-info text-dark">{{ consumer.customerType }}</span>
+          </td>
+
+          <td>{{ consumer.email }}</td>
+          <td>{{ consumer.mobile }}</td>
+
+          <td>
+            <span 
+              class="badge"
+              [ngClass]="{
+                'bg-success': consumer.connection_status === 'Active',
+                'bg-danger': consumer.connection_status === 'Inactive',
+                'bg-warning text-dark': consumer.connection_status === 'Pending'
+              }"
+            >
+              {{ consumer.connection_status }}
+            </span>
+          </td>
+
+          <!-- ACTION COLUMN -->
+          <td>
+            <!-- Activate checkbox -->
+            <label class="me-3">
+              <input
+                type="checkbox"
+                [checked]="consumer.connection_status === 'Active'"
+                [disabled]="consumer.connection_status === 'Active' || isProcessing"
+                (change)="openConfirmDialog('Active')"
+              />
+              <span class="ms-1">Activate</span>
+            </label>
+
+            <!-- Disconnect checkbox -->
+            <label>
+              <input
+                type="checkbox"
+                [checked]="consumer.connection_status === 'Inactive'"
+                [disabled]="consumer.connection_status === 'Inactive' || isProcessing"
+                (change)="openConfirmDialog('Inactive')"
+              />
+              <span class="ms-1">Disconnect</span>
+            </label>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ===========================
+     CONFIRMATION POPUP MODAL
+=========================== -->
+<div class="modal-backdrop-custom" *ngIf="showPopup">
+  <div class="modal-card-custom">
+    <h5 class="text-center mb-3">Confirm Action</h5>
+    <p class="text-center">
+      Are you sure you want to 
+      <strong>{{ pendingStatus }}</strong> this connection?
+    </p>
+
+    <div class="d-flex justify-content-around mt-4">
+      <button class="btn btn-secondary px-4" (click)="closePopup()">Cancel</button>
+      <button class="btn btn-primary px-4" (click)="confirmStatusChange()">Confirm</button>
+    </div>
+  </div>
+</div>

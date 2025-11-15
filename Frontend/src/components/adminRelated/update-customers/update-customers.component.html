@@ -1,24 +1,49 @@
+<nav class="wm-navbar">
+  <div class="wm-container">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <a href="/"><span class="brand-name">PowerEase Admin</span></a>
+    </div>
+
+    <ul class="nav-links">
+      <li><a routerLink="/admin/home" style="color:#0EA5A4;">Dashboard</a></li>
+      <li><a routerLink="/admin/add-bill">Add Bill</a></li>
+      <li><a routerLink="/admin/complaints" style="color:red">View Complaints</a></li>
+    </ul>
+  </div>
+</nav>
+
+
+
+
 <div class="container mt-4">
-  <h2 class="text-center mb-4">🔧 Update Customer Details</h2>
+  <h2 class="text-center mb-4">Update Customer Details</h2>
 
   <!-- Search Customer -->
   <div class="card shadow p-4 mb-4">
     <form (ngSubmit)="fetchCustomer()" #searchForm="ngForm">
       <div class="row align-items-end">
         <div class="col-md-8 mb-3">
-          <label for="customerId" class="form-label">Enter Customer ID</label>
-          <input
-            type="text"
-            id="customerId"
-            class="form-control"
-            placeholder="e.g., CUST1001"
-            [(ngModel)]="searchId"
-            name="customerId"
-            required
-          />
+          <label for="consumerNumber" class="form-label">Consumer Number</label>
+          <div class="d-flex">
+            <input id="consumerNumber" type="text" class="form-control custom-input" name="consumerNumber" maxlength="13"
+              minlength="13" pattern="^[1-9][0-9]{12}$" [(ngModel)]="searchId"
+              placeholder="Enter 13-digit Consumer Number" required #consumerRef="ngModel" />
+          </div>
+          <small style="color:red" *ngIf="consumerRef.value && consumerRef.invalid && consumerRef.touched">
+            Invalid consumer number</small>
         </div>
+
         <div class="col-md-4 mb-3 text-center">
-          <button type="submit" class="btn btn-primary w-100" [disabled]="!searchForm.form.valid">
+          <button
+            type="submit"
+            class="btn btn-primary w-50"
+            [disabled]="!searchForm.form.valid"
+          >
             Search
           </button>
         </div>
@@ -29,20 +54,53 @@
   <!-- Customer Details Form -->
   <div *ngIf="customer" class="card shadow p-4">
     <h5 class="mb-3">Customer Information</h5>
-    <form (ngSubmit)="updateCustomer()" #updateForm="ngForm">
 
+    <form (ngSubmit)="updateCustomer()" #updateForm="ngForm" >
+
+      <!-- Consumer Number + User ID (disabled) -->
       <div class="row">
         <div class="col-md-6 mb-3">
-          <label for="name" class="form-label">Full Name</label>
+          <label for="consumerNumber" class="form-label">Consumer Number</label>
           <input
             type="text"
-            id="name"
+            id="consumerNumber"
             class="form-control"
-            [(ngModel)]="customer.name"
-            name="name"
+            [(ngModel)]="customer.consumerNumber"
+            name="consumerNumber"
+            disabled
+          />
+          <small class="text-muted">Cannot be edited</small>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="userId" class="form-label">User ID</label>
+          <input
+            type="text"
+            id="userId"
+            class="form-control"
+            [(ngModel)]="customer.userId"
+            name="userId"
+            disabled
+          />
+          <small class="text-muted">Cannot be edited</small>
+        </div>
+      </div>
+
+      <!-- Name + Email -->
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="fullName" class="form-label">Full Name</label>
+          <input
+            type="text"
+            id="fullName"
+            class="form-control"
+            [(ngModel)]="customer.fullName"
+            name="fullName"
             required
+            [disabled]="!loaded"
           />
         </div>
+
         <div class="col-md-6 mb-3">
           <label for="email" class="form-label">Email</label>
           <input
@@ -52,23 +110,42 @@
             [(ngModel)]="customer.email"
             name="email"
             required
+            [disabled]="!loaded"
           />
         </div>
       </div>
 
+      <!-- Mobile + Pincode + Status -->
       <div class="row">
-        <div class="col-md-6 mb-3">
-          <label for="phone" class="form-label">Phone Number</label>
+        <div class="col-md-4 mb-3">
+          <label for="mobile" class="form-label">Mobile</label>
           <input
             type="text"
-            id="phone"
+            id="mobile"
             class="form-control"
-            [(ngModel)]="customer.phone"
-            name="phone"
+            [(ngModel)]="customer.mobile"
+            name="mobile"
             maxlength="10"
             required
+            [disabled]="!loaded"
           />
         </div>
+
+        <div class="col-md-4 mb-3">
+          <label for="pincode" class="form-label">Pincode</label>
+          <input
+            type="text"
+            id="pincode"
+            class="form-control"
+            [(ngModel)]="customer.pincode"
+            name="pincode"
+            [disabled]="!loaded"
+          />
+        </div>
+      </div>
+
+      <!-- Address + City + State -->
+      <div class="row">
         <div class="col-md-6 mb-3">
           <label for="address" class="form-label">Address</label>
           <input
@@ -78,52 +155,122 @@
             [(ngModel)]="customer.address"
             name="address"
             required
+            [disabled]="!loaded"
+          />
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <label for="city" class="form-label">City</label>
+          <input
+            type="text"
+            id="city"
+            class="form-control"
+            [(ngModel)]="customer.city"
+            name="city"
+            [disabled]="!loaded"
+          />
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <label for="state" class="form-label">State</label>
+          <input
+            type="text"
+            id="state"
+            class="form-control"
+            [(ngModel)]="customer.state"
+            name="state"
+            [disabled]="!loaded"
           />
         </div>
       </div>
 
+      <!-- Customer Type + Electrical Section (DROPDOWNS) -->
       <div class="row">
         <div class="col-md-6 mb-3">
-          <label for="connectionType" class="form-label">Connection Type</label>
+          <label for="customerType" class="form-label">Customer Type</label>
           <select
-            id="connectionType"
+            id="customerType"
             class="form-control"
-            [(ngModel)]="customer.connectionType"
-            name="connectionType"
+            [(ngModel)]="customer.customerType"
+            name="customerType"
+            [disabled]="!loaded"
           >
-            <option value="domestic">Domestic</option>
-            <option value="commercial">Commercial</option>
+            <option value="Residential">Residential</option>
+            <option value="Commercial">Commercial</option>
           </select>
         </div>
 
         <div class="col-md-6 mb-3">
-          <label for="status" class="form-label">Status</label>
+          <label for="electricalSection" class="form-label">Electrical Section</label>
           <select
-            id="status"
+            id="electricalSection"
             class="form-control"
-            [(ngModel)]="customer.status"
-            name="status"
+            [(ngModel)]="customer.electricalSection"
+            name="electricalSection"
+            [disabled]="!loaded"
           >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+            <option value="WARD A">WARD A</option>
+            <option value="WARD B">WARD B</option>
+            <option value="WARD C">WARD C</option>
           </select>
         </div>
       </div>
 
+      <!-- Password fields (optional) -->
+      <div class="row mt-2">
+        <div class="col-md-6 mb-3">
+          <label for="newPassword" class="form-label">New Password (optional)</label>
+          <input
+            type="password"
+            id="newPassword"
+            class="form-control"
+            [(ngModel)]="newPassword"
+            name="newPassword"
+            minlength="6"
+            [disabled]="!loaded"
+          />
+          <small class="text-muted">Leave blank if not changing password</small>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="confirmPassword" class="form-label">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            class="form-control"
+            [(ngModel)]="confirmPassword"
+            name="confirmPassword"
+            minlength="6"
+            [disabled]="!loaded"
+          />
+        </div>
+      </div>
+
+      <!-- Update Button -->
       <div class="text-center mt-3">
-        <button type="submit" class="btn btn-success px-4" [disabled]="!updateForm.form.valid">
+        <button
+          type="submit"
+          class="btn btn-success px-4"
+          [disabled]="!loaded || !updateForm.form.valid"
+        >
           Update Customer
         </button>
       </div>
+
     </form>
   </div>
 
   <!-- Status Messages -->
-  <div *ngIf="successMessage" class="alert alert-success mt-3 text-center">
-    ✅ {{ successMessage }}
-  </div>
+<div
+  *ngIf="successMessage"
+  class="alert alert-success top-alert text-center"
+>
+  ✅ {{ successMessage }}
+</div>
 
-  <div *ngIf="errorMessage" class="alert alert-danger mt-3 text-center">
-    ❌ {{ errorMessage }}
-  </div>
+<div
+  *ngIf="errorMessage"
+  class="alert alert-danger top-alert text-center"
+>
+  ❌ {{ errorMessage }}
 </div>

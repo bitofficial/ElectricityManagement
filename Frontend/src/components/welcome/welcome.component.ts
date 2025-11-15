@@ -12,10 +12,13 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.css']
 })
+
+
 export class WelcomeComponent implements OnInit {
 
   loginStatus = false;
   isAdmin=false;
+  isSME=false;
   currentYear: number = new Date().getFullYear();
 
   constructor(private router: Router) {}
@@ -23,7 +26,9 @@ export class WelcomeComponent implements OnInit {
   ngOnInit(): void {
     const uid = localStorage.getItem('userId');
     const aid = localStorage.getItem('adminId');
+    const smeId = localStorage.getItem('smeId');
     this.isAdmin=!!aid && aid !== 'undefined' && aid !== 'null';
+    this.isSME=!!smeId && smeId!=='undefined' && smeId!='null';
     this.loginStatus = (!!uid && uid !== 'undefined' && uid !== 'null')||(!!aid && aid !== 'undefined' && aid !== 'null');
   }
 

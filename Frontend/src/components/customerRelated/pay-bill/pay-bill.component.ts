@@ -11,8 +11,8 @@ import { Subscription } from 'rxjs';
 
 interface SelectedBill {
   billId: string;
-  billPeriod?: string;
-  billDate?: string | Date;
+  billingMonth?: string;
+  generatedAt?: string | Date;
   dueDate?: string | Date;
   dueAmount?: number;
   payableAmount: number;
@@ -52,6 +52,10 @@ export class PayBillComponent implements OnInit, OnDestroy {
   paymentError = '';
   transactionId = '';
   isSubmitting = false;
+   invoiceNumber = ''
+  paymentId = ''
+    receiptNumber = ''
+   transactionDate = new Date();
 
   private subs: Subscription[] = [];
 
@@ -205,8 +209,8 @@ export class PayBillComponent implements OnInit, OnDestroy {
         billId: b.billId,
         payableAmount: Number(b.payableAmount) || 0,
         dueDate: b.dueDate,
-        billDate: b.billDate,
-        billPeriod: b.billPeriod
+        generatedAt: b.generatedAt,
+        billingMonth: b.billingMonth
       })),
       totalAmount: this.totalAmount,
       method: this.payment.method,
@@ -226,40 +230,51 @@ export class PayBillComponent implements OnInit, OnDestroy {
         // Always set transaction id first (from backend if present)
         this.transactionId = response?.transactionId || 'TXN' + Math.floor(Math.random() * 1000000);
         this.paymentSuccess = true;
+          this.invoiceNumber = 'INV' + Math.floor(100000 + Math.random() * 900000);
+    this.paymentId = 'PAY' + Math.floor(100000 + Math.random() * 900000);
+    this.receiptNumber = 'RCPT' + Math.floor(100000 + Math.random() * 900000);
+    this.transactionDate = new Date();
 
         // TAKE SNAPSHOT BEFORE clearing selected bills
         this.paidBillsSnapshot = this.selectedBills.map(b => ({ ...b, payableAmount: Number(b.payableAmount) || 0 }));
         this.paidTotal = Number(this.totalAmount) || this.paidBillsSnapshot.reduce((s, b) => s + (Number(b.payableAmount) || 0), 0);
 
         // Prepare bill ids to mark as paid
-        const billIds = this.paidBillsSnapshot.map(b => b.billId);
-        const updatePayload = {
-          transactionId: this.transactionId,
-          method: this.payment.method,
-          amount: this.paidTotal,
-          consumerId: this.consumerId
-        };
+        // Prepare bill ids to mark as paid
+const billIds = this.paidBillsSnapshot.map(b => b.billId);
 
-        // Call backend to mark these bills as paid
-        const markSub = this.billService.markBillsAsPaid(billIds, updatePayload).subscribe({
-          next: (res) => {
-            console.log('Bills marked as paid:', res);
-            // Clear selection and local storage (we keep snapshot for invoice)
-            localStorage.removeItem('selectedBills');
-            this.selectedBills = [];
-            this.totalAmount = 0;
-            this.isSubmitting = false;
-          },
-          error: (err) => {
-            console.error('Failed to mark bills as paid:', err);
-            // Payment succeeded but marking failed — keep snapshot and inform user
-            this.paymentError = 'Payment succeeded, but updating bill status failed. Please contact support or retry marking as paid.';
-            // do NOT clear snapshot so invoice still works
-            this.isSubmitting = false;
-          }
-        });
+// 🔥 FIXED PAYLOAD STRUCTURE
+const updatePayload = {
+  // billIds: billIds,
+  method: this.payment.method,
+  amount: this.paidTotal,
+  consumerId: this.consumerId,
+  transactionId: this.transactionId,
+  paymentId: this.paymentId,
+  invoiceNumber: this.invoiceNumber,
+  receiptNumber: this.receiptNumber
+};
 
-        this.subs.push(markSub);
+// 🔥 FIXED API CALL
+const markSub = this.billService.markBillsAsPaid(billIds,updatePayload).subscribe({
+  next: (res) => {
+    console.log('Bills marked as paid:', res);
+
+    // Clear after success
+    localStorage.removeItem('selectedBills');
+    this.selectedBills = [];
+    this.totalAmount = 0;
+    this.isSubmitting = false;
+  },
+  error: (err) => {
+    console.error('Failed to mark bills as paid:', err);
+    this.paymentError = 'Payment succeeded, but updating bill status failed.';
+    this.isSubmitting = false;
+  }
+});
+
+this.subs.push(markSub);
+
       },
       error: (err) => {
         console.error('Payment failed:', err);
@@ -325,8 +340,8 @@ export class PayBillComponent implements OnInit, OnDestroy {
     const tableData = billsForInvoice.map((b, i) => [
       i + 1,
       b.billId,
-      b.billPeriod || '-',
-      b.billDate ? new Date(b.billDate).toLocaleDateString() : '-',
+      b.billingMonth || '-',
+      b.generatedAt ? new Date(b.generatedAt).toLocaleDateString() : '-',
       b.dueDate ? new Date(b.dueDate).toLocaleDateString() : '-',
       `₹ ${Number(b.payableAmount).toFixed(2)}`
     ]);

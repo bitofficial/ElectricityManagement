@@ -40,7 +40,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").permitAll()
                         .requestMatchers("/api/users/**").permitAll()
                         .requestMatchers("/api/complaints/**").permitAll()
+                        .requestMatchers("/api/user/**").permitAll()
                         .requestMatchers("/api/sme/**").permitAll()
+                        .requestMatchers("/api/admin/sme/getAll").permitAll()
+                        
 
 
                         // Permit Swagger and H2

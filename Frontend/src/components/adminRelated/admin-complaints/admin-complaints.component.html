@@ -23,10 +23,11 @@
       <li><a routerLink="/admin/home" style="color:#0EA5A4;">Dashboard</a></li>
       <li><a routerLink="/admin/add-bill">Add Bill</a></li>
       <li><a routerLink="/admin/add-customer">Add Customer</a></li>
+      <li><a routerLink="/admin/manage-connection">Manage Connection</a></li>
+      <!-- <li><a routerLink="/admin/complaints"  style="color:red">View Complaints</a></li> -->
     </ul>
   </div>
 </nav>
-
 
 <div class="container mt-4">
   <h2 class="text-center mb-4">All Customer Complaints</h2>
@@ -35,14 +36,14 @@
     <input
       type="text"
       class="form-control w-25 d-inline"
-      placeholder="Search by Consumer ID or Status"
+      placeholder="Search by Consumer Number or Status"
       [(ngModel)]="searchQuery"
       (input)="filterComplaints()"
     />
   </div>
 
   <div *ngIf="loading" class="text-center mt-5">
-    <div class="spinner-border text-primary" role="status"></div>
+    <div class="spinner-border text-primary"></div>
     <p>Loading complaints...</p>
   </div>
 
@@ -50,7 +51,7 @@
     <thead class="table-primary">
       <tr>
         <th>Complaint ID</th>
-        <th>Consumer ID</th>
+        <th>Consumer Number</th>
         <th>Category</th>
         <th>Description</th>
         <th>Status</th>
@@ -58,34 +59,88 @@
         <th>Actions</th>
       </tr>
     </thead>
+
     <tbody>
       <tr *ngFor="let c of filteredComplaints">
         <td>{{ c.complaintId }}</td>
-        <td>{{ c.consumerId }}</td>
+        <td>{{ c.consumerNumber }}</td>
         <td>{{ c.category }}</td>
         <td>{{ c.description }}</td>
+
         <td>
           <span
             class="badge"
             [ngClass]="{
-              'bg-warning text-dark': c.status === 'Pending',
-              'bg-success': c.status === 'Resolved',
-              'bg-danger': c.status === 'Rejected'
+              'bg-warning text-dark': isPending(c.status),
+              'bg-info text-dark': isInProgress(c.status),
+              'bg-success text-white': isResolved(c.status),
+              'bg-danger text-white': isRejected(c.status)
             }"
           >
             {{ c.status }}
           </span>
         </td>
-        <td>{{ c.registeredDate | date: 'mediumDate' }}</td>
+
+        <td>{{ c.dateSubmitted | date:'mediumDate' }}</td>
+
         <td>
-          <button
-            class="btn btn-sm btn-outline-info"
-            (click)="viewDetails(c.complaintId)"
-          >
+          <button class="btn btn-sm btn-outline-info" (click)="openStatusModal(c)">
             View
           </button>
         </td>
       </tr>
     </tbody>
   </table>
+</div>
+
+
+<!-- ========================= -->
+<!--  CENTER POPUP MODAL       -->
+<!-- ========================= -->
+
+<div class="modal-overlay" *ngIf="showStatusModal" (click)="closeStatusModal()"></div>
+
+<div class="status-modal" *ngIf="showStatusModal">
+  <div class="modal-card p-3">
+    <h5 class="mb-3">Update Complaint #{{ activeComplaint?.complaintId }}</h5>
+
+    <label class="form-label">Select Status:</label>
+
+    <div class="status-options mb-3">
+      <div class="form-check">
+        <input type="radio" class="form-check-input" name="status" value="PENDING" [(ngModel)]="selectedStatus">
+        <label class="form-check-label">PENDING</label>
+      </div>
+
+      <div class="form-check">
+        <input type="radio" class="form-check-input" name="status" value="INPROGRESS" [(ngModel)]="selectedStatus">
+        <label class="form-check-label">IN-PROGRESS</label>
+      </div>
+
+      <div class="form-check">
+        <input type="radio" class="form-check-input" name="status" value="RESOLVED" [(ngModel)]="selectedStatus">
+        <label class="form-check-label">RESOLVED</label>
+      </div>
+    </div>
+
+    <label class="form-label">Assign SME:</label>
+    <div class="status-options allsmes mb-3">
+      <div class="form-check" *ngFor="let s of filteredSME">
+        <input type="radio" class="form-check-input" name="SME" [value]="s.id" [(ngModel)]="selectedSME">
+        <label class="form-check-label">{{ s.id }} — {{ s.name }} ({{ s.department }})</label>
+      </div>
+    </div>
+
+    <label>Notes (optional):</label>
+    <textarea class="form-control mb-3" rows="3" [(ngModel)]="selectedNotes"></textarea>
+
+    <div class="d-flex justify-content-end gap-2">
+      <button class="btn btn-secondary" (click)="closeStatusModal()">Cancel</button>
+      <button class="btn btn-primary" [disabled]="!selectedStatus || !selectedSME" (click)="applyStatusChange()">Save</button>
+    </div>
+
+    <div *ngIf="modalSuccessMessage" class="alert alert-success text-center mt-3">
+      {{ modalSuccessMessage }}
+    </div>
+  </div>
 </div>

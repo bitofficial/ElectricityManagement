@@ -26,7 +26,8 @@ export class DashboardComponent {
   stats = {
     totalComplaints: 0,
     resolvedComplaints: 0,
-    pendingComplaints: 0
+    pendingComplaints: 0,
+    inprogressComplaints:0
   };
 
   features: FeatureCard[] = [
@@ -59,6 +60,7 @@ export class DashboardComponent {
           this.stats.totalComplaints = data.length;
           this.stats.resolvedComplaints = data.filter((complaint: any) => complaint.status === 'RESOLVED').length;
           this.stats.pendingComplaints = data.fileter((complaint: any) => complaint.status === 'PENDING').length;
+          this.stats.inprogressComplaints = data.fileter((complaint: any) => complaint.status === 'INPROGRESS').length;
         },
         error: () => {
           console.error('Failed loading stats');

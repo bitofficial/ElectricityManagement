@@ -4,8 +4,8 @@ import { RouterLink } from '@angular/router';
 
 interface SelectedBill {
   billId: string;
-  billPeriod?: string;
-  billDate?: string | Date;
+  billingMonth?: string;
+  generatedAt?:string | Date;
   dueDate?: string | Date;
   dueAmount?: number;
   payableAmount: number;

@@ -1,0 +1,154 @@
+/* ------------------------------ */
+/*  MODAL OVERLAY BACKGROUND      */
+/* ------------------------------ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* ------------------------------ */
+/*  MODAL CARD                    */
+/* ------------------------------ */
+
+.status-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  z-index: 2100;
+  width: 90%;
+  max-width: 480px;
+  animation: popupAnimation 0.25s ease-out forwards;
+}
+
+.modal-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px 26px;
+  box-shadow: 0 8px 35px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  animation: scaleUp 0.25s ease-out;
+}
+
+/* ------------------------------ */
+/*  HEADER TEXT                   */
+/* ------------------------------ */
+
+.modal-card h5 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #0b3d91;
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+/* ------------------------------ */
+/*  FORM LABELS                   */
+/* ------------------------------ */
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+  color: #333;
+}
+
+/* ------------------------------ */
+/*  RADIO BUTTON STYLING          */
+/* ------------------------------ */
+
+.status-options .form-check {
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #e2e2e2;
+  transition: all 0.2s ease;
+}
+.allsmes{
+  overflow-y: scroll;
+  height: 150px;
+}
+
+.status-options .form-check:hover {
+  background: #eef7ff;
+  border-color: #0ea5a4;
+}
+
+.form-check-input:checked {
+  background-color: #0ea5a4 !important;
+  border-color: #0ea5a4 !important;
+}
+
+/* ------------------------------ */
+/*  TEXTAREA                      */
+/* ------------------------------ */
+
+textarea.form-control {
+  border-radius: 10px;
+  border: 1px solid #ced4da;
+  font-size: 14px;
+}
+
+/* ------------------------------ */
+/*  BUTTON ROW                    */
+/* ------------------------------ */
+
+.btn-primary {
+  background-color: #0ea5a4 !important;
+  border-color: #0ea5a4 !important;
+  padding: 6px 18px;
+  border-radius: 8px;
+}
+
+.btn-primary:hover {
+  background-color: #0c8d8c !important;
+}
+
+.btn-secondary {
+  border-radius: 8px;
+}
+
+.d-flex.gap-2 button {
+  min-width: 90px;
+}
+
+/* ------------------------------ */
+/* SUCCESS MESSAGE                */
+/* ------------------------------ */
+
+.alert-success {
+  border-radius: 10px;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease;
+}
+
+/* ------------------------------ */
+/* POPUP OPEN ANIMATIONS          */
+/* ------------------------------ */
+
+@keyframes popupAnimation {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.96); }
+  to   { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

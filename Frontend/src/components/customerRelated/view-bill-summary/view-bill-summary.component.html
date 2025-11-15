@@ -39,8 +39,8 @@
         <tr *ngFor="let b of selectedBills; index as i">
           <td>{{ i + 1 }}</td>
           <td>{{ b.billId }}</td>
-          <td>{{ b.billPeriod || '-' }}</td>
-          <td>{{ b.billDate | date:'mediumDate' }}</td>
+          <td>{{ b.billingMonth | date:'MMM-yyyy' }}</td>
+          <td>{{ b.generatedAt | date:'dd-MMM-yyyy' }}</td>
           <td>{{ b.dueDate | date:'mediumDate' }}</td>
           <td class="text-end">{{ b.payableAmount | currency:'INR' }}</td>
           <td>

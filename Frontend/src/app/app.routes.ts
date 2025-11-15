@@ -31,15 +31,14 @@ import { SearchComplaintComponent } from '../components/smeRelated/search-compla
 import { ProfileComponent } from '../components/customerRelated/profile/profile.component';
 import { DashboardComponent } from '../components/smeRelated/dashboard/dashboard.component';
 import { SmeLoginComponent } from '../components/smeRelated/sme-login/sme-login.component';
-
-
-
+import { ContactComponent } from '../components/contact/contact.component';
 
 export const routes: Routes = [
   // 🏠 General Routes
   { path: '', component: WelcomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegistrationComponent },
+  { path: 'contact', component: ContactComponent},
 
   // 👤 Customer Routes
   { path: 'customer/home', component: HomeComponent },

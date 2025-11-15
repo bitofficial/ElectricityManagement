@@ -82,8 +82,8 @@
             <!-- <th>Connection Type</th>
             <th>Connection Status</th> -->
             <!-- <th>Mobile Number</th> -->
-            <!-- <th>Bill Period</th> -->
-            <th>Bill Month</th>
+            <th>Bill Date</th>
+            <th>Bill Period</th>
             <th>Due Date</th>
             <th>Disconnection Date</th>
             <th>Due Amount (₹)</th>
@@ -106,8 +106,8 @@
             <!-- <td>{{ bill.connectionType }}</td> -->
             <!-- <td>{{ bill.connectionStatus }}</td> -->
             <!-- <td>{{ bill.mobileNumber }}</td> -->
-            <!-- <td>{{ bill.billPeriod }}</td> -->
-            <td>{{ bill.billingMonth | date }}</td>
+            <td>{{ bill.generatedAt|date:'dd-MMM-yyyy' }}</td>
+            <td>{{ bill.billingMonth | date:'MMM-yyyy' }}</td>
             <td>{{ bill.dueDate | date }}</td>
            <td>{{ getDisconnectionDate(bill.dueDate) | date:'dd-MMM-yyyy' }}</td>
 

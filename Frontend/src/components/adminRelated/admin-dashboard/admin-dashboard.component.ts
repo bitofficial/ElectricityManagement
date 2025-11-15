@@ -51,6 +51,12 @@ export class AdminDashboardComponent implements OnInit {
       description: 'Manage customer connections.',
       route: '/admin/manage-connection',
       icon: 'bi bi-exclamation-triangle'
+    },
+    {
+      title: 'Update Customers',
+      description: 'Update customer details.',
+      route: '/admin/update-customer',
+      icon: 'bi bi-exclamation-triangle'
     }
   ];
 

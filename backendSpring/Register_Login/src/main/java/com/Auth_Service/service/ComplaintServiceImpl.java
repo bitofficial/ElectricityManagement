@@ -6,7 +6,6 @@ import com.Auth_Service.model.Complaint;
 import com.Auth_Service.model.User;
 import com.Auth_Service.repository.ComplaintRepository;
 import com.Auth_Service.repository.UserRepository;
-import com.Auth_Service.service.ComplaintService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
