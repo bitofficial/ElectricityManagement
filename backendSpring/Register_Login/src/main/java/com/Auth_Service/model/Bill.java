@@ -282,7 +282,7 @@ public class Bill {
 
     @CreationTimestamp
     @Column(name = "generated_at", updatable = false)
-    private String generatedAt;
+    private LocalDateTime generatedAt;
 
     @Column(name = "meter_id", length = 50)
     private String meterId; // optional, may remain null
@@ -317,8 +317,8 @@ public class Bill {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public String getGeneratedAt() { return generatedAt; }
-    public void setGeneratedAt(String generatedAt) { this.generatedAt = generatedAt; }
+    public LocalDateTime getGeneratedAt() { return generatedAt; }
+    public void setGeneratedAt(LocalDateTime generatedAt) { this.generatedAt = generatedAt; }
 
     public String getMeterId() { return meterId; }
     public void setMeterId(String meterId) { this.meterId = meterId; }

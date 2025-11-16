@@ -88,6 +88,7 @@ package com.Auth_Service.dto;
 import com.Auth_Service.model.Bill;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * A DTO to represent a bill summary for list views.
@@ -102,12 +103,13 @@ public class BillListItemDTO {
     private BigDecimal amount;
     private LocalDate dueDate;
     private String status;
+    private LocalDateTime generated_at;
 
     public BillListItemDTO() {
     }
 
     public BillListItemDTO(Long billId, String billingMonth, BigDecimal unitsConsumed,
-                           BigDecimal pricePerUnit, BigDecimal amount, LocalDate dueDate, String status) {
+                           BigDecimal pricePerUnit, BigDecimal amount, LocalDate dueDate, String status,LocalDateTime generated_at) {
         this.billId = billId;
         this.billingMonth = billingMonth;
         this.unitsConsumed = unitsConsumed;
@@ -115,6 +117,7 @@ public class BillListItemDTO {
         this.amount = amount;
         this.dueDate = dueDate;
         this.status = status;
+        this.generated_at = generated_at;
     }
 
     /**
@@ -128,7 +131,8 @@ public class BillListItemDTO {
                 bill.getPricePerUnit(),
                 bill.getAmount(),
                 bill.getDueDate(),
-                bill.getStatus()
+                bill.getStatus(), 
+                bill.getGeneratedAt()
         );
     }
 
@@ -189,4 +193,13 @@ public class BillListItemDTO {
     public void setStatus(String status) {
         this.status = status;
     }
+
+	public LocalDateTime getGenerated_at() {
+		return generated_at;
+	}
+
+	public void setGenerated_at(LocalDateTime generated_at) {
+		this.generated_at = generated_at;
+	}
+    
 }
