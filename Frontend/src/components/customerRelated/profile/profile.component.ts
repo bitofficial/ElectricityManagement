@@ -28,12 +28,13 @@ export class ProfileComponent implements OnInit {
     userId: '',
     consumerNumber: '',
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
   };
 
   loading = false;
   error = '';
   saving = false;
+  connectionStatus = '';
 
   // Replace with actual userId from auth state when available
   private userId = localStorage.getItem('userId') ?? '';
@@ -66,8 +67,10 @@ export class ProfileComponent implements OnInit {
             userId: data.userId ?? '',
             consumerNumber: data.consumerNumber ?? '',
             newPassword: '',
-            confirmPassword: ''
+            confirmPassword: '',
           };
+          this.connectionStatus = data.connection_status ?? '';
+          
         },
         error: (err) => {
           console.error('Failed to load profile', err);

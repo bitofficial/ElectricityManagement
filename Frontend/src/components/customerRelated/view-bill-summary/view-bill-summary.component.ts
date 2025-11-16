@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 interface SelectedBill {
   billId: string;
   billingMonth?: string;
-  generatedAt?:string | Date;
+  generated_at?:string | Date;
   dueDate?: string | Date;
   dueAmount?: number;
   payableAmount: number;

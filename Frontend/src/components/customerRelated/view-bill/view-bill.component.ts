@@ -12,7 +12,7 @@ interface Bill {
   connectionType?: string;
   connectionStatus?: string;
   mobileNumber?: string;
-  generatedAt?: Date;
+  generated_at?: Date;
   billingMonth: Date;
   dueDate: Date;
   disconnectionDate?: Date;
@@ -55,7 +55,7 @@ export class ViewBillComponent implements OnInit {
   private mapBill(b: any): Bill {
   return {
     billId: String(b.billId ?? 'N/A'),   // 👈 force string
-    generatedAt: b.generatedAt?new Date(b.generatedAt) :undefined,
+    generated_at: b.generated_at?new Date(b.generated_at) :undefined,
     billingMonth: new Date(b.billingMonth),
     dueDate: new Date(b.dueDate),
     disconnectionDate: b.disconnectionDate ? new Date(b.disconnectionDate) : undefined,

@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 interface SelectedBill {
   billId: string;
   billingMonth?: string;
-  generatedAt?: string | Date;
+  generated_at?: string | Date;
   dueDate?: string | Date;
   dueAmount?: number;
   payableAmount: number;
@@ -209,7 +209,7 @@ export class PayBillComponent implements OnInit, OnDestroy {
         billId: b.billId,
         payableAmount: Number(b.payableAmount) || 0,
         dueDate: b.dueDate,
-        generatedAt: b.generatedAt,
+        generated_at: b.generated_at,
         billingMonth: b.billingMonth
       })),
       totalAmount: this.totalAmount,
@@ -341,7 +341,7 @@ this.subs.push(markSub);
       i + 1,
       b.billId,
       b.billingMonth || '-',
-      b.generatedAt ? new Date(b.generatedAt).toLocaleDateString() : '-',
+      b.generated_at ? new Date(b.generated_at).toLocaleDateString() : '-',
       b.dueDate ? new Date(b.dueDate).toLocaleDateString() : '-',
       `₹ ${Number(b.payableAmount).toFixed(2)}`
     ]);

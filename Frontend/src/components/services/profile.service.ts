@@ -14,6 +14,7 @@ export interface BackendProfile {
   electricalSection: string;
   userId: string;
   consumerNumber: string;
+  connection_status?: string;
   // backend may or may not include password fields — usually not returned
 }
 
