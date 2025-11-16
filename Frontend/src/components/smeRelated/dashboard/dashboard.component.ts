@@ -59,8 +59,8 @@ export class DashboardComponent {
         next: (data) => {
           this.stats.totalComplaints = data.length;
           this.stats.resolvedComplaints = data.filter((complaint: any) => complaint.status === 'RESOLVED').length;
-          this.stats.pendingComplaints = data.fileter((complaint: any) => complaint.status === 'PENDING').length;
-          this.stats.inprogressComplaints = data.fileter((complaint: any) => complaint.status === 'INPROGRESS').length;
+          this.stats.pendingComplaints = data.filter((complaint: any) => complaint.status === 'PENDING').length;
+          this.stats.inprogressComplaints = data.filter((complaint: any) => complaint.status === 'INPROGRESS').length;
         },
         error: () => {
           console.error('Failed loading stats');

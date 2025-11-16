@@ -22,3 +22,33 @@
 
 .error-card { background: #fff6f6; border: 1px solid #f5c2c2; color: #6a1b1b; }
 .actions { display:flex; gap:8px; margin-top:8px; }
+
+/* Print Button Styling */
+.btn-outline-primary {
+  color: #0EA5A4;
+  border-color: #0EA5A4;
+  background-color: transparent;
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background-color: #0EA5A4;
+  color: white;
+  border-color: #0EA5A4;
+}
+
+.btn-outline-primary svg {
+  vertical-align: middle;
+}
+
+/* Table adjustments */
+.table td {
+  vertical-align: middle;
+  padding: 12px 8px;
+}
+
+.text-center {
+  text-align: center;
+}

@@ -4,6 +4,8 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BillHistoryService, BackendBill } from '../../services/bill-history.service'; // adjust path as needed
 import { finalize } from 'rxjs/operators';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 type PaymentStatus = 'PAID' | 'UNPAID' | 'PARTIAL';
 
@@ -245,5 +247,106 @@ export class BillHistoryComponent implements OnInit {
 
   goBack(): void {
     this.location.back();
+  }
+
+  /**
+   * Generate and download bill as PDF
+   */
+  printBillAsPDF(bill: BillHistory): void {
+    const doc = new jsPDF();
+    const pageHeight = doc.internal.pageSize.height;
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 15;
+    let yPosition = margin;
+
+    // Title
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ELECTRICITY BILL', pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 12;
+
+    // Bill Header Info
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    
+    const headerData = [
+      ['Bill Number:', bill.id],
+      ['Consumer Number:', bill.consumerNumber],
+      ['Billing Period:', bill.billingPeriod],
+      ['Bill Date:', bill.billDate],
+      ['Due Date:', bill.dueDate],
+      ['Bill Amount:', `₹ ${this.formatCurrency(bill.billAmount)}`],
+      ['Payment Status:', bill.paymentStatus]
+    ];
+
+    headerData.forEach((row) => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = margin;
+      }
+      doc.setFont('helvetica', 'bold');
+      doc.text(row[0], margin, yPosition);
+      doc.setFont('helvetica', 'normal');
+      doc.text(row[1], margin + 60, yPosition);
+      yPosition += 7;
+    });
+
+    yPosition += 5;
+
+    // Bill Details Table
+    const tableData = [
+      ['Item', 'Value'],
+      ['Bill Number', bill.id],
+      ['Consumer Number', bill.consumerNumber],
+      ['Billing Period', bill.billingPeriod],
+      ['Bill Date', bill.billDate],
+      ['Due Date', bill.dueDate],
+      ['Bill Amount', `₹ ${this.formatCurrency(bill.billAmount)}`],
+      ['Payment Status', bill.paymentStatus]
+    ];
+
+    autoTable(doc, {
+      head: [tableData[0]],
+      body: tableData.slice(1),
+      startY: yPosition,
+      margin: margin,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [14, 165, 164],
+        textColor: 255,
+        fontStyle: 'bold',
+        fontSize: 12,
+        halign: 'center'
+      },
+      bodyStyles: {
+        fontSize: 11,
+        textColor: 50
+      },
+      alternateRowStyles: {
+        fillColor: [240, 248, 248]
+      },
+      columnStyles: {
+        0: { cellWidth: 80 },
+        1: { halign: 'right' }
+      },
+      didDrawPage: (data) => {
+        // Footer
+        const pageCount = (doc as any).internal.getNumberOfPages();
+        const pageSize = doc.internal.pageSize;
+        const pageHeight = pageSize.height;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(
+          `Page ${data.pageNumber} of ${pageCount}`,
+          pageWidth / 2,
+          pageHeight - 10,
+          { align: 'center' }
+        );
+      }
+    });
+
+    // Generate filename
+    const fileName = `Bill_${bill.id}_${bill.billingPeriod.replace(/\s+/g, '_')}.pdf`;
+    doc.save(fileName);
   }
 }
