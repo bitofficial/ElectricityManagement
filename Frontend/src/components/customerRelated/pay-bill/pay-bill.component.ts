@@ -352,7 +352,7 @@ this.subs.push(markSub);
     doc.text('Consumer Details', left, y);
     y += 16;
     doc.setFontSize(10);
-    doc.text(`Consumer ID: ${this.consumerNumber || this.consumerId}`, left, y);
+    doc.text(`Consumer Number: ${this.consumerNumber || this.consumerId}`, left, y);
     doc.text(`Payment Method: ${this.payment.method}`, 350, y);
     y += 14;
     doc.text(`Transaction Date: ${transactionDate.toLocaleString()}`, left, y);

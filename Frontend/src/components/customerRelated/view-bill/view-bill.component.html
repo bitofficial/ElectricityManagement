@@ -112,7 +112,7 @@
            <td>{{ getDisconnectionDate(bill.dueDate) | date:'dd-MMM-yyyy' }}</td>
 
 
-            <td>{{ bill.dueAmount | number:'1.2-2' }}</td>
+            <td>{{ (bill.paymentStatus=="Paid")?0:  bill.dueAmount | number:'1.2-2' }}</td>
             <td>
               <input
                 type="number"
