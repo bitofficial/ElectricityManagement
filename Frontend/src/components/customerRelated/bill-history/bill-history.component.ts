@@ -253,101 +253,151 @@ export class BillHistoryComponent implements OnInit {
   /**
    * Generate and download bill as PDF
    */
-  printBillAsPDF(bill: BillHistory): void {
-    const doc = new jsPDF();
-    const pageHeight = doc.internal.pageSize.height;
-    const pageWidth = doc.internal.pageSize.width;
-    const margin = 15;
-    let yPosition = margin;
 
-    // Title
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.text('ELECTRICITY BILL', pageWidth / 2, yPosition, { align: 'center' });
-    yPosition += 12;
+  formatDateString(dateStr: string): string {
+  if (!dateStr) return 'N/A';
 
-    // Bill Header Info
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    
-    const headerData = [
-      ['Bill Number:', bill.id],
-      ['Consumer Number:', bill.consumerNumber],
-      ['Billing Period:', bill.billingPeriod],
-      ['Bill Date:', bill.billDate],
-      ['Due Date:', bill.dueDate],
-      ['Bill Amount:', `₹ ${this.formatCurrency(bill.billAmount)}`],
-      ['Payment Status:', bill.paymentStatus]
-    ];
+  // Remove microseconds if present (".762761")
+  const safeDate = dateStr.replace(/\.\d+/, '');
 
-    headerData.forEach((row) => {
-      if (yPosition > pageHeight - 30) {
-        doc.addPage();
-        yPosition = margin;
-      }
-      doc.setFont('helvetica', 'bold');
-      doc.text(row[0], margin, yPosition);
-      doc.setFont('helvetica', 'normal');
-      doc.text(row[1], margin + 60, yPosition);
-      yPosition += 7;
-    });
+  const d = new Date(safeDate);
 
-    yPosition += 5;
+  if (isNaN(d.getTime())) return 'N/A';
 
-    // Bill Details Table
-    const tableData = [
-      ['Item', 'Value'],
-      ['Bill Number', bill.id],
-      ['Consumer Number', bill.consumerNumber],
-      ['Billing Period', bill.billingPeriod],
-      ['Bill Date', bill.billDate],
-      ['Due Date', bill.dueDate],
-      ['Bill Amount', `₹ ${this.formatCurrency(bill.billAmount)}`],
-      ['Payment Status', bill.paymentStatus]
-    ];
+  return d.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }).replace(/,/g, ''); // → "20 Nov 2025"
+}
 
-    autoTable(doc, {
-      head: [tableData[0]],
-      body: tableData.slice(1),
-      startY: yPosition,
-      margin: margin,
-      theme: 'grid',
-      headStyles: {
-        fillColor: [14, 165, 164],
-        textColor: 255,
-        fontStyle: 'bold',
-        fontSize: 12,
-        halign: 'center'
-      },
-      bodyStyles: {
-        fontSize: 11,
-        textColor: 50
-      },
-      alternateRowStyles: {
-        fillColor: [240, 248, 248]
-      },
-      columnStyles: {
-        0: { cellWidth: 80 },
-        1: { halign: 'right' }
-      },
-      didDrawPage: (data) => {
-        // Footer
-        const pageCount = (doc as any).internal.getNumberOfPages();
-        const pageSize = doc.internal.pageSize;
-        const pageHeight = pageSize.height;
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(
-          `Page ${data.pageNumber} of ${pageCount}`,
-          pageWidth / 2,
-          pageHeight - 10,
-          { align: 'center' }
-        );
+
+async printBillAsPDF(bill: BillHistory): Promise<void> {
+  // Try to fetch transaction id first
+  let transactionId: string = 'N/A';
+  let invoiceNumber: string = 'N/A';
+  let transactionDate: string = 'N/A';
+  try {
+    // Replace the URL with your API endpoint and adjust method/headers/body as required
+    const resp = await fetch(`http://localhost:8085/api/dashboard/${this.customerId}/bilkls/${bill.id}/invoice`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+        // add auth headers if needed
       }
     });
 
-    // Generate filename
-    const fileName = `Bill_${bill.id}_${bill.billingPeriod.replace(/\s+/g, '_')}.pdf`;
-    doc.save(fileName);
+    if (resp.ok) {
+      const json = await resp.json();
+      // adjust path to transaction id depending on your API response
+      // e.g. json.transactionId or json.data.transactionId
+      transactionId = json.transactionId ?? json.data?.transactionId ?? 'N/A';
+      invoiceNumber = json.invoiceNumber ?? json.data?.invoiceNumber ?? 'N/A';
+      transactionDate = json.transactionDate ?? json.data?.transactionDate ?? 'N/A';
+    } else {
+      console.warn('Failed to fetch transaction id, status:', resp.status);
+    }
+  } catch (err) {
+    console.error('Error fetching transaction id:', err);
   }
+
+  // Now build PDF with transaction id included
+  const doc = new jsPDF();
+  const pageHeight = doc.internal.pageSize.height;
+  const pageWidth = doc.internal.pageSize.width;
+  const margin = 15;
+  let yPosition = margin;
+
+  // Title
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.text('ELECTRICITY BILL', pageWidth / 2, yPosition, { align: 'center' });
+  yPosition += 12;
+
+  // Bill Header Info (include transaction id)
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+
+  const headerData = [
+    ['Bill Number:', bill.id],
+    ['Transaction ID:', transactionId],
+    ['Invoice Number:', invoiceNumber],
+    ['Transaction Date:',this.formatDateString(transactionDate)],
+    ['Consumer Number:', bill.consumerNumber],
+  ];
+
+  headerData.forEach((row) => {
+    if (yPosition > pageHeight - 30) {
+      doc.addPage();
+      yPosition = margin;
+    }
+    doc.setFont('helvetica', 'bold');
+    doc.text(row[0], margin, yPosition);
+    doc.setFont('helvetica', 'normal');
+    doc.text(row[1], margin + 60, yPosition);
+    yPosition += 7;
+  });
+
+  yPosition += 5;
+
+  // Bill Details Table (also include transaction id)
+  const tableData = [
+    ['Item', 'Value'],
+    ['Bill Number', bill.id],
+    ['Transaction ID', transactionId],
+    ['Consumer Number', bill.consumerNumber],
+    ['Billing Period', bill.billingPeriod],
+    ['Bill Date', bill.billDate],
+    ['Due Date', bill.dueDate],
+    ['Bill Amount', `Rs ${this.formatCurrency(bill.billAmount)}`],
+    ['Payment Status', bill.paymentStatus]
+  ];
+
+  autoTable(doc, {
+    head: [tableData[0]],
+    body: tableData.slice(1),
+    startY: yPosition,
+    margin: margin,
+    theme: 'grid',
+    headStyles: {
+      fillColor: [14, 165, 164],
+      textColor: 255,
+      fontStyle: 'bold',
+      fontSize: 12,
+      halign: 'center'
+    },
+    bodyStyles: {
+      fontSize: 11,
+      textColor: 50
+    },
+    alternateRowStyles: {
+      fillColor: [240, 248, 248]
+    },
+    columnStyles: {
+      0: { cellWidth: 80 },
+      1: { halign: 'right' }
+    },
+    didDrawPage: (data) => {
+      // Footer
+      const pageCount = (doc as any).internal.getNumberOfPages();
+      const pageSize = doc.internal.pageSize;
+      const pageHeightLocal = pageSize.height;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(
+        `Page ${data.pageNumber} of ${pageCount}`,
+        pageWidth / 2,
+        pageHeightLocal - 10,
+        { align: 'center' }
+      );
+    }
+  });
+
+  // Generate filename - include transaction id if available
+  const safePeriod = bill.billingPeriod ? bill.billingPeriod.replace(/\s+/g, '_') : 'period';
+  const safeTransaction = transactionId !== 'N/A' ? `_${transactionId}` : '';
+  const fileName = `Bill_${bill.id}_${safePeriod}${safeTransaction}.pdf`;
+  doc.save(fileName);
+}
+
 }

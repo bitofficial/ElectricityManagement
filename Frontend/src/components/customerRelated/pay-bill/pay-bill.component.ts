@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs';
 
 interface SelectedBill {
   billId: string;
-  billingMonth?: string;
+  billingMonth: string;
   generated_at?: string | Date;
   dueDate?: string | Date;
   dueAmount?: number;
@@ -309,6 +309,23 @@ this.subs.push(markSub);
     this.subs.push(paySub);
   }
 
+ formatDateString(dateStr: string): string {
+  if (!dateStr) return 'N/A';
+
+  // Remove microseconds if present (".762761")
+  const safeDate = dateStr.replace(/\.\d+/, '');
+
+  const d = new Date(safeDate);
+
+  if (isNaN(d.getTime())) return 'N/A';
+
+  return d.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }).replace(/,/g, ''); // → "20 Nov 2025"
+}
+
   /** Generate and download PDF invoice */
   downloadInvoice(): void {
     // Use snapshot if available; otherwise, if paymentSuccess and no snapshot, still allow but warn
@@ -355,17 +372,17 @@ this.subs.push(markSub);
     doc.text(`Consumer Number: ${this.consumerNumber || this.consumerId}`, left, y);
     doc.text(`Payment Method: ${this.payment.method}`, 350, y);
     y += 14;
-    doc.text(`Transaction Date: ${transactionDate.toLocaleString()}`, left, y);
+    doc.text(`Transaction Date: ${this.formatDateString(transactionDate.toLocaleString())}`, left, y);
     y += 20;
 
     // Bills Table
     const tableData = billsForInvoice.map((b, i) => [
       i + 1,
       b.billId,
-      b.billingMonth || '-',
+      this.formatDateString(b.billingMonth).slice(2) || '-',
       b.generated_at ? new Date(b.generated_at).toLocaleDateString() : '-',
       b.dueDate ? new Date(b.dueDate).toLocaleDateString() : '-',
-      `₹ ${Number(b.payableAmount).toFixed(2)}`
+      `Rs ${Number(b.payableAmount).toFixed(2)}`
     ]);
 
     const tableResult: any = (autoTable as any)(doc, {
@@ -380,7 +397,7 @@ this.subs.push(markSub);
     const finalY = (tableResult?.finalY) || (doc as any).lastAutoTable?.finalY || (y + 100);
 
     doc.setFontSize(11);
-    doc.text(`Total Amount Paid: ₹ ${Number(invoiceTotal).toFixed(2)}`, left, finalY + 20);
+    doc.text(`Total Amount Paid: Rs ${Number(invoiceTotal).toFixed(2)}`, left, finalY + 20);
     doc.text('Payment Status: SUCCESS', left, finalY + 40);
 
     doc.setFontSize(10);
