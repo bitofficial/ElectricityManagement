@@ -5,10 +5,11 @@ import { CommonModule } from '@angular/common';
 import { AdminService } from '../../services/admin.service';
 import { ProfileService } from '../../services/profile.service';
 import { RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 interface BackendProfile {
   id?: number;
-  consumerNumber?: string; // numeric string (without prefix)
+  consumerNumber?: string;
   fullName?: string;
   address?: string;
   city?: string;
@@ -18,9 +19,7 @@ interface BackendProfile {
   mobile?: string;
   customerType?: string;
   electricalSection?: string;
-  userId?: string; // e.g. "u-1212344567689"
-  password?: string | null;
-  confirmPassword?: string | null;
+  userId?: string;
   connection_status?: string;
 }
 
@@ -32,23 +31,79 @@ interface BackendProfile {
   styleUrls: ['./update-customers.component.css']
 })
 export class UpdateCustomersComponent {
+
   searchId = '';
   customer: BackendProfile | null = null;
 
-  // local password inputs (not directly stored in customer)
   newPassword = '';
   confirmPassword = '';
-
+  states: { name: string, cities: string[] }[] = [];
+  cities: string[] = [];
   successMessage = '';
   errorMessage = '';
 
-  // indicates that customer details were successfully fetched and form may be edited
+  isCityLocked = false;
+  isStateLocked = false;
+
   loaded = false;
 
   constructor(
     private adminService: AdminService,
-    private profileService: ProfileService
-  ) {}
+    private profileService: ProfileService,
+    private http: HttpClient
+  ) { }
+
+  //--------------------------------------------
+  // 🟦 1. State Dropdown change
+  //--------------------------------------------
+  onStateChange(): void {
+    if (!this.customer?.state) return;
+
+    const selected = this.states.find(s => s.name === this.customer!.state);
+    this.cities = selected ? selected.cities : [];
+    this.customer!.city = '';
+  }
+
+  //--------------------------------------------
+  // 🟦 2. Auto-populate city/state using API
+  //--------------------------------------------
+  fetchLocationByPincode(): void {
+    if (!this.customer?.pincode || this.customer.pincode.length !== 6) return;
+
+    this.http.get<any[]>(`https://api.postalpincode.in/pincode/${this.customer.pincode}`)
+      .subscribe({
+        next: (res) => {
+          const info = res[0];
+          if (info?.Status === 'Success' && info.PostOffice?.length) {
+
+            const postOffice = info.PostOffice[0];
+
+            this.customer!.state = postOffice.State || this.customer!.state;
+            this.customer!.city = postOffice.District || this.customer!.city;
+
+            // update city dropdown list
+            const matchState = this.states.find(s => s.name === this.customer!.state);
+            this.cities = matchState ? [...matchState.cities] : [];
+
+            if (this.customer!.city && !this.cities.includes(this.customer!.city)) {
+              this.cities.push(this.customer!.city);
+            }
+
+            this.isStateLocked = true;
+            this.isCityLocked = true;
+          }
+        },
+        error: (err) => console.error('Error fetching location', err)
+      });
+  }
+
+  //--------------------------------------------
+  // 🟦 3. Fetch customer by ID
+  //--------------------------------------------
+  passwordsMatch(): boolean {
+  return this.newPassword === this.confirmPassword;
+}
+
 
   fetchCustomer(): void {
     this.successMessage = '';
@@ -56,19 +111,17 @@ export class UpdateCustomersComponent {
     this.customer = null;
     this.loaded = false;
 
-    if (!this.searchId?.trim()) {
+    if (!this.searchId.trim()) {
       this.errorMessage = 'Please enter a customer identifier to search.';
       return;
     }
 
-    // call your existing service; adapt if you need to search by consumerNumber vs userId
-    this.profileService.getProfile('u-'+this.searchId).subscribe({
+    this.profileService.getProfile('u-' + this.searchId).subscribe({
       next: (data: BackendProfile) => {
         this.customer = data;
         this.newPassword = '';
         this.confirmPassword = '';
-        this.loaded = true; // now allow editing
-        
+        this.loaded = true;
       },
       error: (err) => {
         console.error('Error fetching customer:', err);
@@ -78,8 +131,9 @@ export class UpdateCustomersComponent {
     });
   }
 
-
-  
+  //--------------------------------------------
+  // 🟦 4. Update customer
+  //--------------------------------------------
   updateCustomer(): void {
     this.successMessage = '';
     this.errorMessage = '';
@@ -94,20 +148,17 @@ export class UpdateCustomersComponent {
       return;
     }
 
-    // If admin entered newPassword, ensure confirm matches
-    if (this.newPassword && this.newPassword !== this.confirmPassword) {
-      this.errorMessage = 'New password and confirm password do not match.';
-      return;
-    }
+   if (this.newPassword && !this.passwordsMatch()) {
+  this.errorMessage = 'New password and confirm password do not match.';
+  return;
+}
 
-    // Determine identifier to send to profileService (service substring logic expects prefixed id)
     const identifier = this.customer.userId ?? this.customer.consumerNumber ?? '';
     if (!identifier) {
-      this.errorMessage = 'Unable to determine user identifier to update.';
+      this.errorMessage = 'Unable to determine user identifier.';
       return;
     }
 
-    // Build payload
     const rawPayload: Partial<BackendProfile & { newPassword?: string; confirmPassword?: string }> = {
       fullName: this.customer.fullName,
       address: this.customer.address,
@@ -118,7 +169,7 @@ export class UpdateCustomersComponent {
       mobile: this.customer.mobile,
       customerType: this.customer.customerType,
       electricalSection: this.customer.electricalSection,
-      userId: this.customer.userId // service expects prefixed id (it substrings inside)
+      userId: this.customer.userId
     };
 
     if (this.newPassword) {
@@ -126,32 +177,19 @@ export class UpdateCustomersComponent {
       rawPayload.confirmPassword = this.confirmPassword;
     }
 
-    // Clean payload (remove undefined keys)
     const payload = Object.fromEntries(
       Object.entries(rawPayload).filter(([_, v]) => v !== undefined)
-    ) as Partial<BackendProfile & { newPassword?: string; confirmPassword?: string }>;
+    );
 
     this.profileService.updateProfile(identifier, payload).subscribe({
-      next: (res) => {
+      next: () => {
         this.successMessage = 'Customer details updated successfully!';
-        this.errorMessage = '';
-        // Optionally refresh to ensure UI shows freshest data
-        setTimeout(() => {
-  this.successMessage = '';
-  this.errorMessage = '';
-}, 3000);
-
-
+        setTimeout(() => this.successMessage = '', 3000);
       },
       error: (err) => {
         console.error('Error updating customer:', err);
-                // Optionally refresh to ensure UI shows freshest data
-        setTimeout(() => {
-  this.successMessage = '';
-  this.errorMessage = '';
-}, 3000);
-
         this.errorMessage = err?.error?.message || 'Failed to update customer details.';
+        setTimeout(() => this.errorMessage = '', 3000);
       }
     });
   }

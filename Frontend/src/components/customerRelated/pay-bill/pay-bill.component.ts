@@ -1,3 +1,5 @@
+// 
+
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgForm, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -29,7 +31,7 @@ interface SelectedBill {
 export class PayBillComponent implements OnInit, OnDestroy {
   selectedBills: SelectedBill[] = [];
   totalAmount = 0;
-
+  isExpired=false;
   // Snapshot of paid bills & amount for invoice / success display
   paidBillsSnapshot: SelectedBill[] | null = null;
   paidTotal = 0;
@@ -71,6 +73,26 @@ export class PayBillComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
   }
+
+  checkExpiry() {
+  if (!this.payment.expiry || this.payment.expiry.length !== 5) {
+    this.isExpired = false;
+    return;
+  }
+
+  const [mm, yy] = this.payment.expiry.split('/');
+  const month = parseInt(mm, 10);
+  const year = 2000 + parseInt(yy, 10); // YY → 20YY
+
+  const today = new Date();
+  const expiryDate = new Date(year, month - 1, 1);
+
+  // Set expiry to END of month
+  expiryDate.setMonth(expiryDate.getMonth() + 1);
+  expiryDate.setDate(0);
+
+  this.isExpired = expiryDate < today;
+}
 
   private parseConsumerNumber(userId: string): string {
     if (!userId) return '';
@@ -230,9 +252,9 @@ export class PayBillComponent implements OnInit, OnDestroy {
         // Always set transaction id first (from backend if present)
         this.transactionId = response?.transactionId || 'TXN' + Math.floor(Math.random() * 1000000);
         this.paymentSuccess = true;
-          this.invoiceNumber = 'INV' + Math.floor(100000 + Math.random() * 900000);
-    this.paymentId = 'PAY' + Math.floor(100000 + Math.random() * 900000);
-    this.receiptNumber = 'RCPT' + Math.floor(100000 + Math.random() * 900000);
+          this.invoiceNumber = response?.invoiceNumber || 'INV' + Math.floor(100000 + Math.random() * 900000);
+    this.paymentId = response?.paymentId || 'PAY' + Math.floor(100000 + Math.random() * 900000);
+    this.receiptNumber = response?.receiptNumber || 'RCPT' + Math.floor(100000 + Math.random() * 900000);
     this.transactionDate = new Date();
 
         // TAKE SNAPSHOT BEFORE clearing selected bills
@@ -307,9 +329,9 @@ this.subs.push(markSub);
     const left = 40;
     let y = 40;
 
-    const invoiceNumber = 'INV' + Math.floor(100000 + Math.random() * 900000);
-    const paymentId = 'PAY' + Math.floor(100000 + Math.random() * 900000);
-    const receiptNumber = 'RCPT' + Math.floor(100000 + Math.random() * 900000);
+    // const invoiceNumber = 'INV' + Math.floor(100000 + Math.random() * 900000);
+    // const paymentId = 'PAY' + Math.floor(100000 + Math.random() * 900000);
+    // const receiptNumber = 'RCPT' + Math.floor(100000 + Math.random() * 900000);
     const transactionDate = new Date();
 
     // Header
@@ -318,11 +340,11 @@ this.subs.push(markSub);
     y += 30;
 
     doc.setFontSize(11);
-    doc.text(`Invoice No: ${invoiceNumber}`, left, y);
-    doc.text(`Payment ID: ${paymentId}`, 350, y);
+    doc.text(`Invoice No: ${this.invoiceNumber}`, left, y);
+    doc.text(`Payment ID: ${this.paymentId}`, 350, y);
     y += 18;
     doc.text(`Transaction ID: ${this.transactionId}`, left, y);
-    doc.text(`Receipt No: ${receiptNumber}`, 350, y);
+    doc.text(`Receipt No: ${this.receiptNumber}`, 350, y);
     y += 22;
 
     // Consumer Info
@@ -365,7 +387,7 @@ this.subs.push(markSub);
     doc.text('Thank you for your payment.', left, finalY + 70);
     doc.text('This is a system-generated invoice.', left, finalY + 85);
 
-    const fileName = `Invoice_${this.consumerId}_${invoiceNumber}.pdf`;
+    const fileName = `Invoice_${this.consumerId}_${this.invoiceNumber}.pdf`;
     doc.save(fileName);
   }
 }

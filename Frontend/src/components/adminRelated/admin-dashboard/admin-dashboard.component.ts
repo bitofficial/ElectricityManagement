@@ -53,9 +53,15 @@ export class AdminDashboardComponent implements OnInit {
       icon: 'bi bi-exclamation-triangle'
     },
     {
-      title: 'Update Customers',
+      title: 'View/Update Customers',
       description: 'Update customer details.',
       route: '/admin/update-customer',
+      icon: 'bi bi-exclamation-triangle'
+    },
+    {
+      title: 'View Bills',
+      description: 'View All Bills',
+      route: '/admin/view-bill',
       icon: 'bi bi-exclamation-triangle'
     }
   ];
@@ -69,6 +75,6 @@ export class AdminDashboardComponent implements OnInit {
   /** ✅ Logout */
   logout(): void {
     localStorage.clear();
-    this.router.navigate(['/admin/login']);
+    this.router.navigate(['']);
   }
 }

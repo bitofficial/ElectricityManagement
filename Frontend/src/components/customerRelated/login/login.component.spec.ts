@@ -7,13 +7,13 @@ describe('LoginComponent', () => {
   let fixture: ComponentFixture<LoginComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
+await TestBed.configureTestingModule({
       imports: [LoginComponent]
     })
     .compileComponents();
     
     fixture = TestBed.createComponent(LoginComponent);
-    component = fixture.componentInstance;
+  component = fixture.componentInstance;
     fixture.detectChanges();
   });
 

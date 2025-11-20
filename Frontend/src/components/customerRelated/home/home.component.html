@@ -1,136 +1,136 @@
 <nav class="wm-navbar">
-  <div class="wm-container">
-    <div class="brand">
-      <div class="logo" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
-          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"
-                stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </div>
-      <a href="/"><span class="brand-name">PowerEase</span></a>
-    </div>
+<div class="wm-container">
+<div class="brand">
+<div class="logo" aria-hidden="true">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
+<path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"
+stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
+</div>
+<a href="/"><span class="brand-name">PowerEase</span></a>
+</div>
 
-    <ul class="nav-links">
-      <li><a routerLink="/customer/home" style="color:#0EA5A4;">Dashboard</a></li>
-      <li><a routerLink="/customer/view-bill">View Bill</a></li>
-      <li><a routerLink="/customer/complaint-status">Search Complaint</a></li>
-      <li><a routerLink="/customer/register-complaint" style="color:red">Register Complaint</a></li>
-    </ul>
-  </div>
+<ul class="nav-links">
+<li><a routerLink="/customer/home" style="color:#0EA5A4;">Dashboard</a></li>
+<li><a routerLink="/customer/view-bill">View Bills</a></li>
+<li><a routerLink="/customer/complaint-status">Search Complaint</a></li>
+<li><a routerLink="/customer/register-complaint" style="color:red">Register Complaint</a></li>
+</ul>
+</div>
 </nav>
 
 <!-- home.component.html -->
 <div class="home-root container py-5">
-  <!-- Top: Welcome -->
-  <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
-    <div class="user-info">
-      <h1 class="welcome mb-1">Welcome, {{ user.fullName }}</h1>
-      <div class="muted small">
-        <div>Account No: <strong>{{ user.consumerNumber }}</strong></div>
-        <div>Billing Address:
-          <span class="d-block text-truncate" style="max-width:420px">{{ user.billingAddress }}</span>
-        </div>
-      </div>
-    </div>
+<!-- Top: Welcome -->
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+<div class="user-info">
+<h1 class="welcome mb-1">Welcome, {{ user.fullName }}</h1>
+<div class="muted small">
+<div>Consumer No: <strong style="color: blue;">{{ user.consumerNumber }}</strong></div>
+<div>Billing Address:
+<span class="d-block text-truncate" style="max-width:420px"><strong>{{ user.billingAddress }}</strong></span>
+</div>
+</div>
+</div>
 
-    <div class="action-buttons d-flex align-items-center gap-2">
-      <a class="btn btn-outline-secondary btn-sm" href="/customer/profile">
-        <i class="bi bi-person-circle me-1"></i> Profile
-      </a>
-      <button class="btn btn-danger btn-sm" (click)="logout()">
-        <i class="bi bi-box-arrow-right me-1"></i> Logout
-      </button>
-    </div>
-  </div>
+<div class="action-buttons d-flex align-items-center gap-2">
+<a class="btn btn-warning btn-sm" href="/instructions">
+Instructions
+</a>
+<button class="btn btn-danger btn-sm" (click)="logout()">
+<i class="bi bi-box-arrow-right me-1"></i> Logout
+</button>
+</div>
+</div>
 
-  <div class="row gx-3 gy-3">
-    <!-- Left column: Bills -->
-    <div class="col-lg-4">
-      <div class="card card-panel shadow-sm">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <h5 class="card-title mb-0">Current Bills</h5>
-            <small class="text-muted">Latest</small>
-          </div>
+<div class="row gx-3 gy-3">
+<!-- Left column: Bills -->
+<div class="col-lg-4">
+<div class="card card-panel shadow-sm">
+<div class="card-body">
+<div class="d-flex justify-content-between align-items-start mb-2">
+<h5 class="card-title mb-0">Current Bills</h5>
+<small class="text-muted">Latest</small>
+</div>
 
-          <!-- ✅ Loop through bills -->
-         <div *ngIf="currentBill; else noBill" class="bill-details border-bottom pb-3 mb-3">
-  <div class="d-flex justify-content-between mb-2">
-    <small class="text-muted">Billing Month</small>
-    <div><strong>{{ currentBill.billingMonth }}</strong></div>
-  </div>
+<!-- ✅ Loop through bills -->
+<div *ngIf="currentBill; else noBill" class="bill-details border-bottom pb-3 mb-3">
+<div class="d-flex justify-content-between mb-2">
+<small class="text-muted">Billing Month</small>
+<div><strong>{{ currentBill.billingMonth }}</strong></div>
+</div>
 
-  <div class="d-flex justify-content-between mb-2">
-    <small class="text-muted">Due Date</small>
-    <div><strong>{{ currentBill.dueDate | date:'longDate' }}</strong></div>
-  </div>
+<div class="d-flex justify-content-between mb-2">
+<small class="text-muted">Due Date</small>
+<div><strong>{{ currentBill.dueDate | date:'longDate' }}</strong></div>
+</div>
 
-  <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
-    <div>
-      <small class="text-muted">Amount Due</small>
-      <div class="h5 mb-0">₹ {{ currentBill.amount | number:'1.2-2' }}</div>
-    </div>
+<div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+<div>
+<small class="text-muted">Amount Due</small>
+<div class="h5 mb-0">₹ {{ currentBill.amount | number:'1.2-2' }}</div>
+</div>
 
-    <div class="text-end">
-      <span class="badge" [ngClass]="(currentBill.status=='Paid') ? 'bg-success' : 'bg-warning text-dark'">
-        {{ currentBill.status }}
-      </span>
-    </div>
-  </div>
+<div class="text-end">
+<span class="badge" [ngClass]="(currentBill.status=='Paid') ? 'bg-success' : 'bg-warning text-dark'">
+{{ currentBill.status }}
+</span>
+</div>
+</div>
 
-  <div class="d-flex gap-2">
-    <a *ngIf="!currentBill.status" class="btn btn-primary btn-sm flex-grow-1" href="/customer/pay-bill">
-      Pay Now
-    </a>
-  </div>
+<div class="d-flex gap-2">
+<a *ngIf="!currentBill.status" class="btn btn-primary btn-sm flex-grow-1" href="/customer/pay-bill">
+Pay Now
+</a>
+</div>
 </div>
 
 <ng-template #noBill>
-  <div class="text-muted">No unpaid bills available.</div>
+<div class="text-muted">No unpaid bills available.</div>
 </ng-template>
 
 
-          <!-- No Bill Template -->
-          <ng-template #noBill>
-            <div class="text-muted">No unpaid bills available.</div>
-          </ng-template>
-        </div>
-      </div>
+<!-- No Bill Template -->
+<ng-template #noBill>
+<div class="text-muted">No unpaid bills available.</div>
+</ng-template>
+</div>
+</div>
 
-      <!-- Quick link card -->
-      <div class="card mt-3 shadow-sm">
-        <div class="card-body small">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <i class="bi bi-clock-history fs-4 me-2"></i>
-              <span>View Bill History</span>
-            </div>
-            <a class="text-primary" routerLink="/customer/bill-history">Open</a>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- Quick link card -->
+<div class="card mt-3 shadow-sm">
+<div class="card-body small">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<i class="bi bi-clock-history fs-4 me-2"></i>
+<span>View Bill History</span>
+</div>
+<a class="text-primary" routerLink="/customer/bill-history">Open</a>
+</div>
+</div>
+</div>
+</div>
 
-    <!-- Right column: Feature cards -->
-    <div class="col-lg-8">
-      <div class="row gx-3 gy-3">
-        <div class="col-md-6" *ngFor="let feature of features">
-          <a [routerLink]="feature.route" class="card feature-card h-100 text-decoration-none">
-            <div class="card-body d-flex gap-3 align-items-start">
-              <div class="icon-wrap">
-                <i [class]="feature.icon + ' feature-icon'"></i>
-              </div>
-              <div class="flex-grow-1">
-                <h6 class="mb-1 feature-title">{{ feature.title }}</h6>
-                <p class="mb-0 small text-muted">{{ feature.description }}</p>
-              </div>
-              <div class="align-self-center">
-                <i class="bi bi-chevron-right text-muted"></i>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
+<!-- Right column: Feature cards -->
+<div class="col-lg-8">
+<div class="row gx-3 gy-3">
+<div class="col-md-6" *ngFor="let feature of features">
+<a [routerLink]="feature.route" class="card feature-card h-100 text-decoration-none">
+<div class="card-body d-flex gap-3 align-items-start">
+<div class="icon-wrap">
+<i [class]="feature.icon + ' feature-icon'"></i>
+</div>
+<div class="flex-grow-1">
+<h6 class="mb-1 feature-title">{{ feature.title }}</h6>
+<p class="mb-0 small text-muted">{{ feature.description }}</p>
+</div>
+<div class="align-self-center">
+<i class="bi bi-chevron-right text-muted"></i>
+</div>
+</div>
+</a>
+</div>
+</div>
+</div>
+</div>
 </div>

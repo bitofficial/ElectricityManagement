@@ -379,7 +379,7 @@ public class DashboardService {
         bill.setAmount(amount);
         bill.setDueDate(dto.getDueDate());
         bill.setConsumerNumber(dto.getConsumerNumber());
-        bill.setPaymentDate(LocalDateTime.now());
+//        bill.setPaymentDate(LocalDateTime.now());
         bill.setStatus("Unpaid");
 
         return billRepository.save(bill);

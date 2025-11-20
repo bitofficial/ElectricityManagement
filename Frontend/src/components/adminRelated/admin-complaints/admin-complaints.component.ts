@@ -12,6 +12,7 @@ import { RouterLink } from '@angular/router';
   templateUrl: './admin-complaints.component.html',
   styleUrls: ['./admin-complaints.component.css']
 })
+
 export class AdminComplaintsComponent implements OnInit {
 
   complaints: any[] = [];
@@ -122,11 +123,11 @@ export class AdminComplaintsComponent implements OnInit {
 
   /** ------------------------ APPLY STATUS CHANGE ------------------------ */
   applyStatusChange() {
-    if (!this.selectedStatus || !this.selectedSME) return;
+    if (!this.selectedStatus) return;
 
     const complaintId = this.activeComplaint.complaintId;
-
-    this.complaintService.updateComplaintSME(complaintId, this.selectedSME).subscribe({
+    if(this.selectedSME){
+      this.complaintService.updateComplaintSME(complaintId, this.selectedSME).subscribe({
       next: () => {
         this.modalSuccessMessage = 'SME assigned successfully!';
 
@@ -141,6 +142,11 @@ export class AdminComplaintsComponent implements OnInit {
         this.modalSuccessMessage = 'Failed to update!';
       }
     });
+  }else{
+    
+    this.updateNotesStatus();
+    }
+    
   }
 
   // BADGE HELPERS

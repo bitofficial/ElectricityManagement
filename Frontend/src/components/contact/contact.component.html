@@ -11,10 +11,19 @@
     </div>
 
     <!-- Show Login/Register/Admin links only if NOT logged in -->
-    <ul class="nav-links">
+    <ul  *ngIf="!loginStatus" class="nav-links">
       <li><a href="">Home</a></li>
       <li><a routerLink="/login" style="background-color: rgb(102, 147, 109); color:white;">Login</a></li>
       <li><a routerLink="/register" class="cta">Register</a></li>
+    </ul>
+
+     <ul *ngIf="loginStatus" class="nav-links">
+      <li>
+        <button class="btn btn-outline-danger" (click)="logout()">Logout</button>
+      </li>
+      <li> <a [routerLink]="isAdmin ? '/admin/home' : isSME ? '/sme/home': '/customer/home'" class="cta">
+    Dashboard
+  </a></li>
     </ul>
   </div>
 </nav>

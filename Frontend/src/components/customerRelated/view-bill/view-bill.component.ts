@@ -35,6 +35,7 @@ export class ViewBillComponent implements OnInit {
   totalAmount = 0;
   loading = false;
   errorMessage = '';
+  loadingMessage= 'No bills found';
 
   private readonly rawUserId = localStorage.getItem('userId') ?? '';
   private readonly consumerNumber = this.parseConsumerNumber(this.rawUserId);

@@ -1,0 +1,77 @@
+<nav class="wm-navbar">
+  <div class="wm-container">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <!-- simple bolt icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <span class="brand-name">PowerEase</span>
+    </div>
+
+    <!-- Show Login/Register/Admin links only if NOT logged in -->
+    <ul *ngIf="!loginStatus" class="nav-links">
+      <li><a routerLink="/login" style="color:white; background-color: rgb(54, 153, 189);">Login</a></li>
+      <li><a routerLink="/register" class="cta">Register</a></li>
+      <li><a routerLink="/admin/login" class="btn btn-outline-secondary">Admin</a></li>
+      <li><a routerLink="/sme/login" class="btn btn-outline-warning">SME</a></li>
+      
+    </ul>
+
+    <!-- Show Logout button only if logged in -->
+    <ul *ngIf="loginStatus" class="nav-links">
+      <li>
+        <button class="btn btn-outline-danger" (click)="logout()">Logout</button>
+      </li>
+      <li> <a [routerLink]="isAdmin ? '/admin/home' : isSME ? '/sme/home': '/customer/home'" class="cta">
+    Dashboard
+  </a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="instructions-container">
+    <h1 class="instructions-title text-center">Customer Instructions</h1>
+  <!-- Section 1 -->
+  <section class="instruction-section">
+    <h2 class="title">1. How to pay a bill?</h2>
+    <ol class="steps">
+      <li>Click on <strong><a href="customer/view-bill">View Bills</a></strong>.</li>
+      <li>If you see bills with status <strong>Unpaid</strong>, click their checkbox to select those bills.</li>
+      <li>Click on the <strong>Proceed to Pay</strong> button.</li>
+      <li>You will be redirected to the bill summary (you can remove a bill if you selected it by mistake).</li>
+      <li>Choose your preferred <strong>Payment Method</strong>.</li>
+      <li>Complete the payment and <strong>download your invoice</strong>.</li>
+    </ol>
+  </section>
+
+  <!-- Section 2 -->
+  <section class="instruction-section">
+    <h2 class="title">2. Disconnected? How to raise a complaint?</h2>
+    <ol class="steps">
+      <li>Go to the <strong><a href="customer/register-complaint">Register Complaint</a></strong> page.</li>
+      <li>Enter your category, or if not listed, select <strong>Others</strong>.</li>
+      <li>Select your preferred mode of contact.</li>
+      <li>Provide a description if any.</li>
+      <li>Submit.</li>
+      <li>To check complaint status, click the <strong><a href="/complaint-status">Complaint Status</a></strong> button in the navigation bar.</li>
+    </ol>
+  </section>
+
+  <!-- Section 3 -->
+<section class="instruction-section">
+  <h2 class="title">3. How to edit your customer profile?</h2>
+  <ol class="steps">
+    <li>Click on the <strong><a href="/customer/profile">Profile</a></strong> option from the navigation bar.</li>
+    <li>Your existing profile details will be displayed.</li>
+    <li>Click the <strong>Edit Profile</strong> button.</li>
+    <li>Update the fields you want to modify (Name, Email, Mobile, Address, etc.).</li>
+    <li>After making changes, click on the <strong>Save</strong> or <strong>Update</strong> button.</li>
+    <li>A confirmation message will appear if the update is successful.</li>
+    <li>You can revisit the Profile page anytime to verify your updated details.</li>
+  </ol>
+</section>
+
+
+</div>

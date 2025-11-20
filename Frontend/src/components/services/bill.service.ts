@@ -36,7 +36,7 @@ export class BillService {
 
   /** By customerId (separate use-case) */
   getAllBills(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/${'all'}`);
+    return this.http.get<any>(`${this.adminUrl}`);
   }
 
   addBill(bill: any): Observable<any> {

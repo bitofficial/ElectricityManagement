@@ -11,7 +11,8 @@
 
     <ul class="nav-links">
       <li><a routerLink="/admin/home" style="color:#0EA5A4;">Dashboard</a></li>
-      <li><a routerLink="/admin/add-customer">Add Customers</a></li>
+      <li><a routerLink="/admin/add-customer">Add Customer</a></li>
+      <li><a routerLink="/admin/update-customer">Update Customer</a></li>
       <li><a routerLink="/admin/manage-connection">Manage Connection</a></li>
       <li><a routerLink="/admin/complaints" style="color:red">View Complaints</a></li>
     </ul>
@@ -44,42 +45,71 @@
     name="billingMonth"
     class="form-control"
     [(ngModel)]="bill.billingMonth"
+    (change)="onBillingMonthChange()"
     required
     [min]="minBillingMonth"
+    [max]="maxBillingMonth"
   />
 
-  <!-- ERROR MESSAGE -->
-  
-
-  <!-- ERROR MESSAGE -->
   <div *ngIf="bill.billingMonth && bill.billingMonth < minBillingMonth" class="text-danger small mt-1">
-    <small>Billing month cannot be older than 1 month from today.</small>
+    <small>You can only select last 2 months.</small>
   </div>
 </div>
 
 
 
     <!-- Due Date -->
-    <div class="form-group mb-3">
-      <label for="dueDate">Due Date:</label>
-      <input type="date" id="dueDate" name="dueDate" class="form-control" [(ngModel)]="bill.dueDate" required />
-    </div>
+  <div class="form-group mb-3">
+  <label for="dueDate">Due Date:</label>
+
+  <input 
+    type="date" 
+    id="dueDate" 
+    name="dueDate" 
+    class="form-control"
+    [(ngModel)]="bill.dueDate"
+    [min]="dueDateMin"
+    [max]="dueDateMax"
+    required
+  />
+
+  <div *ngIf="bill.dueDate && (bill.dueDate < dueDateMin || bill.dueDate > dueDateMax)" class="text-danger small mt-1">
+    <small>Due date must be in the month after billing month.</small>
+  </div>
+</div>
+
 
     <!-- Units -->
     <div class="form-group mb-3">
-      <label for="units">Units Consumed:</label>
-      <input type="number" id="unitsConsumed" name="unitsConsumed" class="form-control" [(ngModel)]="bill.unitsConsumed"
-        placeholder="Enter number of units" required />
-    </div>
+  <label for="unitsConsumed">Units Consumed:</label>
+  <input 
+    type="number"
+    id="unitsConsumed"
+    name="unitsConsumed"
+    class="form-control"
+    [(ngModel)]="bill.unitsConsumed"
+    placeholder="Enter number of units"
+    required
+    pattern="^[0-9]+$"
+    #unitsConsumedRef="ngModel"
+  />
+   <small class="text-danger" *ngIf="unitsConsumedRef.value &&  unitsConsumedRef.touched && unitsConsumedRef.invalid">
+            <span *ngIf="unitsConsumedRef.errors?.['pattern']">Can't be negative.</span>
+          </small>
+</div>
+
 
     <!-- Amount -->
     <div class="form-group mb-3">
       <label for="pricePerUnit">Price Per Unit:</label>
-      <select id="pricePerUnit" name="pricePerUnit" class="form-control" [(ngModel)]="bill.pricePerUnit" required>
-        <option value="" disabled selected>Select Price</option>
+      <select id="pricePerUnit" name="pricePerUnit" class="form-control" [(ngModel)]="bill.pricePerUnit" required #unitpriceRef="ngModel">
+        <option value="" disabled>Select Price</option>
         <option [value]="5">5.00 (Residential)</option>
         <option [value]="7">7.00 (Commercial)</option>
       </select>
+      <small class="text-danger" *ngIf="unitpriceRef.value &&  unitpriceRef.touched && unitpriceRef.invalid">
+            <span *ngIf="unitpriceRef.errors?.['required']">Unit price is required.</span>
+          </small>
     </div>
 
     <div class="text-center">

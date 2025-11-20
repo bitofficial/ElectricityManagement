@@ -16,8 +16,8 @@
     </div>
 
     <ul class="nav-links">
-      <li><a routerLink="/customer/home" style="color: #0EA5A4;">Home</a></li>
-      <li><a routerLink="/customer/pay-bill">Pay Bill</a></li>
+      <li><a routerLink="/customer/home" style="color: #0EA5A4;">Dashboard</a></li>
+      <li><a routerLink="/customer/pay-bill">Pay Bills</a></li>
       <li><a routerLink="/customer/complaint-status">Search Complaint</a></li>
       <li><a routerLink="/customer/register-complaint" style="color: red;">Register Complaint</a></li>
     </ul>
@@ -58,14 +58,14 @@
   <div *ngIf="loading" class="alert alert-info text-center">Loading bills...</div>
 
   <!-- ✅ Error Message -->
-  <div *ngIf="!loading && errorMessage" class="alert alert-danger text-center">
+  <div *ngIf="!loading && errorMessage  && filtered.length === 0" class="alert alert-danger text-center top-alert">
     {{ errorMessage }}
   </div>
 
-  <!-- ✅ Empty State -->
+  <!-- ✅ Empty State 
   <div *ngIf="!loading && !errorMessage && filtered.length === 0" class="alert alert-warning text-center">
     No bills found.
-  </div>
+  </div> -->
 
   <!-- ✅ Bill Table -->
   <div *ngIf="!loading && filtered.length > 0" class="card mt-2 shadow-sm p-3">

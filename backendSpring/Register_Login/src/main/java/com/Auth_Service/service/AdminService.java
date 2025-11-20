@@ -1,11 +1,14 @@
 package com.Auth_Service.service;
 
 import com.Auth_Service.dto.AdminLoginRequestDTO;
+import com.Auth_Service.dto.BillListItemDTO;
 import com.Auth_Service.dto.UserStatusUpdateDTO;
 import com.Auth_Service.dto.UserUpdateDTO; // <-- ADD IMPORT
 import com.Auth_Service.model.Admin;
+import com.Auth_Service.model.Bill;
 import com.Auth_Service.model.User; // <-- ADD IMPORT
 import com.Auth_Service.repository.AdminRepository;
+import com.Auth_Service.repository.BillRepository;
 import com.Auth_Service.repository.UserRepository; // <-- ADD IMPORT
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,8 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional; // <-- ADD IMPORT
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService {
@@ -102,5 +107,18 @@ public class AdminService {
         User user = userRepository.findByConsumerNumber(consumerNumber).orElseThrow(()-> new RuntimeException("Consumer number is not found " + consumerNumber));
         user.setConnection_status(dto.getNewStatus());
         return userRepository.save(user);
+    }
+    @Autowired
+    private BillRepository billRepository;
+    public List<BillListItemDTO> getAllBills() {
+
+        // 1. Fetch all Bill entities from the database
+        List<Bill> allBills = billRepository.findAll();
+
+        // 2. Convert the list of entities into a list of "safe" DTOs
+        //    We are reusing the BillListItemDTO you already created
+        return allBills.stream()
+                .map(BillListItemDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 }

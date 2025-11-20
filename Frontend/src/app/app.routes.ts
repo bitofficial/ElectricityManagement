@@ -32,6 +32,7 @@ import { ProfileComponent } from '../components/customerRelated/profile/profile.
 import { DashboardComponent } from '../components/smeRelated/dashboard/dashboard.component';
 import { SmeLoginComponent } from '../components/smeRelated/sme-login/sme-login.component';
 import { ContactComponent } from '../components/contact/contact.component';
+import { InstructionsComponent } from '../components/instructions/instructions.component';
 
 export const routes: Routes = [
   // 🏠 General Routes
@@ -39,6 +40,8 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegistrationComponent },
   { path: 'contact', component: ContactComponent},
+  { path: 'instructions', component: InstructionsComponent },
+
 
   // 👤 Customer Routes
   { path: 'customer/home', component: HomeComponent },

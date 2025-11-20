@@ -1,11 +1,9 @@
 package com.Auth_Service.controller;
 
-import com.Auth_Service.dto.AdminLoginRequestDTO;
-import com.Auth_Service.dto.SMEDetailsDTO;
-import com.Auth_Service.dto.UserStatusUpdateDTO;
-import com.Auth_Service.dto.UserUpdateDTO; // <-- ADD IMPORT
+import com.Auth_Service.dto.*;
 import com.Auth_Service.model.User; // <-- ADD IMPORT
 import com.Auth_Service.service.AdminService;
+import com.Auth_Service.service.BillService;
 import com.Auth_Service.service.SMEService;
 
 import jakarta.validation.Valid;
@@ -76,5 +74,15 @@ public class AdminController {
     {
     	List<SMEDetailsDTO> smelist = smeService.getAllSMEs();
     	return ResponseEntity.ok(smelist);
+    }
+
+    @Autowired
+    private BillService billService;
+
+    // ✔ ADMIN — VIEW ALL BILLS
+    @GetMapping("/bills")
+    public ResponseEntity<List<BillResponseDTO>> getAllBills() {
+        List<BillResponseDTO> bills = billService.getAllBills();
+        return ResponseEntity.ok(bills);
     }
 }

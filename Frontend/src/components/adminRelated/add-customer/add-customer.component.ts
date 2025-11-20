@@ -38,6 +38,9 @@ export class AddCustomerComponent {
   successMessage = '';
   errorMessage = '';
   showPassword = false;
+  isPasswordLocked = false;
+  isStateLocked = false;
+  isCityLocked = false;
 
   constructor(
     private authService: AuthService,
@@ -52,6 +55,11 @@ export class AddCustomerComponent {
     this.cities = selected ? selected.cities : [];
     this.user.city = '';
   }
+
+autoGeneratePassword(): void {
+  this.user.password = this.user.fullName.slice(0,4).toLowerCase() + this.user.mobile.slice(0,4);
+  this.isPasswordLocked = true;
+}
 
   fetchLocationByPincode(): void {
     const pincode = this.user.pincode;
@@ -76,6 +84,8 @@ export class AddCustomerComponent {
             this.cities.push(this.user.city);
           }
         }
+        this.isStateLocked = true;
+        this.isCityLocked = true;
       },
       error: (err) => console.error('Error fetching location', err)
     });
@@ -138,6 +148,21 @@ export class AddCustomerComponent {
         this.successMessage = 'Customer added successfully !';
         this.errorMessage = '';
         // reset form model
+         this.user = {
+    consumerNumber: '',
+    fullName: '',
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
+    email: '',
+    mobile: '',
+    customerType: '',
+    electricalSection: '',
+    userId: '',
+    password: ''
+  };
+
         
         setTimeout(() => {
           this.successMessage = '';

@@ -135,20 +135,15 @@
 
       <!-- NEW PASSWORD -->
       <div class="form-group mb-3">
-        <label>Create Password <small *ngIf="!isPasswordVerified" class="text-muted">(verify to enable)</small></label>
-        <input
-          type="password"
-          class="form-control"
-          name="newPassword"
-          [(ngModel)]="user.newPassword"
-          minlength="8"
-          required
-          [disabled]="!isPasswordVerified">
-        <div *ngIf="(regForm.submitted || regForm.controls['newPassword']?.touched) && regForm.controls['newPassword']?.errors" class="text-danger small">
-          <div *ngIf="regForm.controls['newPassword']?.errors?.['required']">Password is required.</div>
-          <div *ngIf="regForm.controls['newPassword']?.errors?.['minlength']">Minimum 8 characters required.</div>
-        </div>
-      </div>
+  <label>Create Password <small *ngIf="!isPasswordVerified" class="text-muted">(verify to enable)</small></label>
+  <input type="password" class="form-control" name="newPassword" [(ngModel)]="user.newPassword" minlength="8" required [disabled]="!isPasswordVerified"
+  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$">
+  <div *ngIf="(regForm.submitted || regForm.controls['newPassword']?.touched) && regForm.controls['newPassword']?.errors" class="text-danger small">
+    <div *ngIf="regForm.controls['newPassword']?.errors?.['required']">Password is required.</div>
+    <div *ngIf="regForm.controls['newPassword']?.errors?.['minlength']">Minimum 8 characters required.</div>
+    <div *ngIf="regForm.controls['newPassword']?.errors?.['pattern']">Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.</div>
+  </div>
+</div>
 
       <!-- CONFIRM PASSWORD -->
       <div class="form-group mb-3">
@@ -185,12 +180,12 @@
 <!-- SUCCESS MODAL -->
 <div class="custom-modal-backdrop" *ngIf="showUserIdModal">
   <div class="custom-modal">
-    <h4 style="color:green">Registration Success!</h4>
+    <h4 style="color:rgb(46, 150, 46)">Registration Success!</h4>
     <p><b>{{ user.userId }}</b></p>
 
     <button class="btn btn-success btn-sm" (click)="copyUserId()">Copy</button>
-    <a href="/login" class="btn btn-info btn-sm mx-2">Proceed to Login</a>&nbsp;
-    <a href="" class="btn btn-outline-warning btn-sm mx-2">Not now?</a>
+    <a href="/login" class="btn btn-primary btn-sm mx-2" style="color: white;">Proceed to Login</a>&nbsp;
+    <a href="" class="btn btn-warning btn-sm mx-2">Not now?</a>
   </div>
 </div>
 

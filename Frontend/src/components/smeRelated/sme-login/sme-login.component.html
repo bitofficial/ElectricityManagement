@@ -3,7 +3,7 @@
     <div class="brand">
       <div class="logo" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
-          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
       <span class="brand-name">PowerEase</span>
@@ -16,87 +16,67 @@
 </nav>
 
 <div class="login-wrapper d-flex justify-content-center align-items-center">
-  <div class="login-card shadow-lg p-4">
-    <div class="text-center mb-4">
-      <div class="login-logo mb-2">
+  <div class="login-card shadow-lg p-4" style="width: 560px;">
+    <div class="text-center mb-4" >
+      <div class="login-logo mb-2 text-center center-svg">
         <svg viewBox="0 0 24 24" class="bolt-icon" fill="none" stroke="currentColor">
-          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
+
       <h3 class="fw-bold text-dark mb-1" style="text-align:center;">Login to SME</h3>
     </div>
 
     <form (ngSubmit)="onLogin()" #smeLoginForm="ngForm" autocomplete="off">
 
-  <!-- SME ID -->
-  <div class="form-group mb-3">
-    <label for="smeId" class="form-label" style="width:150px">SME ID</label>
+      <!-- SME ID -->
+      <div class="form-group mb-3">
+        <label for="smeId" class="form-label" style="width:150px">SME ID</label>
 
-    <input
-      id="smeId"
-      type="text"
-      class="form-control custom-input"
-      placeholder="Enter SME ID"
-      [(ngModel)]="smeLoginData.smeId"
-      name="smeId"
-      required
-      maxlength="6"
-      pattern="^[A-Za-z0-9]{1,6}$"
-      #smeIdCtrl="ngModel"
-    />
+        <input id="smeId" type="text" class="form-control custom-input" placeholder="Enter SME ID"
+          [(ngModel)]="smeLoginData.smeId" name="smeId" required maxlength="6" pattern="^[A-Za-z0-9]{1,6}$"
+          #smeIdCtrl="ngModel" />
 
-    <!-- SME ID Errors -->
-    <div class="text-danger small mt-1" *ngIf="smeIdCtrl.invalid && smeIdCtrl.touched">
-      <div *ngIf="smeIdCtrl.errors?.['required']">SME ID is required.</div>
-      <div *ngIf="smeIdCtrl.errors?.['maxlength']">SME ID cannot exceed 6 characters.</div>
-      <div *ngIf="smeIdCtrl.errors?.['pattern']">
-        SME ID must contain only letters and numbers (A–Z, a–z, 0–9).
+        <!-- SME ID Errors -->
+        <small class="text-danger small mt-1 " *ngIf="smeIdCtrl.invalid && smeIdCtrl.touched">
+          <small *ngIf="smeIdCtrl.errors?.['required']">SME ID is required.</small>
+          <small *ngIf="smeIdCtrl.errors?.['maxlength']">SME ID cannot exceed 6 characters.</small>
+          <small *ngIf="smeIdCtrl.errors?.['pattern']">
+            SME ID must contain only letters and numbers (A–Z, a–z, 0–9).
+          </small>
+        </small>
       </div>
-    </div>
-  </div>
+      <!-- PASSWORD -->
+      <div class="form-group mb-4">
+        <label for="password" class="form-label" style="width:150px">Password</label>
 
-  <!-- PASSWORD -->
-  <div class="form-group mb-4">
-    <label for="password" class="form-label" style="width:150px">Password</label>
+        <div class="password-wrapper">
+          <input id="password" [type]="showPassword ? 'text' : 'password'" class="form-control custom-input"
+            placeholder="Enter Password" [(ngModel)]="smeLoginData.password" name="password" minlength="8"
+            maxlength="12" required #passwordCtrl="ngModel" />
 
-    <input
-      id="password"
-      type="password"
-      class="form-control custom-input"
-      placeholder="Enter Password"
-      [(ngModel)]="smeLoginData.password"
-      name="password"
-      required
-      
-      #passwordCtrl="ngModel"
-    />
+          <!-- 👁 / 🙈 Toggle -->
+          <span class="eye-icon" (click)="showPassword = !showPassword">
+            <ng-container *ngIf="!showPassword">👁</ng-container>
+            <ng-container *ngIf="showPassword">🙈</ng-container>
+          </span>
+        </div>
 
-    <!-- Password Errors -->
-    <!-- <div class="text-danger small mt-1" *ngIf="passwordCtrl.invalid && passwordCtrl.touched">
-      <div *ngIf="passwordCtrl.errors?.['required']">
-        Password is required.
+        <!-- PASSWORD ERROR MESSAGES -->
+        <!-- <small class="text-danger small mt-1" *ngIf="passwordCtrl.touched && passwordCtrl.invalid">
+          <small *ngIf="passwordCtrl.errors?.['required']">Password is required</small>
+          <small *ngIf="passwordCtrl.errors?.['minlength']">Minimum length is 8</small>
+          <small *ngIf="passwordCtrl.errors?.['maxlength']">Maximum length is 12</small>
+        </small> -->
       </div>
-      <div *ngIf="passwordCtrl.errors?.['pattern']">
-        Password must contain:
-        <ul class="m-0 ps-3">
-          <li>At least 1 uppercase letter</li>
-          <li>At least 1 number</li>
-          <li>At least 1 symbol</li>
-          <li>Minimum 6 characters</li>
-        </ul>
-      </div>
-    </div> -->
-  </div>
 
-  <!-- SUBMIT BUTTON -->
-  <button
-    type="submit"
-    class="btn btn-primary w-100 gradient-btn"
-    [disabled]="smeLoginForm.invalid"
-  >
-    <span>Login</span>
-  </button>
-</form>
+
+
+      <!-- SUBMIT BUTTON -->
+      <button type="submit" class="btn btn-primary w-100 gradient-btn" [disabled]="smeLoginForm.invalid">
+        <span>Login</span>
+      </button>
+    </form>
 
 
 
@@ -111,10 +91,10 @@
 </div>
 
 
-    <div *ngIf="errorMessage" class="alert alert-danger mt-3 text-center rounded-pill py-2">
-      {{ errorMessage }}
-    </div>
+<div *ngIf="errorMessage" class="alert alert-danger mt-3 text-center rounded-pill py-2">
+  {{ errorMessage }}
+</div>
 
-    <div *ngIf="successMessage" class="alert alert-success mt-3 text-center rounded-pill py-2">
-      {{ successMessage }}
-    </div>
+<div *ngIf="successMessage" class="alert alert-success mt-3 text-center rounded-pill py-2">
+  {{ successMessage }}
+</div>

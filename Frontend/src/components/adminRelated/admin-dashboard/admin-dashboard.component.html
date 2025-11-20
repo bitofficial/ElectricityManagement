@@ -20,9 +20,9 @@
     </div>
 
     <ul class="nav-links">
-      <li><a routerLink="" style="color:#0EA5A4;">Home</a></li>
       <li><a routerLink="/admin/add-bill">Add Bill</a></li>
       <li><a routerLink="/admin/add-customer">Add Customer</a></li>
+      <li><a routerLink="/admin/update-customer">Update Customer</a></li>
       <li><a routerLink="/admin/manage-connection">Manage Connection</a></li>
       <li><a routerLink="/admin/complaints"  style="color:red">View Complaints</a></li>
     </ul>
@@ -59,7 +59,7 @@
                 <i [class]="feature.icon + ' feature-icon'"></i>
               </div>
               <div class="flex-grow-1">
-                <h6 class="mb-1 feature-title">{{ feature.title }}</h6>
+                <h6 class="mb-1 feature-title"> {{feature.title }}</h6>
                 <p class="mb-0 small text-muted">{{ feature.description }}</p>
               </div>
               <div class="align-self-center">

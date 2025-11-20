@@ -1,6 +1,5 @@
 <nav class="wm-navbar">
   <div class="wm-container">
-      <a href="/">
     <div class="brand">
       <div class="logo" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="bolt">
@@ -14,13 +13,14 @@
       </div>
        <span class="brand-name">PowerEase SME</span>
     </div>
-    </a>
 
     <!-- <ul class="nav-links">
       <li><a routerLink="/login" style="color:#0EA5A4;">User</a></li>
       <li><a routerLink="/sme/complaints" style="color:#ff4444;">Complaints</a></li>
     </ul> -->
     <div class="action-buttons d-flex align-items-center gap-2">
+      <li style="list-style: none;"><a routerLink="" style="color:#0EA5A4;">Home</a></li>
+      <li style="list-style: none;">&nbsp;</li>
       <button class="btn btn-danger btn-sm" (click)="logout()">
         <i class="bi bi-box-arrow-right me-1"></i> Logout
       </button>

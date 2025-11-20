@@ -16,9 +16,17 @@ smeLoginData = { smeId: '', password: '' };
   successMessage = '';
   errorMessage = '';
   smeLoginStatus = false;
+  showPassword: boolean = false;
+
 
   constructor(private authService: AuthService, private router: Router) { }
-  
+
+
+togglePassword() {
+  this.showPassword = !this.showPassword;
+}
+
+
   onLogin(): void {
   console.log('Attempting login with:', this.smeLoginData);
 

@@ -12,6 +12,7 @@
     <ul class="nav-links">
       <li><a routerLink="/admin/home" style="color:#0EA5A4;">Dashboard</a></li>
       <li><a routerLink="/admin/add-bill">Add Bill</a></li>
+      <li><a routerLink="/admin/view-bill">View Bill</a></li>
       <li><a routerLink="/admin/add-customer">Add Customer</a></li>
       <li><a routerLink="/admin/manage-connection">Manage Connection</a></li>
       <li><a routerLink="/admin/complaints" style="color:red">View Complaints</a></li>
@@ -32,8 +33,8 @@
         <div class="col-md-8 mb-3">
           <label for="consumerNumber" class="form-label">Consumer Number</label>
           <div class="d-flex">
-            <input id="consumerNumber" type="text" class="form-control custom-input" name="consumerNumber" maxlength="13"
-              minlength="13" pattern="^[1-9][0-9]{12}$" [(ngModel)]="searchId"
+            <input id="consumerNumber" type="text" class="form-control custom-input" name="consumerNumber"
+              maxlength="13" minlength="13" pattern="^[1-9][0-9]{12}$" [(ngModel)]="searchId"
               placeholder="Enter 13-digit Consumer Number" required #consumerRef="ngModel" />
           </div>
           <small style="color:red" *ngIf="consumerRef.value && consumerRef.invalid && consumerRef.touched">
@@ -41,11 +42,7 @@
         </div>
 
         <div class="col-md-4 mb-3 text-center">
-          <button
-            type="submit"
-            class="btn btn-primary w-50"
-            [disabled]="!searchForm.form.valid"
-          >
+          <button type="submit" class="btn btn-primary w-50" [disabled]="!searchForm.form.valid">
             Search
           </button>
         </div>
@@ -57,34 +54,21 @@
   <div *ngIf="customer" class="card shadow p-4">
     <h5 class="mb-3">Customer Information</h5>
 
-    <form (ngSubmit)="updateCustomer()" #updateForm="ngForm" >
+    <form (ngSubmit)="updateCustomer()" #updateForm="ngForm">
 
       <!-- Consumer Number + User ID (disabled) -->
       <div class="row">
         <div class="col-md-6 mb-3">
           <label for="consumerNumber" class="form-label">Consumer Number</label>
-          <input
-            type="text"
-            id="consumerNumber"
-            class="form-control"
-            [(ngModel)]="customer.consumerNumber"
-            name="consumerNumber"
-            disabled
-          />
-          <small class="text-muted">Cannot be edited</small>
+          <input type="text" id="consumerNumber" class="form-control" [(ngModel)]="customer.consumerNumber"
+            name="consumerNumber" disabled />
+          <small class="text-danger">Cannot be edited</small>
         </div>
 
         <div class="col-md-6 mb-3">
           <label for="userId" class="form-label">User ID</label>
-          <input
-            type="text"
-            id="userId"
-            class="form-control"
-            [(ngModel)]="customer.userId"
-            name="userId"
-            disabled
-          />
-          <small class="text-muted">Cannot be edited</small>
+          <input type="text" id="userId" class="form-control" [(ngModel)]="customer.userId" name="userId" disabled />
+          <small class="text-danger">Cannot be edited</small>
         </div>
       </div>
 
@@ -92,57 +76,57 @@
       <div class="row">
         <div class="col-md-6 mb-3">
           <label for="fullName" class="form-label">Full Name</label>
-          <input
-            type="text"
-            id="fullName"
-            class="form-control"
-            [(ngModel)]="customer.fullName"
-            name="fullName"
-            required
-            [disabled]="!loaded"
-          />
+          <input id="fullName" type="text" class="form-control custom-input" name="fullName"
+            pattern="^[A-Za-z][A-Za-z ]*$" [(ngModel)]="customer.fullName" placeholder="Enter full name" required
+            #nameRef="ngModel" />
+          <small class="text-danger" *ngIf="nameRef.value &&  nameRef.touched && nameRef.invalid">
+            <span *ngIf="nameRef.errors?.['required']">Full name is required.</span>
+            <span *ngIf="nameRef.errors?.['pattern']">Name must start with a letter and contain only letters and
+              spaces.</span>
+          </small>
         </div>
 
         <div class="col-md-6 mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input
-            type="email"
-            id="email"
-            class="form-control"
-            [(ngModel)]="customer.email"
-            name="email"
-            required
-            [disabled]="!loaded"
-          />
+          <label class="form-label">Email</label>
+          <input id="email" type="email" class="form-control custom-input" name="email" [(ngModel)]="customer.email"
+            placeholder="Enter email" required #emailRef="ngModel"
+            pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com|mail)$" />
+
+          <small class="text-danger" *ngIf="emailRef.value &&  emailRef.touched && emailRef.invalid">
+            <span *ngIf="emailRef.errors?.['required']">Email is required.</span>
+            <span *ngIf="emailRef.errors?.['pattern']">Email must contain '&#64;' and end with .com or .mail</span>
+            <span *ngIf="emailRef.errors?.['email']">Enter a valid email address.</span>
+          </small>
+
         </div>
       </div>
 
       <!-- Mobile + Pincode + Status -->
       <div class="row">
-        <div class="col-md-4 mb-3">
-          <label for="mobile" class="form-label">Mobile</label>
-          <input
-            type="text"
-            id="mobile"
-            class="form-control"
-            [(ngModel)]="customer.mobile"
-            name="mobile"
-            maxlength="10"
-            required
-            [disabled]="!loaded"
-          />
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Mobile </label>
+          <input id="mobile" type="text" class="form-control custom-input" name="mobile" maxlength="10" minlength="10"
+            pattern="^(?!([0-9])\1{9})[6-9][0-9]{9}$" [(ngModel)]="customer.mobile" placeholder="Enter phone number"
+            required #mobileRef="ngModel" />
+          <small class="text-danger" *ngIf="mobileRef.value &&  mobileRef.touched && mobileRef.invalid">
+            <span *ngIf="mobileRef.errors?.['required']">Phone number is required.</span>
+            <span *ngIf="mobileRef.errors?.['pattern']">Enter a valid 10-digit Indian mobile number.</span>
+            <div *ngIf="mobileRef.errors?.['pattern']">Cannot start with 0-5.</div>
+            <div *ngIf="mobileRef.errors?.['pattern']">Cannot be a repeated sequence.</div>
+            <div *ngIf="mobileRef.errors?.['minlength'] || mobileRef.errors?.['maxlength']">Phone number must be 10
+              digits.</div>
+          </small>
         </div>
 
-        <div class="col-md-4 mb-3">
+        <div class="col-md-6 mb-3">
           <label for="pincode" class="form-label">Pincode</label>
-          <input
-            type="text"
-            id="pincode"
-            class="form-control"
-            [(ngModel)]="customer.pincode"
-            name="pincode"
-            [disabled]="!loaded"
-          />
+          <input id="pincode" type="text" class="form-control custom-input" name="pincode" maxlength="6" minlength="6"
+            pattern="^[1-9][0-9]{5}$" [(ngModel)]="customer.pincode" (blur)="fetchLocationByPincode()"
+            placeholder="Enter pincode" required #pincodeRef="ngModel" />
+          <small class="text-danger" *ngIf="pincodeRef.value && pincodeRef.touched && pincodeRef.invalid">
+            <span *ngIf="pincodeRef.errors?.['required']">Pincode is required.</span>
+            <span *ngIf="pincodeRef.errors?.['pattern']">Pincode must be 6 digits and cannot start with 0.</span>
+          </small>
         </div>
       </div>
 
@@ -150,39 +134,27 @@
       <div class="row">
         <div class="col-md-6 mb-3">
           <label for="address" class="form-label">Address</label>
-          <input
-            type="text"
-            id="address"
-            class="form-control"
-            [(ngModel)]="customer.address"
-            name="address"
-            required
-            [disabled]="!loaded"
-          />
+          <input type="text" id="address" class="form-control" [(ngModel)]="customer.address" name="address" required
+            [disabled]="!loaded" />
         </div>
 
         <div class="col-md-3 mb-3">
           <label for="city" class="form-label">City</label>
-          <input
-            type="text"
-            id="city"
-            class="form-control"
-            [(ngModel)]="customer.city"
-            name="city"
-            [disabled]="!loaded"
-          />
+          <input id="city" type="text" class="form-control custom-input" name="city" [(ngModel)]="customer.city"
+            [disabled]="isCityLocked" placeholder="City will auto-fill" required #cityRef="ngModel" />
+          <small class="text-danger" *ngIf="cityRef.value &&  cityRef.touched && cityRef.invalid">
+            <span *ngIf="cityRef.errors?.['required']">City is required.</span>
+          </small>
         </div>
 
         <div class="col-md-3 mb-3">
           <label for="state" class="form-label">State</label>
-          <input
-            type="text"
-            id="state"
-            class="form-control"
-            [(ngModel)]="customer.state"
-            name="state"
-            [disabled]="!loaded"
-          />
+          <label class="form-label">State / UT</label>
+          <input id="state" type="text" class="form-control custom-input" name="state" [(ngModel)]="customer.state"
+            placeholder="State / UT will auto-fill" required #stateRef="ngModel" [disabled]="isStateLocked" />
+          <small class="text-danger" *ngIf="stateRef.value && stateRef.touched && stateRef.invalid">
+            <span *ngIf="stateRef.errors?.['required']">State is required.</span>
+          </small>
         </div>
       </div>
 
@@ -190,13 +162,8 @@
       <div class="row">
         <div class="col-md-6 mb-3">
           <label for="customerType" class="form-label">Customer Type</label>
-          <select
-            id="customerType"
-            class="form-control"
-            [(ngModel)]="customer.customerType"
-            name="customerType"
-            [disabled]="!loaded"
-          >
+          <select id="customerType" class="form-control" [(ngModel)]="customer.customerType" name="customerType"
+            [disabled]="!loaded">
             <option value="Residential">Residential</option>
             <option value="Commercial">Commercial</option>
           </select>
@@ -204,13 +171,8 @@
 
         <div class="col-md-6 mb-3">
           <label for="electricalSection" class="form-label">Electrical Section</label>
-          <select
-            id="electricalSection"
-            class="form-control"
-            [(ngModel)]="customer.electricalSection"
-            name="electricalSection"
-            [disabled]="!loaded"
-          >
+          <select id="electricalSection" class="form-control" [(ngModel)]="customer.electricalSection"
+            name="electricalSection" [disabled]="!loaded">
             <option value="Ward A">WARD A</option>
             <option value="Ward B">WARD B</option>
             <option value="Ward C">WARD C</option>
@@ -222,39 +184,48 @@
       <div class="row mt-2">
         <div class="col-md-6 mb-3">
           <label for="newPassword" class="form-label">New Password (optional)</label>
-          <input
-            type="password"
-            id="newPassword"
-            class="form-control"
-            [(ngModel)]="newPassword"
-            name="newPassword"
-            minlength="6"
-            [disabled]="!loaded"
-          />
-          <small class="text-muted">Leave blank if not changing password</small>
+          <input class="text-muted" type="password" id="newPassword" class="form-control" [(ngModel)]="newPassword"
+            name="newPassword" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+            minlength="8" maxlength="12" [disabled]="!loaded" placeholder="New Password" />
+          <div
+            *ngIf="(updateForm.submitted || updateForm.controls['newPassword']?.touched) && updateForm.controls['newPassword']?.errors"
+            class="text-danger small">
+            <div *ngIf="updateForm.controls['newPassword']?.errors?.['required']">Password is required.</div>
+            <div *ngIf="updateForm.controls['newPassword']?.errors?.['minlength']">Minimum 8 characters required.</div>
+            <div *ngIf="updateForm.controls['newPassword']?.errors?.['pattern']">Password must contain at least one
+              uppercase letter, one lowercase letter, one number, and one special character.</div>
+          </div>
+          <small class="text-warning">Leave blank if not changing password</small>
         </div>
 
         <div class="col-md-6 mb-3">
           <label for="confirmPassword" class="form-label">Confirm Password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            class="form-control"
-            [(ngModel)]="confirmPassword"
-            name="confirmPassword"
-            minlength="6"
-            [disabled]="!loaded"
-          />
+
+          <input type="password" id="confirmPassword" class="form-control" [(ngModel)]="confirmPassword"
+            name="confirmPassword" minlength="8" maxlength="12" [disabled]="!loaded" placeholder="Confirm Password"
+            #confirmRef="ngModel" />
+
+          <div class="text-danger small" *ngIf="confirmRef.touched">
+
+            <!-- Required -->
+            <div *ngIf="confirmRef.errors?.['required']">
+              Confirm password is required.
+            </div>
+
+            <!-- Match check -->
+            <div *ngIf="confirmPassword && newPassword && !passwordsMatch()">
+              Passwords do not match.
+            </div>
+
+          </div>
         </div>
+
+
       </div>
 
       <!-- Update Button -->
       <div class="text-center mt-3">
-        <button
-          type="submit"
-          class="btn btn-success px-4"
-          [disabled]="!loaded || !updateForm.form.valid"
-        >
+        <button type="submit" class="btn btn-success px-4" [disabled]="!loaded || !updateForm.form.valid">
           Update Customer
         </button>
       </div>
@@ -263,16 +234,10 @@
   </div>
 
   <!-- Status Messages -->
-<div
-  *ngIf="successMessage"
-  class="alert alert-success top-alert text-center"
->
-  ✅ {{ successMessage }}
-</div>
+  <div *ngIf="successMessage" class="alert alert-success top-alert text-center">
+    ✅ {{ successMessage }}
+  </div>
 
-<div
-  *ngIf="errorMessage"
-  class="alert alert-danger top-alert text-center"
->
-  ❌ {{ errorMessage }}
-</div>
+  <div *ngIf="errorMessage" class="alert alert-danger top-alert text-center">
+    ❌ {{ errorMessage }}
+  </div>
