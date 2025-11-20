@@ -9,7 +9,8 @@ export interface BackendBill {
   pricePerUnit: number;
   amount: number;
   dueDate: string;        // ISO or yyyy-mm-dd
-  status: string;         // e.g. "Paid"
+  status: string;  
+  generated_at:string       // e.g. "Paid"
 }
 
 @Injectable({

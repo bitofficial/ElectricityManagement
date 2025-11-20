@@ -88,10 +88,10 @@ export class BillHistoryComponent implements OnInit {
     if (key === 'partial' || key === 'partially paid' || key === 'partialpaid') return 'PARTIAL';
     return 'UNPAID';
   }
-  private parseBillingMonth(billingMonth: string | undefined): { billDate: string; billingPeriod: string } {
+  private parseBillingMonth(billingMonth: string | undefined): {billingPeriod: string } {
     if (!billingMonth) {
       const d = new Date();
-      return { billDate: d.toISOString().slice(0,10), billingPeriod: '' };
+      return {  billingPeriod: '' };
     }
     // Accept formats like "OCT-2025", "OCT-2025", "Oct-2025", "2025-10"
     const s = billingMonth.trim();
@@ -106,7 +106,7 @@ export class BillHistoryComponent implements OnInit {
         const date = new Date(year, monthIndex, 1);
         const billDate = date.toISOString().slice(0,10);
         const billingPeriod = date.toLocaleString(undefined, { month: 'short', year: 'numeric' });
-        return { billDate, billingPeriod };
+        return { billingPeriod };
       }
     }
     // try "YYYY-MM" or "YYYY-MM-DD"
@@ -114,11 +114,11 @@ export class BillHistoryComponent implements OnInit {
     if (!isNaN(ymd.getTime())) {
       const billDate = new Date(ymd.getFullYear(), ymd.getMonth(), 1).toISOString().slice(0,10);
       const billingPeriod = ymd.toLocaleString(undefined, { month: 'short', year: 'numeric' });
-      return { billDate, billingPeriod };
+      return {  billingPeriod };
     }
 
     // fallback
-    return { billDate: new Date().toISOString().slice(0,10), billingPeriod: s };
+    return { billingPeriod: s };
   }
 
   loadBills(): void {
@@ -135,11 +135,12 @@ export class BillHistoryComponent implements OnInit {
           // console.log(backend)
           // Map backend array into our BillHistory[] shape
           const mapped: BillHistory[] = backend.map(b => {
-            const { billDate, billingPeriod } = this.parseBillingMonth(b.billingMonth);
+            const { billingPeriod } = this.parseBillingMonth(b.billingMonth);
             // Use backend dueDate as ISO string (if it's already yyyy-mm-dd it's fine)
             const dueDateIso = b.dueDate ? new Date(b.dueDate).toISOString().slice(0,10) : '';
             // Construct a pdfUrl if your API provides one; otherwise leave undefined or point to a route
             const pdfUrl = `/api/dashboard/bill/${b.billId}/pdf`; // adjust if your backend has endpoint
+            const billDate = b.generated_at ? new Date(b.generated_at).toISOString().slice(0,10) : '';
             return {
               id: String(b.billId),
               consumerNumber: `${this.customerId.toString().padStart(4, '0')}`, // or get from backend if available
