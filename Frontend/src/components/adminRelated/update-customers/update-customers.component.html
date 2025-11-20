@@ -62,13 +62,11 @@
           <label for="consumerNumber" class="form-label">Consumer Number</label>
           <input type="text" id="consumerNumber" class="form-control" [(ngModel)]="customer.consumerNumber"
             name="consumerNumber" disabled />
-          <small class="text-danger">Cannot be edited</small>
         </div>
 
         <div class="col-md-6 mb-3">
           <label for="userId" class="form-label">User ID</label>
           <input type="text" id="userId" class="form-control" [(ngModel)]="customer.userId" name="userId" disabled />
-          <small class="text-danger">Cannot be edited</small>
         </div>
       </div>
 
@@ -225,7 +223,7 @@
 
       <!-- Update Button -->
       <div class="text-center mt-3">
-        <button type="submit" class="btn btn-success px-4" [disabled]="!loaded || !updateForm.form.valid">
+        <button type="submit" class="btn btn-success px-4" >
           Update Customer
         </button>
       </div>
