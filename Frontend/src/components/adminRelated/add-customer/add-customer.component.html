@@ -138,11 +138,23 @@
 
         <div class="col-md-6 mb-3">
           <label class="form-label">State / UT</label>
-          <input id="state" type="text" class="form-control custom-input" name="state" [(ngModel)]="user.state"
-            placeholder="State / UT will auto-fill" required #stateRef="ngModel" [disabled] = "isStateLocked" />
-          <small class="text-danger" *ngIf="stateRef.value && stateRef.touched && stateRef.invalid">
-            <span *ngIf="stateRef.errors?.['required']">State is required.</span>
-          </small>
+         <input
+  id="state"
+  type="text"
+  class="form-control custom-input"
+  name="state"
+  [(ngModel)]="user.state"
+  placeholder="State / UT will auto-fill"
+  required
+  #stateRef="ngModel"
+  [disabled]="isStateLocked"
+  pattern="^[A-Za-z][A-Za-z ]*$"
+/>
+
+<small class="text-danger" *ngIf="stateRef.touched && stateRef.invalid">
+  <span *ngIf="stateRef.errors?.['required']">State is required.</span>
+  <span *ngIf="stateRef.errors?.['pattern']">Only alphabets allowed and cannot start with a space.</span>
+</small>
         </div>
       </div>
 
@@ -150,14 +162,29 @@
       <div class="row">
         <div class="col-md-6 mb-3">
           <label class="form-label">City</label>
-          <input id="city" type="text" class="form-control custom-input" name="city" [(ngModel)]="user.city"
-      [disabled]="isCityLocked" placeholder="City will auto-fill" required #cityRef="ngModel"  />
-          <small class="text-danger" *ngIf="cityRef.value &&  cityRef.touched && cityRef.invalid">
-            <span *ngIf="cityRef.errors?.['required']">City is required.</span>
-          </small>
+          <input
+  id="city"
+  type="text"
+  class="form-control custom-input"
+  name="city"
+  [(ngModel)]="user.city"
+  [disabled]="isCityLocked"
+  placeholder="City will auto-fill"
+  required
+  #cityRef="ngModel"
+  pattern="^[A-Za-z][A-Za-z ]*$"
+/>
+
+<small class="text-danger" *ngIf="cityRef.touched && cityRef.invalid">
+  <span *ngIf="cityRef.errors?.['required']">City is required.</span>
+  <span *ngIf="cityRef.errors?.['pattern']">
+    Only alphabets allowed and cannot start with a space.
+  </span>
+</small>
+
         </div>
 <div class="col-md-6 mb-3">
-  <label class="form-label">Create Password</label>
+  <label class="form-label">User Password</label>
   <div class="password-wrapper" style="position:relative;">
     <p style="font-size: 12px;color: #0ea55f;">
       First four letters of name followed by first four digits of phone number
@@ -171,10 +198,9 @@
       maxlength="8"
       [ngModel]="user.password"
       (ngModelChange)="user.password = $event"
-      placeholder="aaaaxxxx"
+      placeholder="Click to auto generate"
       required
       #passwordRef="ngModel"
-      [disabled]="isPasswordLocked"
       (focus)="autoGeneratePassword()"
     />
 

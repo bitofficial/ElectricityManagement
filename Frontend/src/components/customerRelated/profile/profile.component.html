@@ -45,16 +45,16 @@
     <section class="card-section">
       <h3>Address</h3>
       <label>Address</label>
-      <textarea [(ngModel)]="profile.address" name="address" rows="3" required></textarea>
+      <textarea [(ngModel)]="profile.address" name="address" rows="3" disabled required></textarea>
       
       <label>City</label>
-      <input type="text" [(ngModel)]="profile.city" name="city" required>
+      <input type="text" [(ngModel)]="profile.city" name="city" disabled required>
 
       <label>State</label>
-      <input type="text" [(ngModel)]="profile.state" name="state" required>
+      <input type="text" [(ngModel)]="profile.state" name="state" disabled required>
       
       <label>Pincode</label>
-      <input type="text" [(ngModel)]="profile.pincode" name="pincode" required>
+      <input type="text" [(ngModel)]="profile.pincode" name="pincode" disabled required>
     </section>
     
     <section class="card-section">
@@ -62,10 +62,10 @@
       <label>Consumer Number</label>
       <input type="text" [(ngModel)]="profile.consumerNumber" name="consumerNumber" disabled>
       <label>Customer Type</label>
-      <input type="text" [(ngModel)]="profile.customerType" name="customerType" required>
+      <input type="text" [(ngModel)]="profile.customerType" name="customerType" required disabled>
       
       <label>Electrical Section</label>
-      <input type="text" [(ngModel)]="profile.electricalSection" name="electricalSection" required>
+      <input type="text" [(ngModel)]="profile.electricalSection" name="electricalSection" disabled required>
       
       <label>User ID</label>
       <input type="text" [(ngModel)]="profile.userId" name="userId" disabled>

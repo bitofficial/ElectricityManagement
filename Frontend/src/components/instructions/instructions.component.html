@@ -1,5 +1,6 @@
 <nav class="wm-navbar">
   <div class="wm-container">
+    <a href="/" style="text-decoration: none;">
     <div class="brand">
       <div class="logo" aria-hidden="true">
         <!-- simple bolt icon -->
@@ -9,6 +10,7 @@
       </div>
       <span class="brand-name">PowerEase</span>
     </div>
+    </a>
 
     <!-- Show Login/Register/Admin links only if NOT logged in -->
     <ul *ngIf="!loginStatus" class="nav-links">
@@ -72,6 +74,17 @@
     <li>You can revisit the Profile page anytime to verify your updated details.</li>
   </ol>
 </section>
+
+<section class="instruction-section">
+  <h2 class="title">4. Forgot Your Password?</h2>
+  <ol class="steps">
+    <li>If you forget your password, send an email to <strong><a href="mailto:support@powerease.com">support&#64;powerease.com</a></strong>.</li>
+    <li>Make sure to mail us using your <strong>registered email address</strong>.</li>
+    <li>The admin will verify your details and reset your password.</li>
+    <li>You will receive the updated login details on your registered email.</li>
+  </ol>
+</section>
+
 
 
 </div>

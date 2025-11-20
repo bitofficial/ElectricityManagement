@@ -36,7 +36,7 @@ export class PayBillComponent implements OnInit, OnDestroy {
   paidBillsSnapshot: SelectedBill[] | null = null;
   paidTotal = 0;
 
-  consumerId = localStorage.getItem('consumerId') || 'CUST1001';
+  consumerId = localStorage.getItem('userId') || 'CUSTOMER';
 
   payment = {
     method: '' as '' | 'UPI' | 'Card' | 'NetBanking',
@@ -349,7 +349,6 @@ this.subs.push(markSub);
     // const invoiceNumber = 'INV' + Math.floor(100000 + Math.random() * 900000);
     // const paymentId = 'PAY' + Math.floor(100000 + Math.random() * 900000);
     // const receiptNumber = 'RCPT' + Math.floor(100000 + Math.random() * 900000);
-    const transactionDate = new Date();
 
     // Header
     doc.setFontSize(18);
@@ -372,7 +371,7 @@ this.subs.push(markSub);
     doc.text(`Consumer Number: ${this.consumerNumber || this.consumerId}`, left, y);
     doc.text(`Payment Method: ${this.payment.method}`, 350, y);
     y += 14;
-    doc.text(`Transaction Date: ${this.formatDateString(transactionDate.toLocaleString())}`, left, y);
+    doc.text(`Transaction Date: ${this.transactionDate.toLocaleString()}`, left, y);
     y += 20;
 
     // Bills Table
@@ -404,7 +403,7 @@ this.subs.push(markSub);
     doc.text('Thank you for your payment.', left, finalY + 70);
     doc.text('This is a system-generated invoice.', left, finalY + 85);
 
-    const fileName = `Invoice_${this.consumerId}_${this.invoiceNumber}.pdf`;
+    const fileName = `Invoice_${this.consumerNumber}_${this.invoiceNumber}.pdf`;
     doc.save(fileName);
   }
 }

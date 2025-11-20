@@ -83,11 +83,16 @@ autoGeneratePassword(): void {
           if (this.user.city && !this.cities.includes(this.user.city)) {
             this.cities.push(this.user.city);
           }
+          this.isStateLocked = true;
+          this.isCityLocked = true;
+        }else{
+          this.user.state = '';
+          this.user.city = '';
+          this.isStateLocked = false;
+          this.isCityLocked = false;
         }
-        this.isStateLocked = true;
-        this.isCityLocked = true;
       },
-      error: (err) => console.error('Error fetching location', err)
+      error: (err) => {console.error('Error fetching location', err);this.isStateLocked = false; this.isCityLocked = false;}
     });
   }
 

@@ -116,7 +116,12 @@ export class AdminComplaintsComponent implements OnInit {
       notes: this.selectedNotes
     }).subscribe({
       next: () => {
+        this.modalSuccessMessage = 'Complaint status updated successfully!';
         setTimeout(() => this.closeStatusModal(), 2000);
+      },
+      error: err => {
+        console.error('Status update failed:', err);
+        this.modalSuccessMessage = 'Failed to update!';
       }
     });
   }
@@ -129,7 +134,6 @@ export class AdminComplaintsComponent implements OnInit {
     if(this.selectedSME){
       this.complaintService.updateComplaintSME(complaintId, this.selectedSME).subscribe({
       next: () => {
-        this.modalSuccessMessage = 'SME assigned successfully!';
 
         // Update UI locally
         this.activeComplaint.assignedSme = this.selectedSME;
